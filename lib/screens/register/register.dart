@@ -14,10 +14,25 @@ class _RegisterPageState extends State<RegisterPage> {
       new GlobalKey<ScaffoldState>();
 
   bool _validateRegister() {
-    if (RegExp(
-            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
-        .hasMatch(nameController.text)) {
-      print('Email invalid');
+    // For validate the data it should vaildate from firebase
+    // Simple check for not set any empty to backend
+    if (_eula == false) {
+      print('eula false');
+      _scaffoldstate.currentState.showSnackBar(new SnackBar(
+          content: new Text('You not agree Terms and Conditions'),
+          duration: new Duration(seconds: 10),
+          backgroundColor: Colors.red));
+      return false;
+    }
+    if (nameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        passwordconfirmController.text.isEmpty) {
+      print('empty controller');
+      _scaffoldstate.currentState.showSnackBar(new SnackBar(
+          content:
+              new Text('Please complete the require infomation to register'),
+          duration: new Duration(seconds: 10),
+          backgroundColor: Colors.red));
       return false;
     }
     return true;
@@ -89,6 +104,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       Checkbox(
                         value: _eula,
                         onChanged: (bool value) {
+                          // this will impact the perfomance
+                          // because is re-rendering the whole page
+                          // TO-FIX : use Provider
                           setState(() {
                             _eula = value;
                           });
@@ -111,13 +129,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         print(passwordController.text);
                         print(passwordconfirmController.text);
                         print(_eula.toString());
-                        if (_eula == false) {
-                          _scaffoldstate.currentState.showSnackBar(new SnackBar(
-                              content: new Text(
-                                  'You not agree Terms and Conditions'),
-                              duration: new Duration(seconds: 10),
-                              backgroundColor: Colors.red));
-                        } else {}
+                        if (_validateRegister()) {}
                       },
                     )),
               ],

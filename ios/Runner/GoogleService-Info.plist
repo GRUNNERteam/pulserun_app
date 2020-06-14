@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1025559605388-7afg4du20otphoeu78b3s0mago23vl7l.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1025559605388-7afg4du20otphoeu78b3s0mago23vl7l</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1025559605388-hvsjg20ad3alrpi4eh5g2u11bksffk4u.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCbzznMqNb0DqeV5wujoIzc8B8xkyzaZIo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1025559605388</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>edu.isne.project.pulserunApp</string>
+	<key>PROJECT_ID</key>
+	<string>workout-271417</string>
+	<key>STORAGE_BUCKET</key>
+	<string>workout-271417.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1025559605388:ios:e93f3ea60d9e1358404ba9</string>
+	<key>DATABASE_URL</key>
+	<string>https://workout-271417.firebaseio.com</string>
+</dict>
+</plist>

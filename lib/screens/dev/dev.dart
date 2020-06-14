@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pulserun_app/screens/login/login.dart';
+import 'package:pulserun_app/screens/register/register.dart';
 import '../home/home.dart';
 
 class DevPage extends StatelessWidget {
@@ -32,6 +33,15 @@ class DevPage extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => LoginPage()));
                   },
                 ),
+                RaisedButton(
+                  child: Text('RegisterPage'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterPage()));
+                  },
+                )
               ],
             ))));
   }

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:pulserun_app/screens/dev/dev.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   // Set Device to portraitUp
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 

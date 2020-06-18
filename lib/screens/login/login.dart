@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// import 'package:pulserun_app/screens/GoogleLogin/googlelogin.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pulserun_app/screens/register/register.dart';
 class LoginPage extends StatefulWidget {
@@ -76,6 +78,15 @@ class _LoginPageState extends State<LoginPage> {
                         print(passwordController.text);
                       },
                     )),
+                    Container(
+                    height: 60,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    child: RaisedButton(
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      child: Text('Google Account'),
+                      onPressed: () =>  loginWithGoogle(context)
+                    )),
                 Container(
                     child: Row(
                   children: <Widget>[
@@ -98,3 +109,17 @@ class _LoginPageState extends State<LoginPage> {
             )));
   }
 }
+
+ Future loginWithGoogle(BuildContext context) async {
+    GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: [
+        'https://www.googleapis.com/auth/fitness.body.read',
+      ],
+    );
+    GoogleSignInAccount user = await _googleSignIn.signIn();
+    GoogleSignInAuthentication userAuth = await user.authentication;
+ 
+  //   await _auth2.signInWithCredential(GoogleAuthProvider.getCredential(
+  //       idToken: userAuth.idToken, accessToken: userAuth.accessToken));
+  //   checkAuth(context); // after success route to home.
+   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 // import 'package:pulserun_app/screens/GoogleLogin/googlelogin.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pulserun_app/screens/home/home.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pulserun_app/screens/register/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -85,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                       textColor: Colors.white,
                       color: Colors.blue,
                       child: Text('Google Account'),
-                      onPressed: () =>  loginWithGoogle(context)
+                      onPressed: () =>  signinWithGoogle(context)
                     )),
                 Container(
                     child: Row(
@@ -110,16 +112,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
- Future loginWithGoogle(BuildContext context) async {
-    GoogleSignIn _googleSignIn = GoogleSignIn(
-      scopes: [
+ Future signinWithGoogle(BuildContext context) async {
+   final GoogleSignIn googleSignIn = GoogleSignIn( scopes: [
         'https://www.googleapis.com/auth/fitness.body.read',
-      ],
-    );
-    GoogleSignInAccount user = await _googleSignIn.signIn();
-    GoogleSignInAuthentication userAuth = await user.authentication;
- 
-  //   await _auth2.signInWithCredential(GoogleAuthProvider.getCredential(
-  //       idToken: userAuth.idToken, accessToken: userAuth.accessToken));
-  //   checkAuth(context); // after success route to home.
+      ],);
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+    AuthResult authResult = await _auth.signInWithCredential(credential);
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    Navigator.push(context,MaterialPageRoute(builder: (context) => HomePage(name: user.displayName)));
    }

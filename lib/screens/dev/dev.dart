@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pulserun_app/screens/home/home.dart';
 import 'package:pulserun_app/screens/login/login.dart';
 import 'package:pulserun_app/screens/register/register.dart';
-import '../home/home.dart';
 
 class DevPage extends StatelessWidget {
   @override

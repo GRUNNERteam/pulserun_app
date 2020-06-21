@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pulserun_app/screens/home/home.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -148,7 +151,29 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                       },
                     )),
+                    // Container(
+                    // height: 60,
+                    // padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    // child: RaisedButton(
+                    //   textColor: Colors.white,
+                    //   color: Colors.blue,
+                    //   child: Text('Google Account'),
+                    //   onPressed: () =>  signinWithGoogle(context)
+                    // )),
               ],
             )));
   }
 }
+
+// Future signinWithGoogle(BuildContext context) async {
+//    final GoogleSignIn googleSignIn = GoogleSignIn( scopes: [
+//         'https://www.googleapis.com/auth/fitness.body.read',
+//       ],);
+//     final FirebaseAuth _auth = FirebaseAuth.instance;
+//     final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+//     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+//     final AuthCredential credential = GoogleAuthProvider.getCredential(idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+//     AuthResult authResult = await _auth.signInWithCredential(credential);
+//     final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+//     Navigator.push(context,MaterialPageRoute(builder: (context) => HomePage(name: user.displayName)));
+//    }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1025559605388",
+    "firebase_url": "https://workout-271417.firebaseio.com",
+    "project_id": "workout-271417",
+    "storage_bucket": "workout-271417.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025559605388:android:08dcdd6cceca8500404ba9",
+        "android_client_info": {
+          "package_name": "com.example.pulserun_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1025559605388-url42lrketprjhjk8to801500vjia481.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pulserun_app",
+            "certificate_hash": "d68b6b9c446c76ca475197b55750cf35fe6d1772"
+          }
+        },
+        {
+          "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdtMyqJWJknhpRq62L1odJQzspgWj3sik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1025559605388-7afg4du20otphoeu78b3s0mago23vl7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "edu.isne.project.pulserunApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

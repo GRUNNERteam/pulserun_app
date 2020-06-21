@@ -22,7 +22,7 @@ class DevPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) => HomePage(
-                                  title: 'HomePage',
+                                  name: 'HomePage',
                                 )));
                   },
                 ),

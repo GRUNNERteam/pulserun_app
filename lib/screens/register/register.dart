@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pulserun_app/services/auth/auth.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _eula = false;
   final GlobalKey<ScaffoldState> _scaffoldstate =
       new GlobalKey<ScaffoldState>();
+  final AuthService _auth = AuthService();
 
   bool _validateRegister() {
     // For validate the data it should vaildate from firebase
@@ -20,7 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
       print('eula false');
       _scaffoldstate.currentState.showSnackBar(new SnackBar(
           content: new Text('You not agree Terms and Conditions'),
-          duration: new Duration(seconds: 10),
+          duration: new Duration(seconds: 5),
           backgroundColor: Colors.red));
       return false;
     }
@@ -31,9 +33,17 @@ class _RegisterPageState extends State<RegisterPage> {
       _scaffoldstate.currentState.showSnackBar(new SnackBar(
           content:
               new Text('Please complete the require infomation to register'),
-          duration: new Duration(seconds: 10),
+          duration: new Duration(seconds: 5),
           backgroundColor: Colors.red));
       return false;
+    }
+
+    if (passwordController.text != passwordconfirmController.text) {
+      print('password not match');
+      _scaffoldstate.currentState.showSnackBar(new SnackBar(
+          content: new Text('Please re-type password again.'),
+          duration: new Duration(seconds: 5),
+          backgroundColor: Colors.red));
     }
     return true;
   }
@@ -124,12 +134,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       textColor: Colors.white,
                       color: Colors.blue,
                       child: Text('Register'),
-                      onPressed: () {
-                        print(nameController.text);
-                        print(passwordController.text);
-                        print(passwordconfirmController.text);
-                        print(_eula.toString());
-                        if (_validateRegister()) {}
+                      onPressed: () async {
+                        if (_validateRegister()) {
+                          dynamic result =
+                              await _auth.registerWithEmailAndPassword(
+                                  nameController.text, passwordController.text);
+                          if(result != null){
+                            print(result);
+                            Navigator.pop(context);
+                          }else{
+                            print(result);
+                          }
+                        }
                       },
                     )),
               ],

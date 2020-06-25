@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pulserun_app/screens/dev/dev.dart';
+import 'package:pulserun_app/screens/healt/health.dart';
 
 class HomePage extends StatefulWidget {
   
@@ -31,6 +32,15 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue,
                       child: Text('Sign Out'),
                       onPressed: () =>  signout(context)
+                    )),
+                       Container(
+                    height: 60,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    child: RaisedButton(
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      child: Text('Heart rate'),
+                      onPressed: () =>  Navigator.push(context,MaterialPageRoute(builder: (context) => myH()))
                     )),
         ]
       )),

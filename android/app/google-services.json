@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1025559605388:android:08dcdd6cceca8500404ba9",
+        "mobilesdk_app_id": "1:1025559605388:android:f5fa551c753b93a2404ba9",
         "android_client_info": {
-          "package_name": "com.example.pulserun_app"
+          "package_name": "edu.isne.project.pulserunApp"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "1025559605388-url42lrketprjhjk8to801500vjia481.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.pulserun_app",
-            "certificate_hash": "d68b6b9c446c76ca475197b55750cf35fe6d1772"
-          }
-        },
         {
           "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
           "client_type": 3

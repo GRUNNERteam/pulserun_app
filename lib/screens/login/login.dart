@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-// import 'package:pulserun_app/screens/GoogleLogin/googlelogin.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pulserun_app/screens/home/home.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pulserun_app/screens/register/register.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pulserun_app/services/auth/auth.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController nameController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     print('Loading Login Page');
@@ -42,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   padding: EdgeInsets.all(10),
                   child: TextField(
-                    controller: nameController,
+                    controller: usernameController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'User Name',
@@ -75,20 +73,17 @@ class _LoginPageState extends State<LoginPage> {
                       textColor: Colors.white,
                       color: Colors.blue,
                       child: Text('Login'),
-                      onPressed: () {
-                        print(nameController.text);
-                        print(passwordController.text);
-                      },
+                      onPressed: () => _auth.signInWithEmailAndPassword(usernameController.text, passwordController.text),
                     )),
-                    Container(
+                Container(
                     height: 60,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: RaisedButton(
-                      textColor: Colors.white,
-                      color: Colors.blue,
-                      child: Text('Google Account'),
-                      onPressed: () =>  signinWithGoogle(context)
-                    )),
+                        textColor: Colors.white,
+                        color: Colors.blue,
+                        child: Text('Google Account'),
+                        onPressed: () =>
+                            _auth.signInWithGoogleAccount(context))),
                 Container(
                     child: Row(
                   children: <Widget>[
@@ -101,7 +96,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       onPressed: () {
                         //signup screen
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterPage()));
                       },
                     )
                   ],
@@ -111,16 +109,3 @@ class _LoginPageState extends State<LoginPage> {
             )));
   }
 }
-
- Future signinWithGoogle(BuildContext context) async {
-   final GoogleSignIn googleSignIn = GoogleSignIn( scopes: [
-        'https://www.googleapis.com/auth/fitness.body.read',
-      ],);
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.getCredential(idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
-    AuthResult authResult = await _auth.signInWithCredential(credential);
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
-    Navigator.push(context,MaterialPageRoute(builder: (context) => HomePage(name: user.displayName)));
-   }

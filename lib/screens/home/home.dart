@@ -12,18 +12,47 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// for popupmenu
+enum choice { sign_out }
+
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
 
+  void choiceAction(choice c) {
+    switch (c) {
+      case choice.sign_out:
+        {
+          _auth.signOutInstance();
+          break;
+        }
+      default:
+        {
+          print('choiceAction : out of scope');
+          break;
+        }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'HOME',
           style: TextStyle(color: Colors.white),
         ),
+        actions: <Widget>[
+          PopupMenuButton<choice>(
+              icon: Icon(Icons.account_circle, color: Colors.white),
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<choice>>[
+                    const PopupMenuItem<choice>(
+                        value: choice.sign_out, child: Text('sign out'))
+                  ]
+              // padding: EdgeInsets.only(right: 20),
+              // child: Icon(Icons.account_circle),
+              )
+        ],
         centerTitle: true,
       ),
       body: Center(

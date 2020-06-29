@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pulserun_app/screens/home/home.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      'Sign in',
+                      'Sign In',
                       style: TextStyle(fontSize: 20),
                     )),
                 Container(
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                     FlatButton(
                       textColor: Colors.blue,
                       child: Text(
-                        'Sign in',
+                        'Sign Up',
                         style: TextStyle(fontSize: 20),
                       ),
                       onPressed: () {

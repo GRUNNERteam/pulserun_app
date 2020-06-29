@@ -55,6 +55,11 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     print('Loading Register Page');
     return Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            color: Colors.white,
+          ),
+        ),
         key: _scaffoldstate,
         body: Padding(
             padding: EdgeInsets.all(10),
@@ -142,24 +147,24 @@ class _RegisterPageState extends State<RegisterPage> {
                           dynamic result =
                               await _auth.registerWithEmailAndPassword(
                                   nameController.text, passwordController.text);
-                          if(result != null){
+                          if (result != null) {
                             print(result);
                             Navigator.pop(context);
-                          }else{
+                          } else {
                             print(result);
                           }
                         }
                       },
                     )),
-                    // Container(
-                    // height: 60,
-                    // padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                    // child: RaisedButton(
-                    //   textColor: Colors.white,
-                    //   color: Colors.blue,
-                    //   child: Text('Google Account'),
-                    //   onPressed: () =>  signinWithGoogle(context)
-                    // )),
+                // Container(
+                // height: 60,
+                // padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                // child: RaisedButton(
+                //   textColor: Colors.white,
+                //   color: Colors.blue,
+                //   child: Text('Google Account'),
+                //   onPressed: () =>  signinWithGoogle(context)
+                // )),
               ],
             )));
   }

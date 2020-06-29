@@ -19,7 +19,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: AppBar(title: Text('HOME')),
+      appBar: AppBar(
+        title: Text(
+          'HOME',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
       body: Center(
           child: Column(children: <Widget>[
         //Text('USER : ' + widget.name),

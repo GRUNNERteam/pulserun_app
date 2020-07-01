@@ -25,7 +25,7 @@ class AuthService {
   Future signInWithEmailAndPassword(email, password) async {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: email.trim(), password: password);
       return _userFromFirebase(result.user);
     } catch (e) {
       print(e.toString());

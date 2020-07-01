@@ -18,7 +18,8 @@ class AuthService {
   }
 
   UserModel _userFromFirebase(FirebaseUser user) {
-    return user != null ? UserModel(uid: user.uid) : null;
+    
+    return user != null ? UserModel(uid: user.uid,displayName: user.displayName,imageURL: user.photoUrl) : null;
   }
 
   // Sign In with Email and Password

@@ -1,9 +1,14 @@
+import 'dart:html';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserModel {
   String uid;
+  String displayName;
+  String imageURL;
+
   // Constructor
-  UserModel({this.uid});
+  UserModel({this.uid, this.displayName, this.imageURL});
   String getUid() {
     return this.isEmpty() ? null : this.uid.toString();
   }

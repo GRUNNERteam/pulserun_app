@@ -24,12 +24,13 @@ class MyApp extends StatelessWidget {
       FirebaseAnalyticsObserver(analytics: analytics);
 
   Widget build(BuildContext context) {
-    return StreamProvider<UserModel>.value(
-        value: AuthService().user,
+    return MultiProvider(
+        providers: [StreamProvider<UserModel>.value(value: AuthService().user)],
         child: MaterialApp(
           title: 'PulseApp',
           navigatorObservers: <NavigatorObserver>[observer],
           theme: ThemeData(
+            iconTheme: IconThemeData(color: Colors.white),
             brightness: Brightness.light,
             primarySwatch: Colors.lightBlue,
             accentColor: Colors.cyanAccent,

@@ -15,6 +15,9 @@ class _WrapperState extends State<Wrapper> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserModel>(context);
     print('Wraaper : ' + user.toString());
+    //print('uid : ' + user.uid);
+    //print('UserDisplay : ' + user.displayName);
+    //print('PhotoURL : ' + user.imageURL);
     if (user == null) {
       return LoginPage();
     } else {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:pulserun_app/models/user.dart';
-import 'package:pulserun_app/screens/dev/dev.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 //import 'package:pulserun_app/screens/health/health.dart';
 
@@ -58,34 +56,29 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
       ),
       drawer: Drawer(
-        semanticLabel: 'test',
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children:<Widget>[
+          semanticLabel: 'test',
+          child: ListView(padding: EdgeInsets.zero, children: <Widget>[
             DrawerHeader(
-              
               child: Text('MENU'),
               decoration: BoxDecoration(),
             ),
-          ]
-        )
-      ),
+          ])),
       body: Center(
           child: Column(children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(10.0),
-              // if did not use ${} instead of directly from provider. it will cause invalid argument(by Provider found null data)
-              child: Text('Hello, ${userData.displayName}'),
-            ),
-            SizedBox(height: 10.0),
-            Container(
-              height:180.0,
-              child:
-              // should replace with firebase user image
-              // await ref.getDownloadURL();
-              // not done yet
-              Image.network('https://www.pngfind.com/pngs/m/535-5357481_user-account-management-circle-user-icon-blue-hd.png')
-            )
+        Container(
+          margin: EdgeInsets.all(10.0),
+          // if did not use ${} instead of directly from provider. it will cause invalid argument(by Provider found null data)
+          child: Text('Hello, ${userData.displayName}'),
+        ),
+        SizedBox(height: 10.0),
+        Container(
+            height: 180.0,
+            child:
+                // should replace with firebase user image
+                // await ref.getDownloadURL();
+                // not done yet
+                Image.network(
+                    'https://www.pngfind.com/pngs/m/535-5357481_user-account-management-circle-user-icon-blue-hd.png'))
         //Text('USER : ' + widget.name),
         // Text('Home Screen'),
         // Text('Todo List'),

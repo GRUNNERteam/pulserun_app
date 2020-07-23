@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pulserun_app/screens/home/home.dart';
 import 'package:pulserun_app/screens/login/login.dart';
+import 'package:pulserun_app/screens/map/map.dart';
 import 'package:pulserun_app/screens/register/register.dart';
 
 class DevPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('Loading DevPage!!!');
-    // TODO: implement build
     return Scaffold(
         appBar: AppBar(title: Text('DevPage')),
         body: Center(
@@ -40,6 +40,16 @@ class DevPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) => RegisterPage()));
+                  },
+                ),
+                RaisedButton(
+                  child: Text('MapPage'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MapPage(),
+                        ));
                   },
                 )
               ],

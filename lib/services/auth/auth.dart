@@ -18,7 +18,12 @@ class AuthService {
   }
 
   UserModel _userFromFirebase(FirebaseUser user) {
-    return user != null ? UserModel(uid: user.uid,displayName: user.displayName,imageURL: user.photoUrl) : null;
+    return user != null
+        ? UserModel(
+            uid: user.uid,
+            displayName: user.displayName,
+            imageURL: user.photoUrl)
+        : null;
   }
 
   // Sign In with Email and Password
@@ -70,7 +75,6 @@ class AuthService {
       AuthResult result = await _auth.signInWithCredential(
           GoogleAuthProvider.getCredential(
               idToken: userAuth.idToken, accessToken: userAuth.accessToken));
-      // TODO: return uid to current context/screens
       return _userFromFirebase(result.user); // return only needed infomation
 
     } catch (e) {

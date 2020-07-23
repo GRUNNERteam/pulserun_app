@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pulserun_app/models/user.dart';
-import 'package:pulserun_app/wrapper.dart';
+import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
 void main() {
@@ -26,25 +26,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [StreamProvider<UserModel>.value(value: AuthService().user)],
-        child: MaterialApp(
-          title: 'PulseApp',
-          navigatorObservers: <NavigatorObserver>[observer],
-          theme: ThemeData(
-            iconTheme: IconThemeData(color: Colors.white),
-            brightness: Brightness.light,
-            primarySwatch: Colors.lightBlue,
-            accentColor: Colors.cyanAccent,
-            fontFamily: 'Open Sans',
-            textTheme: TextTheme(
-              headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-              headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-              bodyText2: TextStyle(fontSize: 14.0),
-            ),
-          ),
-          darkTheme: ThemeData(
-              // For supported Dark Mode
-              brightness: Brightness.dark),
-          home: Wrapper(),
-        ));
+        child: MaterialApp(home: SplashPage()));
   }
 }

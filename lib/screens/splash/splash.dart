@@ -13,8 +13,8 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     // bypass for dev
-    
-    return Wrapper();
+
+    // return Wrapper();
     // .flr is from rive.app
     // I will re-desgin the splash-screen after got a name of application
     return SplashScreen.navigate(

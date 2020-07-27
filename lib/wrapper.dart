@@ -4,6 +4,7 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/dev/dev.dart';
 import 'package:pulserun_app/screens/home/home.dart';
 import 'package:pulserun_app/screens/login/login.dart';
+import 'package:pulserun_app/services/auth/auth.dart';
 
 class Wrapper extends StatefulWidget {
   @override
@@ -13,7 +14,11 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
-    return DevPage();
+    // bypass by login with dev account
+    final AuthService _auth = AuthService();
+    _auth.signInWithEmailAndPassword(
+        'devacc@dev.com', '123456789'); // will remove for production build
+    // end
     final user = Provider.of<UserModel>(context);
     if (user == null) {
       return LoginPage();

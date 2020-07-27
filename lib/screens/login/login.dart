@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pulserun_app/components/widgets/button_widget.dart';
 import 'package:pulserun_app/components/widgets/textfield_widget.dart';
 import 'package:pulserun_app/components/widgets/wave_widget.dart';
+import 'package:pulserun_app/screens/register/register.dart';
 import 'package:pulserun_app/theme/theme.dart';
 
 class LoginPage extends StatefulWidget {
@@ -84,10 +85,14 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   height: 10.0,
                 ),
-                ButtonWidget(
-                  title: 'Sign Up',
-                  hasBorder: true,
-                ),
+                RaisedButton(
+                  child: Text('Register'),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegisterPage(),
+                      )),
+                )
               ],
             ),
           ),

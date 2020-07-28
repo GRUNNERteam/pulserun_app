@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -6,11 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pulserun_app/models/localtion.dart';
 
-const double CAMERA_ZOOM = 13;
-const double CAMERA_TILT = 0;
-const double CAMERA_BEARING = 30;
-const LatLng SOURCE_LOCATION = LatLng(42.7477863, -71.1699932);
-const LatLng DEST_LOCATION = LatLng(42.6871386, -71.2143403);
 const String DIRECTIONS_API = "AIzaSyBEuFGSRougNTQTRM1ZTnCD3abQ_NNAXOI";
 
 class MapPage extends StatefulWidget {
@@ -19,130 +15,148 @@ class MapPage extends StatefulWidget {
 }
 
 class MapPageState extends State<MapPage> {
-  Completer<GoogleMapController> _controller = Completer();
-  var _geolocator = Geolocator();
+  // Position Model
+  LocationModel _pos = new LocationModel();
+  Geolocator _geolocator = new Geolocator();
+  GoogleMapController mapController;
+
+  Map<MarkerId, Marker> _markers = {};
+  Map<PolylineId, Polyline> _polylines = {};
+  List<LatLng> _polylineCoordinates = [];
+  PolylinePoints _polylinePoints = PolylinePoints();
+
   var _locationOptions = LocationOptions(
-      accuracy: LocationAccuracy.bestForNavigation, distanceFilter: 10);
-  LocationModel _locationModel = LocationModel();
-  // this set will hold my markers
-  Set<Marker> _markers = {};
-  // this will hold the generated polylines
-  Set<Polyline> _polylines = {};
-  // this will hold each polyline coordinate as Lat and Lng pairs
-  List<LatLng> polylineCoordinates = [];
-  // this is the key object - the PolylinePoints
-  // which generates every polyline between start and finish
-  PolylinePoints polylinePoints = PolylinePoints();
+    accuracy: LocationAccuracy.bestForNavigation,
+    distanceFilter: 10,
+  );
 
-  // config for Camera that define on upper code
-  CameraPosition initialLocation = CameraPosition(
-      zoom: CAMERA_ZOOM,
-      bearing: CAMERA_BEARING,
-      tilt: CAMERA_TILT,
-      target: SOURCE_LOCATION);
+  double _zoomLevel = 14;
 
-  //initState
+  bool isEnd = false;
+  bool isTracking = false;
   @override
   void initState() {
+    print("init State");
     super.initState();
-    //setSourceAndDestinationIcons();
+
+    if (isTracking) {
+    } else {
+      _startTracking();
+    }
+
+    if (isEnd) {
+      /// destination marker
+      _addMarker(
+        _pos.destination,
+        "destination",
+        descriptor: BitmapDescriptor.defaultMarkerWithHue(90),
+      );
+    }
+    //_getPolyline();
   }
 
-  void onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
-    setMapPins();
-    setPolylines();
+  Future<void> _startTracking() async {
+    Position _result = await _geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.bestForNavigation,
+    );
+    isTracking = true;
+    _pos.addOrignLatLng(_pos.positionToLatLng(_result));
+    goToOrigin(); // For displaying user
   }
 
-  void setMapPins() {
-    setState(() {
-      // source pin
-      _markers.add(Marker(
-        markerId: MarkerId('sourcePin'),
-        position: SOURCE_LOCATION,
-        //icon: sourceIcon
-      ));
-      // destination pin
-      _markers.add(Marker(
-        markerId: MarkerId('destPin'),
-        position: DEST_LOCATION,
-        //icon: destinationIcon
-      ));
-    });
+  void _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
   }
 
-  setPolylines() async {
-    List<PointLatLng> result =
-        (await polylinePoints?.getRouteBetweenCoordinates(
-            DIRECTIONS_API,
-            PointLatLng(SOURCE_LOCATION.latitude, SOURCE_LOCATION.longitude),
-            PointLatLng(DEST_LOCATION.latitude,
-                DEST_LOCATION.longitude))) as List<PointLatLng>;
+  _addMarker(LatLng position, String id,
+      {BitmapDescriptor descriptor = BitmapDescriptor.defaultMarker}) {
+    MarkerId markerId = MarkerId(id);
+    Marker marker = Marker(
+      markerId: markerId,
+      icon: descriptor,
+      position: position,
+    );
+    _markers[markerId] = marker;
+  }
 
-    if (result.isNotEmpty) {
-      // loop through all PointLatLng points and convert them
-      // to a list of LatLng, required by the Polyline
-      result.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+  _addPolyLine() {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.red,
+      points: _polylineCoordinates,
+    );
+    _polylines[id] = polyline;
+    setState(() {});
+  }
+
+  // ignore: unused_element
+  _getPolyline() async {
+    PolylineResult result = await _polylinePoints.getRouteBetweenCoordinates(
+      DIRECTIONS_API,
+      _pos.getOriginPointLatLng(),
+      _pos.getLastPointLatLng(),
+      travelMode: TravelMode.walking,
+    );
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        _polylineCoordinates.add(LatLng(
+          point.latitude,
+          point.longitude,
+        ));
       });
     }
-    setState(() {
-      // create a Polyline instance
-      // with an id, an RGB color and the list of LatLng pairs
-      Polyline polyline = Polyline(
-          polylineId: PolylineId('poly'),
-          color: Color.fromARGB(255, 40, 122, 198),
-          points: polylineCoordinates);
-
-      // add the constructed polyline as a set of points
-      // to the polyline set, which will eventually
-      // end up showing up on the map
-      _polylines.add(polyline);
-    });
+    _addPolyLine();
   }
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    var currentLocation = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-    print("Pos : " +
-        currentLocation.latitude.toString() +
-        currentLocation.longitude.toString());
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: LatLng(currentLocation.latitude, currentLocation.longitude),
-        zoom: 16)));
+  // google map cam
+  void goToOrigin() {
+    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: _pos.origin,
+      zoom: _zoomLevel,
+    )));
+  }
+
+  void goToCurrent() {
+    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: _pos.lastPos,
+      zoom: _zoomLevel,
+    )));
   }
 
   @override
   Widget build(BuildContext context) {
-    print("MapPage");
+    // stream location
+    // ignore: unused_local_variable
     StreamSubscription<Position> positionStream = _geolocator
         .getPositionStream(_locationOptions)
         .listen((Position position) {
-      print(position == null
-          ? 'Unknown'
-          : position.latitude.toString() +
-              ', ' +
-              position.longitude.toString());
-      // add to list location model
       if (position != null) {
-        _locationModel.addListLatLng(_locationModel.positionToLatLng(position));
+        if (isTracking) {
+          _pos.addListLatLng(_pos.positionToLatLng(position));
+          _polylineCoordinates.add(_pos.lastPos);
+          _addPolyLine();
+          print("SetState Action!~~");
+          setState(() {});
+        }
       }
     });
 
-    return new Scaffold(
+    /// Last for dest marker
+    _addMarker(
+      _pos.origin,
+      "origin",
+      descriptor: BitmapDescriptor.defaultMarkerWithHue(90),
+    );
+    print("Creating Map Page!!!");
+
+    return Scaffold(
       body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition:
-            CameraPosition(target: LatLng(40.688841, -74.044015), zoom: 11.00),
-        markers: _markers,
-        polylines: _polylines,
-        onMapCreated: onMapCreated,
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: Text('Current Position!'),
-        icon: Icon(Icons.directions_boat),
+        initialCameraPosition: CameraPosition(target: _pos.lastPos, zoom: 15),
+        myLocationEnabled: true,
+        onMapCreated: _onMapCreated,
+        markers: Set<Marker>.of(_markers.values),
+        polylines: Set<Polyline>.of(_polylines.values),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pulserun_app/screens/Bluetooth/Bluetooth.dart';
 import 'package:pulserun_app/screens/home/home.dart';
 import 'package:pulserun_app/screens/login/login.dart';
 import 'package:pulserun_app/screens/map/map.dart';
@@ -50,6 +51,13 @@ class DevPage extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => MapPage(),
                         ));
+                  },
+                ),
+                RaisedButton(
+                  child: Text('BLE TEST'),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => BLE()));
                   },
                 )
               ],

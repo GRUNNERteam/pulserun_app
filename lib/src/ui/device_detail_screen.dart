@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:flutter_reactive_ble_example/src/ble/ble_device_connector.dart';
+import 'package:pulserun_app/src/ble/ble_device_connector.dart';
 import 'package:provider/provider.dart';
 
 class DeviceDetailScreen extends StatelessWidget {

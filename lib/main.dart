@@ -18,6 +18,7 @@ void main() {
 class MyApp extends StatelessWidget {
   // for aualytics project
   // via firebase console
+  // ignore: todo
   // TODO : implement observe in each page
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer =

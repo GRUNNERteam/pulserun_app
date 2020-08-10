@@ -8,20 +8,22 @@ class LocationModel {
   LatLng lastPos = new LatLng(0, 0);
   List<LatLng> _listPos = new List<LatLng>();
   bool _allowToSave = true;
+
+  // constructor
   LocationModel() {
     _listPos.clear();
     _allowToSave = true;
   }
 
   void addOrignLatLng(LatLng value) {
-    // prevent add origin after add destination
-    if (!_allowToSave) return;
-
     try {
-      // if origin was added should clear pos in list for tracking
-      _listPos.clear();
-      this.origin = value;
-      addListLatLng(value);
+      // prevent add origin after add destination
+      if (!_allowToSave) {
+        // if origin was added should clear pos in list for tracking
+        _listPos.clear();
+        this.origin = value;
+        addListLatLng(value);
+      }
     } catch (error) {
       print(error.toString());
     }
@@ -38,19 +40,23 @@ class LocationModel {
   }
 
   void addListLatLng(LatLng value) {
-    if (!_allowToSave) return;
-
     try {
       // for debug
-      print("LatLng : Lat=" +
-          value.latitude.toString() +
-          " Lng=" +
-          value.longitude.toString());
-      this._listPos.add(value);
-      this.lastPos = value;
+      if (_allowToSave) {
+        print("LatLng : Lat=" +
+            value.latitude.toString() +
+            " Lng=" +
+            value.longitude.toString());
+        this._listPos.add(value);
+        this.lastPos = value;
+      }
     } catch (error) {
       print(error.toString());
     }
+  }
+
+  void setLastPos(LatLng value) {
+    this.lastPos = value;
   }
 
   LatLng positionToLatLng(Position position) {

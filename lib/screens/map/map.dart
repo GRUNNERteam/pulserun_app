@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -15,6 +14,12 @@ class MapPage extends StatefulWidget {
 }
 
 class MapPageState extends State<MapPage> {
+  LocationOptions _locationOptions = LocationOptions(
+    accuracy: LocationAccuracy.bestForNavigation,
+    distanceFilter: 10,
+    timeInterval: 100,
+  );
+
   // Position Model
   LocationModel _pos = new LocationModel();
   Geolocator _geolocator = new Geolocator();
@@ -25,45 +30,66 @@ class MapPageState extends State<MapPage> {
   List<LatLng> _polylineCoordinates = [];
   PolylinePoints _polylinePoints = PolylinePoints();
 
-  var _locationOptions = LocationOptions(
-    accuracy: LocationAccuracy.bestForNavigation,
-    distanceFilter: 10,
-  );
-
-  double _zoomLevel = 14;
+  double _zoomLevel = 20;
 
   bool isEnd = false;
   bool isTracking = false;
+
   @override
   void initState() {
-    print("init State");
     super.initState();
-
-    if (isTracking) {
-    } else {
-      _startTracking();
-    }
-
-    if (isEnd) {
-      /// destination marker
-      _addMarker(
-        _pos.destination,
-        "destination",
-        descriptor: BitmapDescriptor.defaultMarkerWithHue(90),
-      );
-    }
     //_getPolyline();
   }
 
-  Future<void> _startTracking() async {
+  // @override
+  // void dispose() {
+
+  //   super.dispose();
+  // }
+
+  Future<LatLng> initPos() async {
     Position _result = await _geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.bestForNavigation,
     );
-    isTracking = true;
-    _pos.addOrignLatLng(_pos.positionToLatLng(_result));
-    goToOrigin(); // For displaying user
+    setState(() {
+      _pos.setLastPos(_pos.positionToLatLng(_result));
+      goToCurrent();
+    });
   }
 
+  // tracking part
+  Future<void> _startTracking() async {
+    print("Start Tracking location");
+    Position _result = await _geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.bestForNavigation,
+    );
+    setState(() {
+      /// Last for origin marker
+      _addMarker(
+        _pos.origin,
+        "origin",
+        descriptor: BitmapDescriptor.defaultMarkerWithHue(90),
+      );
+      this.isTracking = true;
+      _pos.addOrignLatLng(_pos.positionToLatLng(_result));
+      goToOrigin();
+    });
+// For displaying user
+  }
+
+  Future<void> _stopTracking() async {
+    print("Stop Tracking location");
+    Position _result = await _geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.bestForNavigation,
+    );
+    setState(() {
+      this.isTracking = false;
+      _pos.addDestination(_pos.positionToLatLng(_result));
+      goToCurrent();
+    });
+  }
+
+  // set controller
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
   }
@@ -124,40 +150,50 @@ class MapPageState extends State<MapPage> {
     )));
   }
 
+  // floatingActionButton
+  FloatingActionButton btnTracking(context) {
+    if (!isTracking) {
+      return FloatingActionButton.extended(
+          onPressed: () async {
+            await _startTracking();
+          },
+          label: Text("Start Tracking"));
+    } else {
+      return FloatingActionButton.extended(
+          onPressed: () async {
+            await _stopTracking();
+          },
+          label: Text("Stop Tracking"));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // stream location
-    // ignore: unused_local_variable
-    StreamSubscription<Position> positionStream = _geolocator
-        .getPositionStream(_locationOptions)
-        .listen((Position position) {
-      if (position != null) {
-        if (isTracking) {
-          _pos.addListLatLng(_pos.positionToLatLng(position));
+    if (isTracking) {
+      print("isTracking in build");
+      _geolocator
+          .getPositionStream(_locationOptions)
+          .listen((Position _posStream) {
+        if (_posStream != null) {
+          _pos.addListLatLng(_pos.positionToLatLng(_posStream));
           _polylineCoordinates.add(_pos.lastPos);
+          goToCurrent();
           _addPolyLine();
-          print("SetState Action!~~");
-          setState(() {});
         }
-      }
-    });
+      });
+    }
 
-    /// Last for dest marker
-    _addMarker(
-      _pos.origin,
-      "origin",
-      descriptor: BitmapDescriptor.defaultMarkerWithHue(90),
-    );
     print("Creating Map Page!!!");
 
     return Scaffold(
       body: GoogleMap(
-        initialCameraPosition: CameraPosition(target: _pos.lastPos, zoom: 15),
+        initialCameraPosition: CameraPosition(target: _pos.lastPos, zoom: 18),
         myLocationEnabled: true,
         onMapCreated: _onMapCreated,
         markers: Set<Marker>.of(_markers.values),
         polylines: Set<Polyline>.of(_polylines.values),
       ),
+      floatingActionButton: btnTracking(context),
     );
   }
 }

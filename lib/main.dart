@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
+import 'package:pulserun_app/validation/validation_login.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,17 @@ class MyApp extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [StreamProvider<UserModel>.value(value: AuthService().user)],
-        child: MaterialApp(home: SplashPage()));
+      providers: [
+        StreamProvider<UserModel>.value(
+          value: AuthService().user,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ValidationLogin(),
+        ),
+      ],
+      child: MaterialApp(
+        home: SplashPage(),
+      ),
+    );
   }
 }

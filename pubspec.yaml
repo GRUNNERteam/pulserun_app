@@ -35,6 +35,7 @@ dependencies:
   # health: ^1.0.2+2
   flare_flutter: ^2.0.4
   flare_splash_screen: ^3.0.1
+  flutter_spinkit: ^4.1.2+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -2,17 +2,37 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+class LocationItem {
+  double lat;
+  double lng;
+  double alt;
+  double bearing; // orientation aka heading in geolocator
+  double tilt; // viewing angle
+  DateTime ts; // timestamp
+
+  LocationItem(this.lat, this.lng, this.alt, this.bearing, this.tilt, this.ts);
+}
+
 class LocationModel {
+  List<LocationItem> locList; // new way to collect a location
   LatLng origin = new LatLng(0, 0);
   LatLng destination = new LatLng(0, 0);
   LatLng lastPos = new LatLng(0, 0);
-  List<LatLng> _listPos = new List<LatLng>();
+  List<LatLng> _listPos = new List<LatLng>(); // will replace this with new list
   bool _allowToSave = true;
 
   // constructor
   LocationModel() {
-    _listPos.clear();
-    _allowToSave = true;
+    this._listPos.clear();
+    this._allowToSave = true;
+  }
+
+  void clear() {
+    this._listPos.clear();
+    this.origin = LatLng(0, 0);
+    this.destination = LatLng(0, 0);
+    this.lastPos = LatLng(0, 0);
+    this._allowToSave = true;
   }
 
   void addOrignLatLng(LatLng value) {

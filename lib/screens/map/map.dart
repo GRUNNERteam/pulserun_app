@@ -5,6 +5,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pulserun_app/models/localtion.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const String DIRECTIONS_API = "AIzaSyBEuFGSRougNTQTRM1ZTnCD3abQ_NNAXOI";
 
@@ -31,30 +32,27 @@ class MapPageState extends State<MapPage> {
   PolylinePoints _polylinePoints = PolylinePoints();
 
   double _zoomLevel = 20;
-
+  LatLng initPos;
+  bool isInit = false;
   bool isEnd = false;
   bool isTracking = false;
 
   @override
   void initState() {
     super.initState();
+
     //_getPolyline();
   }
 
-  // @override
-  // void dispose() {
-
-  //   super.dispose();
-  // }
-
-  Future<LatLng> initPos() async {
+  void initGoogleMap() async {
     Position _result = await _geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.bestForNavigation,
     );
-    setState(() {
-      _pos.setLastPos(_pos.positionToLatLng(_result));
-      goToCurrent();
-    });
+    this.initPos = _pos.positionToLatLng(_result);
+    this.isInit = true;
+    print("initGoogleMap Completed!");
+
+    setState(() {});
   }
 
   // tracking part
@@ -162,6 +160,7 @@ class MapPageState extends State<MapPage> {
       return FloatingActionButton.extended(
           onPressed: () async {
             await _stopTracking();
+            _pos.clear();
           },
           label: Text("Stop Tracking"));
     }
@@ -169,6 +168,10 @@ class MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isInit) {
+      initGoogleMap();
+    }
+
     if (isTracking) {
       print("isTracking in build");
       _geolocator
@@ -186,13 +189,24 @@ class MapPageState extends State<MapPage> {
     print("Creating Map Page!!!");
 
     return Scaffold(
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(target: _pos.lastPos, zoom: 18),
-        myLocationEnabled: true,
-        onMapCreated: _onMapCreated,
-        markers: Set<Marker>.of(_markers.values),
-        polylines: Set<Polyline>.of(_polylines.values),
-      ),
+      body: !isInit
+          ? Center(
+              child: SpinKitCubeGrid(
+                color: Colors.blue,
+                size: 50.0,
+              ),
+            )
+          : GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: initPos,
+                zoom: 18,
+              ),
+              compassEnabled: true,
+              myLocationEnabled: true,
+              onMapCreated: _onMapCreated,
+              markers: Set<Marker>.of(_markers.values),
+              polylines: Set<Polyline>.of(_polylines.values),
+            ),
       floatingActionButton: btnTracking(context),
     );
   }

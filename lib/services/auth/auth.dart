@@ -22,7 +22,8 @@ class AuthService {
         ? UserModel(
             uid: user.uid,
             displayName: user.displayName,
-            imageURL: user.photoUrl)
+            imageURL: user.photoUrl,
+          )
         : null;
   }
 
@@ -57,6 +58,7 @@ class AuthService {
       if (isGoogleSignIn) {
         await _googleSignIn.signOut();
       }
+
       return await _auth.signOut();
     } catch (e) {
       print(e.toString());

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
+import 'package:pulserun_app/theme/theme.dart';
 import 'package:pulserun_app/validation/validation_login.dart';
 
 void main() {
@@ -36,6 +37,10 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        title: "FatDash",
+        theme: GlobalTheme.mytheme,
+        themeMode: ThemeMode.light,
+        debugShowCheckedModeBanner: false,
         home: SplashPage(),
       ),
     );

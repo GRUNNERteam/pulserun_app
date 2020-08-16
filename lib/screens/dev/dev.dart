@@ -30,11 +30,7 @@ class DevPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(
-                        name: 'HomePage',
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => HomePage()),
                   );
                 },
               ),

@@ -1,119 +1,106 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:pulserun_app/components/background/home_background.dart';
+import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/user.dart';
-import 'package:pulserun_app/services/auth/auth.dart';
-//import 'package:pulserun_app/screens/health/health.dart';
-
-class HomePage extends StatefulWidget {
-  HomePage({Key key, this.name}) : super(key: key);
-  final String name;
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-// for popupmenu
-enum choice { sign_out }
+import 'package:pulserun_app/services/database/database.dart';
+import 'package:pulserun_app/theme/theme.dart';
 
 class _HomePageState extends State<HomePage> {
-  final AuthService _auth = AuthService();
-  void choiceAction(choice c) {
-    switch (c) {
-      case choice.sign_out:
-        {
-          _auth.signOutInstance();
-          break;
-        }
-      default:
-        {
-          print('choiceAction : out of scope');
-          break;
-        }
-    }
+  bool _isloading = true;
+  DatabaseService _db = DatabaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    _db.createAccount(widget.user);
+    _isloading = false;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<UserModel>(context);
+    print(widget.user.uid);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'HOME',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: <Widget>[
-          PopupMenuButton<choice>(
-              icon: Icon(Icons.account_circle, color: Colors.white),
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<choice>>[
-                    const PopupMenuItem<choice>(
-                        value: choice.sign_out, child: Text('sign out'))
-                  ]
-              // padding: EdgeInsets.only(right: 20),
-              // child: Icon(Icons.account_circle),
-              )
-        ],
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-          semanticLabel: 'test',
-          child: ListView(padding: EdgeInsets.zero, children: <Widget>[
-            DrawerHeader(
-              child: Text('MENU'),
-              decoration: BoxDecoration(),
+      body: (_isloading)
+          ? LoadingWidget()
+          : SingleChildScrollView(
+              child: Stack(
+                children: [
+                  HomePageBackground(
+                    screenHeight: MediaQuery.of(context).size.height,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 50.0,
+                        ),
+                        Container(
+                          height: 300.0,
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  'Wellcome, ${widget.user.displayName}',
+                                  style: TextStyle(
+                                    color: GlobalTheme.default_text,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                CircleAvatar(
+                                  radius: 76,
+                                  // TODO : backgroundColor will show green or red show current healthy
+                                  backgroundColor: GlobalTheme.tiffany_blue,
+                                  child: CircleAvatar(
+                                    radius: 72,
+                                    backgroundImage:
+                                        (widget.user.imageURL != null)
+                                            ? NetworkImage(widget.user.imageURL)
+                                            : null,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 200,
+                          child: Card(
+                            color: GlobalTheme.light_cyan,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            elevation: 0,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ])),
-      body: Center(
-          child: Column(children: <Widget>[
-        Container(
-          margin: EdgeInsets.all(10.0),
-          // if did not use ${} instead of directly from provider. it will cause invalid argument(by Provider found null data)
-          child: Text('Hello, ${userData.displayName}'),
-        ),
-        SizedBox(height: 10.0),
-        Container(
-            height: 180.0,
-            child:
-                // should replace with firebase user image
-                // await ref.getDownloadURL();
-                // not done yet
-                Image.network(
-                    'https://www.pngfind.com/pngs/m/535-5357481_user-account-management-circle-user-icon-blue-hd.png'))
-        //Text('USER : ' + widget.name),
-        // Text('Home Screen'),
-        // Text('Todo List'),
-        // Container(
-        //     height: 60,
-        //     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        //     child: RaisedButton(
-        //       textColor: Colors.white,
-        //       color: Colors.blue,
-        //       child: Text('Sign Out'),
-        //       // onPressed: () =>  signout(context)
-        //       onPressed: () {
-        //         _auth.signOutInstance();
-        //       },
-        //     )),
-        // Container(
-        //     height: 60,
-        //     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        //     child: RaisedButton(
-        //       textColor: Colors.white,
-        //       color: Colors.blue,
-        //       child: Text('Heart rate'),
-        //       //onPressed: () =>  Navigator.push(context,MaterialPageRoute(builder: (context) => myH()))
-        //       onPressed: () {},
-        //     )),
-      ])),
     );
   }
 }
 
-//  Future signout(BuildContext context) async {
-//     final GoogleSignIn googleSignIn = GoogleSignIn();
-//     bool isSigned = await googleSignIn.isSignedIn();
-//     if(isSigned){
-//       await googleSignIn.signOut();
-//       Navigator.push(context,MaterialPageRoute(builder: (context) => DevPage()));
-//     }
-//    }
+class HomePage extends StatefulWidget {
+  final UserModel user;
+  HomePage({Key key, @required this.user}) : super(key: key);
+  @override
+  State<HomePage> createState() => _HomePageState();
+}

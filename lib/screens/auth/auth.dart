@@ -1,16 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/theme/theme.dart';
 import 'package:pulserun_app/validation/validation_login.dart';
 
 // https://github.com/afgprogrammer/Flutter-Login-Page-3/tree/master/lib
 
-class AuthPageState extends State<AuthPage> {
+class _AuthPageState extends State<AuthPage> {
+  // ignore: unused_field
   bool _isLoading = true;
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,28 +26,10 @@ class AuthPageState extends State<AuthPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _usernameController.dispose();
     _passwordController.dispose();
     _isLoading = true;
     super.dispose();
-  }
-
-  Widget _tab(String name) {
-    return Tab(
-      child: Align(
-        alignment: Alignment.center,
-        child: Text(name),
-      ),
-    );
-  }
-
-  Widget _signIn(BuildContext context) {
-    return LoadingWidget();
-  }
-
-  Widget _signUp(BuildContext context) {
-    return LoadingWidget();
   }
 
   @override
@@ -256,6 +237,8 @@ class AuthPageState extends State<AuthPage> {
 }
 
 class AuthPage extends StatefulWidget {
+  AuthPage({Key key}) : super(key: key);
+
   @override
-  State<AuthPage> createState() => AuthPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }

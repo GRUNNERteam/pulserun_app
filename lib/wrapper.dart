@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/auth/auth.dart';
-import 'package:pulserun_app/screens/dev/dev.dart';
 import 'package:pulserun_app/screens/home/home.dart';
-import 'package:pulserun_app/screens/login/login.dart';
-import 'package:pulserun_app/services/auth/auth.dart';
 
 class Wrapper extends StatefulWidget {
+  Wrapper({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _WrapperState();
 }
@@ -26,10 +25,11 @@ class _WrapperState extends State<Wrapper> {
     print(_user);
 
     if (_user == null) {
-      return AuthPage();
+      return new AuthPage();
     } else {
-      return DevPage();
-      //return HomePage(name: 'Pules App');
+      return new HomePage(
+        user: _user,
+      );
     }
   }
 }

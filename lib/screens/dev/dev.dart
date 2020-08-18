@@ -28,13 +28,10 @@ class DevPage extends StatelessWidget {
               RaisedButton(
                 child: Text('HomePage'),
                 onPressed: () {
+                  return null;
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(
-                        name: 'HomePage',
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => HomePage()),
                   );
                 },
               ),

@@ -1,50 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:pulserun_app/theme/theme.dart';
 
-class HomePageBackground extends StatelessWidget {
-  final screenHeight;
+class BackgroundHomePage extends StatefulWidget {
+  final double height;
 
-  const HomePageBackground({Key key, @required this.screenHeight})
-      : super(key: key);
+  BackgroundHomePage(this.height);
+
+  @override
+  _BackgroundHomePageState createState() => _BackgroundHomePageState();
+}
+
+class _BackgroundHomePageState extends State<BackgroundHomePage>
+    with TickerProviderStateMixin {
+  AnimationController _controller;
+  Animation<double> animation;
+  final double startingHeight = 20.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 5));
+    animation = Tween<double>(begin: startingHeight, end: widget.height)
+        .animate(_controller);
+    _controller.forward(from: 0.0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
-
-    return ClipPath(
-      clipper: BottomShapeClipper(),
-      child: Container(
-        height: screenHeight * 0.5,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              themeData.primaryColor,
-              themeData.accentColor,
-            ],
-          ),
-        ),
+    return Scaffold(
+      body: AnimatedBuilder(
+        builder: (context, anim) {
+          return ClipPath(
+            clipper: RoundedClipper(animation.value),
+            child: Container(
+              height: animation.value,
+              color: Theme.of(context).primaryColor,
+            ),
+          );
+        },
+        animation: _controller,
       ),
     );
   }
 }
 
-class BottomShapeClipper extends CustomClipper<Path> {
+class RoundedClipper extends CustomClipper<Path> {
+  final double height;
+
+  RoundedClipper(this.height);
+
   @override
   Path getClip(Size size) {
-    Path path = Path();
-    Offset curveStartPoint = Offset(0, size.height * 0.85);
-    Offset curveEndPoint = Offset(size.width, size.height * 0.85);
-    path.lineTo(curveStartPoint.dx, curveStartPoint.dy);
+    var path = Path();
+    path.lineTo(0.0, height - 200);
     path.quadraticBezierTo(
-        size.width / 2, size.height, curveEndPoint.dx, curveEndPoint.dy);
-    path.lineTo(size.width, 0);
+      size.width / 2,
+      height,
+      size.width,
+      height - 200,
+    );
+    path.lineTo(size.width, 0.0);
+    path.close();
     return path;
   }
 
   @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return true;
-  }
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }

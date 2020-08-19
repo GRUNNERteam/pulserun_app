@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
@@ -19,10 +20,11 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void initState() {
-    super.initState();
+    initialize();
     _usernameController.clear();
     _passwordController.clear();
     _isLoading = false;
+    super.initState();
   }
 
   @override
@@ -33,243 +35,251 @@ class _AuthPageState extends State<AuthPage> {
     super.dispose();
   }
 
+  void initialize() async {
+    if (FirebaseAuth.instance.currentUser != null) {
+      _authService.signOutInstance();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final _signInvalidation = Provider.of<ValidationLogin>(context);
+    //final _signInvalidation = Provider.of<ValidationLogin>(context);
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            colors: [
-              GlobalTheme.tiffany_blue,
-              GlobalTheme.light_cyan,
-            ],
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              colors: [
+                GlobalTheme.tiffany_blue,
+                GlobalTheme.light_cyan,
+              ],
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Sign In",
-                    style: TextStyle(
-                      color: GlobalTheme.white,
-                      fontSize: 40,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "Wellcome back to FatDash!",
-                    style: TextStyle(
-                      color: GlobalTheme.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 20,
               ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: GlobalTheme.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
-                  ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Sign In",
+                      style: TextStyle(
+                        color: GlobalTheme.white,
+                        fontSize: 40,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Wellcome back to FatDash!",
+                      style: TextStyle(
+                        color: GlobalTheme.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 60,
-                        ),
-                        // Container(
-                        //   padding: EdgeInsets.all(20),
-                        //   decoration: BoxDecoration(
-                        //     color: GlobalTheme.white,
-                        //     boxShadow: [
-                        //       BoxShadow(
-                        //         color: GlobalTheme.light_cyan_shadow,
-                        //         blurRadius: 20,
-                        //         offset: Offset(0, 10),
-                        //       ),
-                        //     ],
-                        //   ),
-                        //   child: Column(
-                        //     children: <Widget>[
-                        //       Container(
-                        //         padding: EdgeInsets.all(10),
-                        //         decoration: BoxDecoration(
-                        //           border: Border(
-                        //             bottom: BorderSide(
-                        //               color: Colors.grey[200],
-                        //             ),
-                        //           ),
-                        //         ),
-                        //         child: TextField(
-                        //           controller: _usernameController,
-                        //           decoration: InputDecoration(
-                        //             errorText: _signInvalidation.username.error,
-                        //             hintText: "Enter an Email",
-                        //             hintStyle: TextStyle(
-                        //               color: Colors.grey,
-                        //             ),
-                        //             border: InputBorder.none,
-                        //           ),
-                        //           onChanged: (String value) =>
-                        //               _signInvalidation.changeUsername(value),
-                        //         ),
-                        //       ),
-                        //       Container(
-                        //         padding: EdgeInsets.all(10),
-                        //         decoration: BoxDecoration(
-                        //           border: Border(
-                        //             bottom: BorderSide(
-                        //               color: Colors.grey[200],
-                        //             ),
-                        //           ),
-                        //         ),
-                        //         child: TextField(
-                        //           obscureText: true,
-                        //           controller: _passwordController,
-                        //           decoration: InputDecoration(
-                        //             errorText: _signInvalidation.password.error,
-                        //             hintText: "Enter an Password",
-                        //             hintStyle: TextStyle(
-                        //               color: Colors.grey,
-                        //             ),
-                        //             border: InputBorder.none,
-                        //           ),
-                        //           onChanged: (String value) =>
-                        //               _signInvalidation.changePassword(value),
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   height: 40,
-                        // ),
-                        // Text(
-                        //   "Forgot Password?",
-                        //   style: TextStyle(
-                        //     color: Colors.grey,
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   height: 40,
-                        // ),
-                        // ButtonTheme(
-                        //   minWidth: double.infinity,
-                        //   height: 50.0,
-                        //   disabledColor: GlobalTheme.default_error,
-                        //   buttonColor: GlobalTheme.tiffany_blue,
-                        //   child: RaisedButton(
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(50),
-                        //     ),
-                        //     child: Center(
-                        //       child: Text(
-                        //         "Sign In",
-                        //         style: TextStyle(
-                        //           color: Colors.white,
-                        //           fontWeight: FontWeight.bold,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     onPressed: (!_signInvalidation.isValid)
-                        //         ? null
-                        //         : _signInvalidation.submit,
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   height: 50,
-                        // ),
-                        // Text(
-                        //   "Continue with other way",
-                        //   style: TextStyle(
-                        //     color: Colors.grey,
-                        //   ),
-                        // ),
-                        RichText(
-                          text: TextSpan(
-                              text: 'To Sign In, ',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              children: <TextSpan>[
-                                TextSpan(text: 'You need google account'),
-                              ]),
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Container(
-                          height: 1,
-                          width: 300,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Center(
-                                // Google PlatformException(sign_in_failed, com.google.android.gms.common.api.ApiException: 10: , null)
-                                // https://stackoverflow.com/questions/47619229/google-sign-in-failed-com-google-android-gms-common-api-apiexception-10
-                                // SHA1  key error
-                                child: GoogleSignInButton(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: GlobalTheme.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(60),
+                      topRight: Radius.circular(60),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 60,
+                          ),
+                          // Container(
+                          //   padding: EdgeInsets.all(20),
+                          //   decoration: BoxDecoration(
+                          //     color: GlobalTheme.white,
+                          //     boxShadow: [
+                          //       BoxShadow(
+                          //         color: GlobalTheme.light_cyan_shadow,
+                          //         blurRadius: 20,
+                          //         offset: Offset(0, 10),
+                          //       ),
+                          //     ],
+                          //   ),
+                          //   child: Column(
+                          //     children: <Widget>[
+                          //       Container(
+                          //         padding: EdgeInsets.all(10),
+                          //         decoration: BoxDecoration(
+                          //           border: Border(
+                          //             bottom: BorderSide(
+                          //               color: Colors.grey[200],
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         child: TextField(
+                          //           controller: _usernameController,
+                          //           decoration: InputDecoration(
+                          //             errorText: _signInvalidation.username.error,
+                          //             hintText: "Enter an Email",
+                          //             hintStyle: TextStyle(
+                          //               color: Colors.grey,
+                          //             ),
+                          //             border: InputBorder.none,
+                          //           ),
+                          //           onChanged: (String value) =>
+                          //               _signInvalidation.changeUsername(value),
+                          //         ),
+                          //       ),
+                          //       Container(
+                          //         padding: EdgeInsets.all(10),
+                          //         decoration: BoxDecoration(
+                          //           border: Border(
+                          //             bottom: BorderSide(
+                          //               color: Colors.grey[200],
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         child: TextField(
+                          //           obscureText: true,
+                          //           controller: _passwordController,
+                          //           decoration: InputDecoration(
+                          //             errorText: _signInvalidation.password.error,
+                          //             hintText: "Enter an Password",
+                          //             hintStyle: TextStyle(
+                          //               color: Colors.grey,
+                          //             ),
+                          //             border: InputBorder.none,
+                          //           ),
+                          //           onChanged: (String value) =>
+                          //               _signInvalidation.changePassword(value),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // SizedBox(
+                          //   height: 40,
+                          // ),
+                          // Text(
+                          //   "Forgot Password?",
+                          //   style: TextStyle(
+                          //     color: Colors.grey,
+                          //   ),
+                          // ),
+                          // SizedBox(
+                          //   height: 40,
+                          // ),
+                          // ButtonTheme(
+                          //   minWidth: double.infinity,
+                          //   height: 50.0,
+                          //   disabledColor: GlobalTheme.default_error,
+                          //   buttonColor: GlobalTheme.tiffany_blue,
+                          //   child: RaisedButton(
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(50),
+                          //     ),
+                          //     child: Center(
+                          //       child: Text(
+                          //         "Sign In",
+                          //         style: TextStyle(
+                          //           color: Colors.white,
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     onPressed: (!_signInvalidation.isValid)
+                          //         ? null
+                          //         : _signInvalidation.submit,
+                          //   ),
+                          // ),
+                          // SizedBox(
+                          //   height: 50,
+                          // ),
+                          // Text(
+                          //   "Continue with other way",
+                          //   style: TextStyle(
+                          //     color: Colors.grey,
+                          //   ),
+                          // ),
+                          RichText(
+                            text: TextSpan(
+                                text: 'To Sign In, ',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                children: <TextSpan>[
+                                  TextSpan(text: 'You need google account'),
+                                ]),
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Container(
+                            height: 1,
+                            width: 300,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Center(
+                                  // Google PlatformException(sign_in_failed, com.google.android.gms.common.api.ApiException: 10: , null)
+                                  // https://stackoverflow.com/questions/47619229/google-sign-in-failed-com-google-android-gms-common-api-apiexception-10
+                                  // SHA1  key error
+                                  child: GoogleSignInButton(
+                                    textStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    borderRadius: 20,
+                                    darkMode: false,
+                                    onPressed: () =>
+                                        _authService.signInWithGoogleAccount(),
                                   ),
-                                  borderRadius: 20,
-                                  darkMode: false,
-                                  onPressed: () => _authService
-                                      .signInWithGoogleAccount(context),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 150,
-                        ),
-                        Container(
-                          child: TypewriterAnimatedTextKit(
-                            speed: Duration(milliseconds: 300),
-                            text: [
-                              'Stay fit with us',
-                              'Fat Dash',
                             ],
-                            textStyle: TextStyle(
-                              fontSize: 36,
-                            ),
-                            repeatForever: true,
                           ),
-                        )
-                      ],
+                          SizedBox(
+                            height: 150,
+                          ),
+                          Container(
+                            child: TypewriterAnimatedTextKit(
+                              speed: Duration(milliseconds: 300),
+                              text: [
+                                'Stay fit with us',
+                                'Fat Dash',
+                              ],
+                              textStyle: TextStyle(
+                                fontSize: 36,
+                              ),
+                              repeatForever: true,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

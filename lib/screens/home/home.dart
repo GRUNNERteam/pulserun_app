@@ -1,172 +1,175 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
-import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/services/database/database.dart';
-import 'package:pulserun_app/theme/theme.dart';
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
   bool _isloading = true;
-  DatabaseService _db = DatabaseService();
+  // ignore: unused_field
+  DatabaseService _db;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  TabController _tabcontroller;
   int _selectedIndex = 0;
   @override
   void initState() {
-    super.initState();
-    _tabcontroller = TabController(length: 2, vsync: this);
-    _db.createAccount(widget.user);
+    //_db = new DatabaseService(widget.user);
     _isloading = false;
+    super.initState();
   }
 
   @override
   void dispose() {
-    _tabcontroller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.user.uid);
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: 10,
-          ),
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(),
-              child: Text('Fat Dash'),
+    print('Created State');
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
             ),
-            ListTile(
-              leading: Icon(MdiIcons.logout),
-              title: Text('Sign out'),
-              onTap: () => _auth.signOutInstance(),
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(),
+                child: Text('Fat Dash'),
+              ),
+              ListTile(
+                leading: Icon(MdiIcons.logout),
+                title: Text('Sign out'),
+                onTap: () => _auth.signOutInstance(),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(MdiIcons.floorPlan),
+              label: 'Planing',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(MdiIcons.runFast),
+              label: 'Run',
             ),
           ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.floorPlan),
-            title: Text('Planing'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.runFast),
-            title: Text('Run'),
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-      body: (_isloading)
-          ? LoadingWidget()
-          : Stack(
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      height: 300,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0XFF00B686), Color(0XFF00838F)],
+        body: (_isloading)
+            ? LoadingWidget()
+            : Stack(
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0XFF00B686), Color(0XFF00838F)],
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20, right: 20.0, top: 30),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.menu,
-                                    color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20.0, top: 30),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.menu,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () =>
+                                        _scaffoldKey.currentState.openDrawer(),
                                   ),
-                                  onPressed: () =>
-                                      _scaffoldKey.currentState.openDrawer(),
-                                ),
-                                FadeAnimatedTextKit(
-                                  text: [
-                                    'Wellcome to Fat Dash',
-                                    'Stay fit today',
-                                    'Run & Plan',
-                                  ],
-                                  textStyle: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                  FadeAnimatedTextKit(
+                                    text: [
+                                      'Wellcome to Fat Dash',
+                                      'Stay fit today',
+                                      'Run & Plan',
+                                    ],
+                                    textStyle: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                    repeatForever: true,
                                   ),
-                                  repeatForever: true,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            _profile(
-                              displayname: widget.user.uid,
-                            )
-                          ],
+                                ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              _profile(
+                                displayname: widget.user.displayName,
+                                imgUrl: widget.user.photoURL,
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        color: Colors.grey.shade100,
-                        child: ListView(
-                          padding: EdgeInsets.only(top: 45),
-                          children: [
-                            Text(
-                              "Activity",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [],
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Text(
-                              "History",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [],
-                            )
-                          ],
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          color: Colors.grey.shade100,
+                          child: ListView(
+                            padding: EdgeInsets.only(top: 45),
+                            children: [
+                              Text(
+                                "Activity",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [],
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Text(
+                                "History",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [],
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-                _status()
-              ],
-            ),
+                      )
+                    ],
+                  ),
+                  _status()
+                ],
+              ),
+      ),
     );
   }
 
@@ -177,9 +180,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
+// ignore: camel_case_types
 class _profile extends StatelessWidget {
   final String displayname;
-  const _profile({Key key, @required this.displayname}) : super(key: key);
+  final String imgUrl;
+  const _profile({Key key, @required this.displayname, @required this.imgUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -258,6 +264,7 @@ class _profile extends StatelessWidget {
   }
 }
 
+// ignore: camel_case_types
 class _status extends StatelessWidget {
   const _status({
     Key key,
@@ -401,7 +408,7 @@ class _status extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  final UserModel user;
+  final User user;
   HomePage({Key key, @required this.user}) : super(key: key);
   @override
   State<HomePage> createState() => _HomePageState();

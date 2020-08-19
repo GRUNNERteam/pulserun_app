@@ -140,17 +140,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       color: Colors.blue,
                       child: Text('Register'),
                       onPressed: () async {
-                        if (_validateRegister()) {
-                          dynamic result =
-                              await _auth.registerWithEmailAndPassword(
-                                  nameController.text, passwordController.text);
-                          if (result != null) {
-                            print(result);
-                            Navigator.pop(context);
-                          } else {
-                            print(result);
-                          }
-                        }
+                        // if (_validateRegister()) {
+                        //   dynamic result =
+                        //       await _auth.registerWithEmailAndPassword(
+                        //           nameController.text, passwordController.text);
+                        //   if (result != null) {
+                        //     print(result);
+                        //     Navigator.pop(context);
+                        //   } else {
+                        //     print(result);
+                        //   }
+                        // }
                       },
                     )),
                 // Container(

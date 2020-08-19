@@ -1,24 +1,28 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pulserun_app/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
+  // ignore: unused_field
+  UserModel _user;
   // firestore
-  final _firestoreInstance = Firestore.instance;
-  DatabaseService() {}
+  final FirebaseFirestore _firestoreInstance = FirebaseFirestore.instance;
+  DatabaseService(User value) {
+    this._user = new UserModel(value);
+    this.createAccount(value);
+  }
   //for register first time
-  Future<void> createAccount(UserModel user) async {
+  Future<void> createAccount(User user) async {
     print("Createing User in Database ...");
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
-    var userRef =
-        _firestoreInstance.collection("users").document(firebaseUser.uid);
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+    var userRef = _firestoreInstance.collection("users").doc(firebaseUser.uid);
 
     userRef.get().then(
           (docSnapshot) => {
             if (!docSnapshot.exists)
               {
                 userRef
-                    .setData(user.getAllUserData())
+                    .set(UserModel(user).getAllUserData())
                     .then((_) => print("INIT DATA ACCOUNT COMPLETED!!"))
               }
             else

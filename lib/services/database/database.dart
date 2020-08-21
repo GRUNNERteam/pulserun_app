@@ -3,31 +3,66 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
-  // ignore: unused_field
-  UserModel _user;
+  UserModel _user = new UserModel();
+  DocumentReference _userRef;
   // firestore
   final FirebaseFirestore _firestoreInstance = FirebaseFirestore.instance;
-  DatabaseService(User value) {
-    this._user = new UserModel(value);
-    this.createAccount(value);
+  DatabaseService() {
+    print('Construct DB Service..');
+    this._user.setUserModel(FirebaseAuth.instance.currentUser);
+    this._userRef = _firestoreInstance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid);
+    this.createAccount();
   }
-  //for register first time
-  Future<void> createAccount(User user) async {
-    print("Createing User in Database ...");
-    var firebaseUser = FirebaseAuth.instance.currentUser;
-    var userRef = _firestoreInstance.collection("users").doc(firebaseUser.uid);
 
-    userRef.get().then(
+  DocumentReference getUserRef() {
+    return this._userRef;
+  }
+
+  UserModel getUserModel() {
+    return this._user;
+  }
+
+  //for register first time
+  Future<void> createAccount() async {
+    print("Createing User in Database ...");
+    _userRef.get().then(
           (docSnapshot) => {
             if (!docSnapshot.exists)
               {
-                userRef
-                    .set(UserModel(user).getAllUserData())
-                    .then((_) => print("INIT DATA ACCOUNT COMPLETED!!"))
+                _userRef.set(_user.getAllUserData()).then(
+                  (_) {
+                    print("INIT DATA ACCOUNT COMPLETED!!");
+                  },
+                )
               }
             else
-              {print("User already existing")}
+              {
+                print("User already existing"),
+                _userRef.update(_user.getAllUserData()).then((_) {
+                  print('Updateing User db from User Model ...');
+                  getUserData();
+                })
+              }
           },
         );
+  }
+
+  Future<UserModel> getUserData() async {
+    print('Getting User Data from firestore');
+    DocumentSnapshot snapshot = await _userRef.get();
+    if (snapshot.data().isNotEmpty) {
+      Map<String, dynamic> data = snapshot.data();
+      // debugging
+      // data.forEach((key, value) {
+      //   print('${key} : ${value}');
+      // });
+
+      this._user.setAllData(data);
+      return this._user;
+    } else {
+      return null;
+    }
   }
 }

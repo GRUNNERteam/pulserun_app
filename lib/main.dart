@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
+import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/statistic.dart';
+import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
-import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/theme/theme.dart';
-import 'package:pulserun_app/validation/validation_login.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,13 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => ValidationLogin(),
+          create: (context) => UserModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => StatisticModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PlanModel(),
         ),
       ],
       child: MyApp(),

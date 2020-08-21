@@ -62,9 +62,7 @@ class _WrapperState extends State<Wrapper> {
     if (_user == null) {
       return AuthPage();
     } else {
-      return HomePage(
-        user: _user,
-      );
+      return HomePage();
     }
   }
 }

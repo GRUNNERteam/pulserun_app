@@ -1,37 +1,48 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class CurrentStatusModel extends ChangeNotifier {
-  double _bmi;
-  String _status;
-  double _distance;
+class CurrentStatusModel {
+  double bmi;
+  String status;
+  double distance;
+  CurrentStatusModel({
+    this.bmi,
+    this.status,
+    this.distance,
+  });
 
-  double get bmi => _bmi;
-  String get status => _status;
-  double get distance => _distance;
-
-  CurrentStatusModel() {
-    // Mockup Data
-    this._bmi = 0.0;
-    this._status = 'Unknows';
-    this._distance = 0.0;
-  }
-  Map<String, dynamic> getAllData() {
-    print('Getting all CurrentStatus DataModel');
+  Map<String, dynamic> toMap() {
     return {
-      'bmi': this._bmi,
-      'status': this._status,
-      'distance': this._distance,
+      'bmi': bmi,
+      'status': status,
+      'distance': distance,
     };
   }
 
-  void setCurrentStatus(Map<String, dynamic> value) {
-    value.forEach((key, value) {
-      print('${key} : ${value}');
-    });
+  factory CurrentStatusModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
 
-    this._bmi = value['bmi'] as double;
-    this._status = value['status'] as String;
-    this._distance = value['distance'] as double;
-    notifyListeners();
+    return CurrentStatusModel(
+      bmi: map['bmi'],
+      status: map['status'],
+      distance: map['distance'],
+    );
   }
+
+  String toJson() => json.encode(toMap());
+
+  factory CurrentStatusModel.fromJson(String source) =>
+      CurrentStatusModel.fromMap(json.decode(source));
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is CurrentStatusModel &&
+        o.bmi == bmi &&
+        o.status == status &&
+        o.distance == distance;
+  }
+
+  @override
+  int get hashCode => bmi.hashCode ^ status.hashCode ^ distance.hashCode;
 }

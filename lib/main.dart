@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
-import 'package:pulserun_app/models/plan.dart';
-import 'package:pulserun_app/models/statistic.dart';
-import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
+import 'package:pulserun_app/cubit/running_cubit.dart';
+import 'package:pulserun_app/repository/currentstatus_repository.dart';
+import 'package:pulserun_app/repository/location_repository.dart';
+import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/theme/theme.dart';
 
@@ -15,55 +17,43 @@ void main() {
   // Set Device to portraitUp
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => UserModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => StatisticModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => PlanModel(),
-        ),
-      ],
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // for aualytics project
-  // via firebase console
-  // ignore: todo
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Firebase.initializeApp(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => HomeCubit(UserDB(), CurrentStatus())),
+        BlocProvider(create: (context) => RunningCubit(LocationData())),
+      ],
+      child: FutureBuilder(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return MaterialApp(
+              home: Scaffold(
+                body: ShowErrorWidget(),
+              ),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              title: "FatDash",
+              theme: GlobalTheme.mytheme,
+              themeMode: ThemeMode.light,
+              debugShowCheckedModeBanner: false,
+              home: SplashPage(),
+            );
+          }
           return MaterialApp(
             home: Scaffold(
-              body: ShowErrorWidget(),
+              body: LoadingWidget(),
             ),
           );
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            title: "FatDash",
-            theme: GlobalTheme.mytheme,
-            themeMode: ThemeMode.light,
-            debugShowCheckedModeBanner: false,
-            home: SplashPage(),
-          );
-        }
-        return MaterialApp(
-          home: Scaffold(
-            body: LoadingWidget(),
-          ),
-        );
-      },
+        },
+      ),
     );
   }
 }

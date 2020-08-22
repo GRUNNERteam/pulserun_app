@@ -1,48 +1,65 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:pulserun_app/services/database/database.dart';
+import 'dart:convert';
 
-class PlanModel extends ChangeNotifier {
-  int _planId;
-  double _targetHeartRate;
-  Timestamp _start;
-  //RunningModel _progress = RunningModel();
-  CollectionReference _ref;
-  PlanModel() {
-    // Mock up Data
-    this._ref = DatabaseService()
-        .getUserRef()
-        .collection('statisticCollection')
-        .doc('statistic')
-        .collection('plans');
+class PlanModel {
+  int planId;
+  double targetHeartRate;
+  DateTime start;
+  PlanModel({
+    this.planId,
+    this.targetHeartRate,
+    this.start,
+  });
 
-    this._planId = 0;
-    this._targetHeartRate = 120;
-    this._start = Timestamp.fromDate(DateTime(2020, 5, 5));
-    _initDB();
-  }
-  void _initDB() async {
-    await this._ref.doc(this._planId.toString()).get().then((snapshot) {
-      if (!snapshot.exists) {
-        _ref.doc(this._planId.toString()).set(this.getAllData());
-      } else {
-        print('plan Already Existing, Retriveing data ...');
-        _ref.doc(this._planId.toString()).get().then((snapshot) {
-          Map<String, dynamic> data = snapshot.data();
-          this._planId = data['planId'];
-          this._targetHeartRate = data['targetHeartRate'];
-          this._start = data['start'];
-        });
-      }
-    });
-  }
-
-  Map<String, dynamic> getAllData() {
+  Map<String, dynamic> toMap() {
     return {
-      'planId': this._planId,
-      'targetHeartRate': this._targetHeartRate,
-      'start': this._start,
-      //'progress': null,
+      'planId': planId,
+      'targetHeartRate': targetHeartRate,
+      'start': start?.millisecondsSinceEpoch,
     };
+  }
+
+  factory PlanModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return PlanModel(
+      planId: map['planId'],
+      targetHeartRate: map['targetHeartRate'],
+      start: DateTime.fromMillisecondsSinceEpoch(map['start']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory PlanModel.fromJson(String source) =>
+      PlanModel.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'PlanModel(planId: $planId, targetHeartRate: $targetHeartRate, start: $start)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is PlanModel &&
+        o.planId == planId &&
+        o.targetHeartRate == targetHeartRate &&
+        o.start == start;
+  }
+
+  @override
+  int get hashCode =>
+      planId.hashCode ^ targetHeartRate.hashCode ^ start.hashCode;
+
+  PlanModel copyWith({
+    int planId,
+    double targetHeartRate,
+    DateTime start,
+  }) {
+    return PlanModel(
+      planId: planId ?? this.planId,
+      targetHeartRate: targetHeartRate ?? this.targetHeartRate,
+      start: start ?? this.start,
+    );
   }
 }

@@ -3,11 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
-import 'package:provider/provider.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/theme/theme.dart';
-import 'package:pulserun_app/validation/validation_login.dart';
 
 // https://github.com/afgprogrammer/Flutter-Login-Page-3/tree/master/lib
 

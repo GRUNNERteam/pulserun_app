@@ -1,77 +1,86 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class UserModel extends ChangeNotifier {
-  String _uid;
-  String _displayName;
-  String _photoURL;
-  String _email;
-  String _birthDate;
+class UserModel {
+  final String uid;
+  final String displayName;
+  final String photoURL;
+  final String email;
+  String birthDate;
 
-  String get uid => _uid;
-  String get displayName => _displayName;
-  String get photoURL => _photoURL;
-  String get email => _email;
-  String get birthDate => _birthDate;
-  // Constructor
+  UserModel(
+    this.uid,
+    this.displayName,
+    this.photoURL,
+    this.email,
+    this.birthDate,
+  );
 
-  void setUserModel(User user) {
-    this._uid = user.uid;
-    this._displayName = user.displayName;
-    this._photoURL = user.photoURL;
-    this._email = user.email;
-    notifyListeners();
+  @override
+  int get hashCode {
+    return uid.hashCode ^
+        displayName.hashCode ^
+        photoURL.hashCode ^
+        email.hashCode ^
+        birthDate.hashCode;
   }
 
-  void setBirthDate(String value) {
-    // https://stackoverflow.com/questions/57494106/how-to-select-birth-date-with-dateformat-in-flutter
-    try {} catch (e) {}
-  }
-
-  void setAllData(Map<String, dynamic> value) {
-    print('SetData to UserModel');
-    // value.forEach((key, value) {
-    //   print('${key} : ${value}');
-    // });
-    this._uid = value['uid'];
-    this._displayName = value['displayName'];
-    this._photoURL = value['photoURL'] ?? '';
-    this._email = value['email'];
-    this._birthDate = value['birthDate'] ?? '';
-
-    notifyListeners();
-  }
-
-  String getUid() {
-    return this.isEmpty() ? null : this.uid.toString();
-  }
-
-  bool isEmpty() {
-    if (this.uid == null) {
-      return true;
-    }
-    return false;
-  }
-
-  bool isBirthDateEmpty() {
-    if (this._birthDate == null || this._birthDate == '') {
-      print('BirthDate is Empty');
-      return true;
-    } else {
-      print(this._birthDate);
-      return false;
-    }
-  }
-
-  Map<String, dynamic> getAllUserData() {
-    print('Getting all User DataModel');
+  Map<String, dynamic> toMap() {
     return {
-      'uid': this._uid,
-      'email': this._email,
-      'displayName': this._displayName,
-      'photoURL': this._photoURL,
-      'birthDate': this._birthDate,
-      //'statistic': statistic.getAllData(),
+      'uid': uid,
+      'displayName': displayName,
+      'photoURL': photoURL,
+      'email': email,
+      'birthDate': birthDate,
     };
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return UserModel(
+      map['uid'],
+      map['displayName'],
+      map['photoURL'],
+      map['email'],
+      map['birthDate'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory UserModel.fromJson(String source) =>
+      UserModel.fromMap(json.decode(source));
+
+  UserModel copyWith({
+    String uid,
+    String displayName,
+    String photoURL,
+    String email,
+    String birthDate,
+  }) {
+    return UserModel(
+      uid ?? this.uid,
+      displayName ?? this.displayName,
+      photoURL ?? this.photoURL,
+      email ?? this.email,
+      birthDate ?? this.birthDate,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'UserModel(uid: $uid, displayName: $displayName, photoURL: $photoURL, email: $email, birthDate: $birthDate)';
+  }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is UserModel &&
+        o.uid == uid &&
+        o.displayName == displayName &&
+        o.photoURL == photoURL &&
+        o.email == email &&
+        o.birthDate == birthDate;
   }
 }

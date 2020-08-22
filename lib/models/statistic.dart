@@ -1,59 +1,60 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:pulserun_app/models/currentstatus.dart';
-import 'package:pulserun_app/services/database/database.dart';
+import 'dart:convert';
 
-class StatisticModel extends ChangeNotifier {
-  DocumentReference _ref;
+import 'package:pulserun_app/models/currentstatus.dart';
+
+class StatisticModel {
+  int statId;
+  DateTime lastUpdate;
+  StatisticModel({
+    this.statId,
+    this.lastUpdate,
+  });
   CurrentStatusModel _currentStatus = CurrentStatusModel();
 
-  CurrentStatusModel get currentStatus => _currentStatus;
-
-  StatisticModel() {
-    this._ref = DatabaseService()
-        .getUserRef()
-        .collection('statisticCollection')
-        .doc('statistic');
-
-    _initDB();
+  StatisticModel copyWith({
+    int statId,
+    DateTime lastUpdate,
+  }) {
+    return StatisticModel(
+      statId: statId ?? this.statId,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
+    );
   }
 
-  void _initDB() async {
-    await this._ref.get().then((snapshot) {
-      if (!snapshot.exists) {
-        _ref.set(this.getAllData());
-      } else {
-        print('statistic Already Existing, Retriveing data ...');
-        Map<String, dynamic> data = snapshot.data();
-        // data.forEach((key, value) {
-        //   print('${key} : ${value}');
-        // });
-        if (data['currentStatus'] == null) {
-          this._ref.update(this.getAllData());
-          this._ref.get().then((snapshot) {
-            Map<String, dynamic> data = snapshot.data();
-            this._currentStatus.setCurrentStatus(data['currentStatus']);
-          });
-        } else {
-          this._currentStatus.setCurrentStatus(data['currentStatus']);
-        }
-        notifyListeners();
-      }
-    });
-  }
-
-  CurrentStatusModel getCurrentStatus() {
-    return getCurrentStatus();
-  }
-
-  DocumentReference getRef() {
-    return this._ref;
-  }
-
-  Map<String, dynamic> getAllData() {
-    print('Getting all Statistic DataModel');
+  Map<String, dynamic> toMap() {
     return {
-      'currentStatus': _currentStatus.getAllData(),
+      'statId': statId,
+      'lastUpdate': lastUpdate?.millisecondsSinceEpoch,
     };
   }
+
+  factory StatisticModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return StatisticModel(
+      statId: map['statId'],
+      lastUpdate: DateTime.fromMillisecondsSinceEpoch(map['lastUpdate']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory StatisticModel.fromJson(String source) =>
+      StatisticModel.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'StatisticModel(statId: $statId, lastUpdate: $lastUpdate)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is StatisticModel &&
+        o.statId == statId &&
+        o.lastUpdate == lastUpdate;
+  }
+
+  @override
+  int get hashCode => statId.hashCode ^ lastUpdate.hashCode;
 }

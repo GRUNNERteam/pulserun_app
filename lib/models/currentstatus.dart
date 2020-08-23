@@ -21,10 +21,18 @@ class CurrentStatusModel {
   factory CurrentStatusModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
 
+    if (map['bmi'] is int) {
+      int temp = map['bmi'];
+      map['bmi'] = temp.toDouble();
+    }
+    if (map['distance'] is int) {
+      int temp = map['distance'];
+      map['distance'] = temp.toDouble();
+    }
     return CurrentStatusModel(
-      bmi: map['bmi'],
-      status: map['status'],
-      distance: map['distance'],
+      bmi: map['bmi'] as double,
+      status: map['status'] as String,
+      distance: map['distance'] as double,
     );
   }
 

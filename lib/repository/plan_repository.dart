@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/services/auth/auth.dart';

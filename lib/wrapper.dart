@@ -35,14 +35,12 @@ class _WrapperState extends State<Wrapper> {
 
   void initialize() async {
     try {
-      // Wait for Firebase to initialize and set `_initialized` state to true
       bool isEmpty = await FirebaseAuth.instance.userChanges().isEmpty;
       setState(() {
         _isSignIn = (isEmpty) ? false : true;
         _initialized = true;
       });
     } catch (e) {
-      // Set `_error` state to true if Firebase initialization fails
       setState(() {
         _error = true;
       });

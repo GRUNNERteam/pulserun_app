@@ -1,182 +1,253 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
+import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
-import 'package:pulserun_app/services/database/database.dart';
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
 class _HomePageState extends State<HomePage> {
-  final AuthService _auth = AuthService();
-  bool _isloading = true;
-  // ignore: unused_field
-  DatabaseService _db;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _selectedIndex = 0;
-  @override
-  void initState() {
-    //_db = new DatabaseService(widget.user);
-    _isloading = false;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
+  int _indexHotbar = 1;
   @override
   Widget build(BuildContext context) {
-    print('Created State');
+    print('Created HomePage');
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
-            children: <Widget>[
-              DrawerHeader(
-                decoration: BoxDecoration(),
-                child: Text('Fat Dash'),
-              ),
-              ListTile(
-                leading: Icon(MdiIcons.logout),
-                title: Text('Sign out'),
-                onTap: () => _auth.signOutInstance(),
-              ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(MdiIcons.floorPlan),
-              label: 'Planing',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(MdiIcons.runFast),
-              label: 'Run',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
-        body: (_isloading)
-            ? LoadingWidget()
-            : Stack(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        height: 300,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0XFF00B686), Color(0XFF00838F)],
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20.0, top: 30),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () =>
-                                        _scaffoldKey.currentState.openDrawer(),
-                                  ),
-                                  FadeAnimatedTextKit(
-                                    text: [
-                                      'Wellcome to Fat Dash',
-                                      'Stay fit today',
-                                      'Run & Plan',
-                                    ],
-                                    textStyle: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                    repeatForever: true,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              _profile(
-                                displayname: widget.user.displayName,
-                                imgUrl: widget.user.photoURL,
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          color: Colors.grey.shade100,
-                          child: ListView(
-                            padding: EdgeInsets.only(top: 45),
-                            children: [
-                              Text(
-                                "Activity",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [],
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                "History",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [],
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  _status()
-                ],
-              ),
+        drawer: _menu(),
+        bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
+        body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+          if (state is HomeInitial) {
+            print('Init');
+            BlocProvider.of<HomeCubit>(context)
+                .getUser(); // trigger to load data
+            return LoadingWidget();
+          } else if (state is HomeLoading) {
+            print('Loading');
+            return LoadingWidget();
+          } else if (state is HomeLoaded) {
+            return _body(state.currentStatusModel, state.userModel);
+          } else {
+            // state Error
+            return ShowErrorWidget();
+          }
+        }),
       ),
     );
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  Widget _body(CurrentStatusModel status, UserModel user) {
+    return Stack(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Container(
+              height: 300,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Color(0XFF00B686), Color(0XFF00838F)]),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(
+                            Icons.menu,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            _scaffoldKey.currentState.openDrawer();
+                          },
+                        ),
+                        FadeAnimatedTextKit(
+                          text: [
+                            'Wellcome to Fat Dash',
+                            'Stay fit today',
+                            'Run & Plan',
+                          ],
+                          textStyle: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          repeatForever: true,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    _profile(
+                      displayname: user.displayName,
+                      imgUrl: user.photoURL,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                color: Colors.grey.shade100,
+                child: ListView(
+                  padding: EdgeInsets.only(top: 45),
+                  children: <Widget>[
+                    Text(
+                      "Activity",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      "History",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[],
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+        _status(
+          bmi: status.bmi.toString(),
+          currentStatus: status.status.toString(),
+          distance: status.distance.toString(),
+        ),
+      ],
+    );
+  }
+}
+
+class _buildBottomNavBar extends StatelessWidget {
+  const _buildBottomNavBar({
+    @required this.index,
+    Key key,
+  }) : super(key: key);
+
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.floorPlan),
+          label: 'Current Plan',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.runFast),
+          label: 'Run',
+        ),
+      ],
+      currentIndex: index,
+      onTap: (value) {
+        switch (value) {
+          case 2:
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => RunningPage()));
+            break;
+          default:
+        }
+      },
+    );
+  }
+}
+
+class _menu extends StatelessWidget {
+  const _menu({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+        ),
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(),
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: Container(
+                    child: ColorizeAnimatedTextKit(
+                      speed: Duration(milliseconds: 400),
+                      text: ['FAT DASH'],
+                      colors: [
+                        Colors.purple,
+                        Colors.blue,
+                        Colors.yellow,
+                        Colors.red,
+                      ],
+                      textStyle: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      repeatForever: true,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.floorPlan),
+            title: Text('Planing'),
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.logout),
+            title: Text('Sign out'),
+            onTap: () async => await AuthService().signOutInstance(),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -210,7 +281,11 @@ class _profile extends StatelessWidget {
             borderRadius: BorderRadius.circular(40.0),
           ),
           padding: EdgeInsets.all(5),
-          child: CircleAvatar(),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+              imgUrl,
+            ),
+          ),
         ),
         SizedBox(
           width: 20,
@@ -266,9 +341,16 @@ class _profile extends StatelessWidget {
 
 // ignore: camel_case_types
 class _status extends StatelessWidget {
-  const _status({
-    Key key,
-  }) : super(key: key);
+  final String bmi;
+  final String currentStatus;
+  final String distance;
+
+  const _status(
+      {Key key,
+      @required this.bmi,
+      @required this.currentStatus,
+      @required this.distance})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -280,19 +362,20 @@ class _status extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.85,
         height: 90,
         decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.05),
-                blurRadius: 8,
-                spreadRadius: 3,
-                offset: Offset(0, 10),
-              ),
-            ],
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(50),
-            )),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 8,
+              spreadRadius: 3,
+              offset: Offset(0, 10),
+            ),
+          ],
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            bottomLeft: Radius.circular(50),
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -303,7 +386,7 @@ class _status extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: [
+                      children: <Widget>[
                         Text(
                           "BMI",
                           style: TextStyle(
@@ -321,11 +404,13 @@ class _status extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      "99",
+                      bmi,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
                     )
                   ],
                 ),
@@ -338,7 +423,7 @@ class _status extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: [
+                      children: <Widget>[
                         Text(
                           "Status",
                           style: TextStyle(
@@ -356,11 +441,13 @@ class _status extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      "Unkown",
+                      currentStatus,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
                     )
                   ],
                 ),
@@ -381,17 +468,19 @@ class _status extends StatelessWidget {
                           width: 10,
                         ),
                         Icon(
-                          Icons.arrow_downward,
+                          MdiIcons.runFast,
                           color: Color(0XFF00838F),
                         )
                       ],
                     ),
                     Text(
-                      "0.1 km",
+                      distance.toString() + " KM",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
                     )
                   ],
                 ),
@@ -405,11 +494,4 @@ class _status extends StatelessWidget {
       ),
     );
   }
-}
-
-class HomePage extends StatefulWidget {
-  final User user;
-  HomePage({Key key, @required this.user}) : super(key: key);
-  @override
-  State<HomePage> createState() => _HomePageState();
 }

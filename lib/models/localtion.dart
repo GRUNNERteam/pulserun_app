@@ -1,93 +1,210 @@
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class LocationItem {
-  double lat;
-  double lng;
-  double alt;
-  double bearing; // orientation aka heading in geolocator
-  double tilt; // viewing angle
-  DateTime ts; // timestamp
+class LocationModel {
+  List<PositionModel> position;
+  List<CameraPosition> camPosition;
+  LocationModel({
+    this.position,
+    this.camPosition,
+  });
 
-  LocationItem(this.lat, this.lng, this.alt, this.bearing, this.tilt, this.ts);
+  void addPos(PositionModel pos) {
+    this.position.add(pos);
+    this.camPosition.add(convertPosToCam(pos));
+  }
+
+  CameraPosition convertPosToCam(PositionModel pos) {
+    // ref MapView
+    // https://developers.google.com/maps/documentation/android-sdk/views
+    return CameraPosition(
+      target: LatLng(pos.latitude, pos.longitude),
+      bearing: pos.heading,
+      tilt: 45,
+      zoom: 20,
+    );
+  }
+
+  LocationModel copyWith({
+    List<PositionModel> position,
+    List<CameraPosition> camPosition,
+  }) {
+    return LocationModel(
+      position: position ?? this.position,
+      camPosition: camPosition ?? this.camPosition,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'position': position?.map((x) => x?.toMap())?.toList(),
+      'camPosition': camPosition?.map((x) => x?.toMap())?.toList(),
+    };
+  }
+
+  factory LocationModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return LocationModel(
+      position: List<PositionModel>.from(
+          map['position']?.map((x) => PositionModel.fromMap(x))),
+      camPosition: List<CameraPosition>.from(
+          map['camPosition']?.map((x) => CameraPosition.fromMap(x))),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory LocationModel.fromJson(String source) =>
+      LocationModel.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'LocationModel(position: $position, camPosition: $camPosition)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is LocationModel &&
+        listEquals(o.position, position) &&
+        listEquals(o.camPosition, camPosition);
+  }
+
+  @override
+  int get hashCode => position.hashCode ^ camPosition.hashCode;
 }
 
-class LocationModel {
-  List<LocationItem> locList; // new way to collect a location
-  LatLng origin = new LatLng(0, 0);
-  LatLng destination = new LatLng(0, 0);
-  LatLng lastPos = new LatLng(0, 0);
-  List<LatLng> _listPos = new List<LatLng>(); // will replace this with new list
-  bool _allowToSave = true;
+class PositionModel {
+  final double latitude;
+  final double longitude;
+  final DateTime timestamp;
+  final bool mocked;
+  final double altitude;
+  final double accuracy;
+  final double heading;
+  final double speed;
+  final double speedAccuracy;
+  PositionModel({
+    this.latitude,
+    this.longitude,
+    this.timestamp,
+    this.mocked,
+    this.altitude,
+    this.accuracy,
+    this.heading,
+    this.speed,
+    this.speedAccuracy,
+  });
 
-  // constructor
-  LocationModel() {
-    this._listPos.clear();
-    this._allowToSave = true;
+  PositionModel convertGeoPosToCustom(Position pos) {
+    return PositionModel(
+      latitude: pos.latitude,
+      longitude: pos.longitude,
+      timestamp: pos.timestamp,
+      mocked: pos.mocked,
+      altitude: pos.altitude,
+      accuracy: pos.accuracy,
+      heading: pos.heading,
+      speed: pos.speed,
+      speedAccuracy: pos.speedAccuracy,
+    );
   }
 
-  void clear() {
-    this._listPos.clear();
-    this.origin = LatLng(0, 0);
-    this.destination = LatLng(0, 0);
-    this.lastPos = LatLng(0, 0);
-    this._allowToSave = true;
+  PositionModel copyWith({
+    double latitude,
+    double longitude,
+    DateTime timestamp,
+    bool mocked,
+    double altitude,
+    double accuracy,
+    double heading,
+    double speed,
+    double speedAccuracy,
+  }) {
+    return PositionModel(
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      timestamp: timestamp ?? this.timestamp,
+      mocked: mocked ?? this.mocked,
+      altitude: altitude ?? this.altitude,
+      accuracy: accuracy ?? this.accuracy,
+      heading: heading ?? this.heading,
+      speed: speed ?? this.speed,
+      speedAccuracy: speedAccuracy ?? this.speedAccuracy,
+    );
   }
 
-  void addOrignLatLng(LatLng value) {
-    try {
-      // prevent add origin after add destination
-      if (!_allowToSave) {
-        // if origin was added should clear pos in list for tracking
-        _listPos.clear();
-        this.origin = value;
-        addListLatLng(value);
-      }
-    } catch (error) {
-      print(error.toString());
-    }
+  Map<String, dynamic> toMap() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'timestamp': timestamp?.millisecondsSinceEpoch,
+      'mocked': mocked,
+      'altitude': altitude,
+      'accuracy': accuracy,
+      'heading': heading,
+      'speed': speed,
+      'speedAccuracy': speedAccuracy,
+    };
   }
 
-  void addDestination(LatLng value) {
-    try {
-      this.destination = value;
-      addListLatLng(value);
-      this._allowToSave = false;
-    } catch (error) {
-      print(error.toString());
-    }
+  factory PositionModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return PositionModel(
+      latitude: map['latitude'],
+      longitude: map['longitude'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
+      mocked: map['mocked'],
+      altitude: map['altitude'],
+      accuracy: map['accuracy'],
+      heading: map['heading'],
+      speed: map['speed'],
+      speedAccuracy: map['speedAccuracy'],
+    );
   }
 
-  void addListLatLng(LatLng value) {
-    try {
-      // for debug
-      if (_allowToSave) {
-        print("LatLng : Lat=" +
-            value.latitude.toString() +
-            " Lng=" +
-            value.longitude.toString());
-        this._listPos.add(value);
-        this.lastPos = value;
-      }
-    } catch (error) {
-      print(error.toString());
-    }
+  String toJson() => json.encode(toMap());
+
+  factory PositionModel.fromJson(String source) =>
+      PositionModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'PositionModel(latitude: $latitude, longitude: $longitude, timestamp: $timestamp, mocked: $mocked, altitude: $altitude, accuracy: $accuracy, heading: $heading, speed: $speed, speedAccuracy: $speedAccuracy)';
   }
 
-  void setLastPos(LatLng value) {
-    this.lastPos = value;
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is PositionModel &&
+        o.latitude == latitude &&
+        o.longitude == longitude &&
+        o.timestamp == timestamp &&
+        o.mocked == mocked &&
+        o.altitude == altitude &&
+        o.accuracy == accuracy &&
+        o.heading == heading &&
+        o.speed == speed &&
+        o.speedAccuracy == speedAccuracy;
   }
 
-  LatLng positionToLatLng(Position position) {
-    return LatLng(position.latitude, position.longitude);
-  }
-
-  PointLatLng getLastPointLatLng() {
-    return PointLatLng(lastPos.latitude, lastPos.longitude);
-  }
-
-  PointLatLng getOriginPointLatLng() {
-    return PointLatLng(origin.latitude, origin.longitude);
+  @override
+  int get hashCode {
+    return latitude.hashCode ^
+        longitude.hashCode ^
+        timestamp.hashCode ^
+        mocked.hashCode ^
+        altitude.hashCode ^
+        accuracy.hashCode ^
+        heading.hashCode ^
+        speed.hashCode ^
+        speedAccuracy.hashCode;
   }
 }

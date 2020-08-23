@@ -3,47 +3,52 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
-import 'package:provider/provider.dart';
+import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/theme/theme.dart';
-import 'package:pulserun_app/validation/validation_login.dart';
 
 // https://github.com/afgprogrammer/Flutter-Login-Page-3/tree/master/lib
 
 class _AuthPageState extends State<AuthPage> {
-  // ignore: unused_field
   bool _isLoading = true;
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
 
   final _authService = AuthService();
 
   @override
   void initState() {
     initialize();
-    _usernameController.clear();
-    _passwordController.clear();
-    _isLoading = false;
     super.initState();
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _isLoading = true;
     super.dispose();
   }
 
   void initialize() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      _authService.signOutInstance();
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        await _authService.signOutInstance();
+        setState(() {
+          print('Sign Out Instance Complete!');
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     //final _signInvalidation = Provider.of<ValidationLogin>(context);
+    if (_isLoading) {
+      return LoadingWidget();
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -106,114 +111,6 @@ class _AuthPageState extends State<AuthPage> {
                           SizedBox(
                             height: 60,
                           ),
-                          // Container(
-                          //   padding: EdgeInsets.all(20),
-                          //   decoration: BoxDecoration(
-                          //     color: GlobalTheme.white,
-                          //     boxShadow: [
-                          //       BoxShadow(
-                          //         color: GlobalTheme.light_cyan_shadow,
-                          //         blurRadius: 20,
-                          //         offset: Offset(0, 10),
-                          //       ),
-                          //     ],
-                          //   ),
-                          //   child: Column(
-                          //     children: <Widget>[
-                          //       Container(
-                          //         padding: EdgeInsets.all(10),
-                          //         decoration: BoxDecoration(
-                          //           border: Border(
-                          //             bottom: BorderSide(
-                          //               color: Colors.grey[200],
-                          //             ),
-                          //           ),
-                          //         ),
-                          //         child: TextField(
-                          //           controller: _usernameController,
-                          //           decoration: InputDecoration(
-                          //             errorText: _signInvalidation.username.error,
-                          //             hintText: "Enter an Email",
-                          //             hintStyle: TextStyle(
-                          //               color: Colors.grey,
-                          //             ),
-                          //             border: InputBorder.none,
-                          //           ),
-                          //           onChanged: (String value) =>
-                          //               _signInvalidation.changeUsername(value),
-                          //         ),
-                          //       ),
-                          //       Container(
-                          //         padding: EdgeInsets.all(10),
-                          //         decoration: BoxDecoration(
-                          //           border: Border(
-                          //             bottom: BorderSide(
-                          //               color: Colors.grey[200],
-                          //             ),
-                          //           ),
-                          //         ),
-                          //         child: TextField(
-                          //           obscureText: true,
-                          //           controller: _passwordController,
-                          //           decoration: InputDecoration(
-                          //             errorText: _signInvalidation.password.error,
-                          //             hintText: "Enter an Password",
-                          //             hintStyle: TextStyle(
-                          //               color: Colors.grey,
-                          //             ),
-                          //             border: InputBorder.none,
-                          //           ),
-                          //           onChanged: (String value) =>
-                          //               _signInvalidation.changePassword(value),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                          // SizedBox(
-                          //   height: 40,
-                          // ),
-                          // Text(
-                          //   "Forgot Password?",
-                          //   style: TextStyle(
-                          //     color: Colors.grey,
-                          //   ),
-                          // ),
-                          // SizedBox(
-                          //   height: 40,
-                          // ),
-                          // ButtonTheme(
-                          //   minWidth: double.infinity,
-                          //   height: 50.0,
-                          //   disabledColor: GlobalTheme.default_error,
-                          //   buttonColor: GlobalTheme.tiffany_blue,
-                          //   child: RaisedButton(
-                          //     shape: RoundedRectangleBorder(
-                          //       borderRadius: BorderRadius.circular(50),
-                          //     ),
-                          //     child: Center(
-                          //       child: Text(
-                          //         "Sign In",
-                          //         style: TextStyle(
-                          //           color: Colors.white,
-                          //           fontWeight: FontWeight.bold,
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     onPressed: (!_signInvalidation.isValid)
-                          //         ? null
-                          //         : _signInvalidation.submit,
-                          //   ),
-                          // ),
-                          // SizedBox(
-                          //   height: 50,
-                          // ),
-                          // Text(
-                          //   "Continue with other way",
-                          //   style: TextStyle(
-                          //     color: Colors.grey,
-                          //   ),
-                          // ),
                           RichText(
                             text: TextSpan(
                                 text: 'To Sign In, ',
@@ -249,8 +146,19 @@ class _AuthPageState extends State<AuthPage> {
                                     ),
                                     borderRadius: 20,
                                     darkMode: false,
-                                    onPressed: () =>
-                                        _authService.signInWithGoogleAccount(),
+                                    onPressed: () {
+                                      return FutureBuilder(
+                                        future: _authService
+                                            .signInWithGoogleAccount(),
+                                        builder: (context, snapshot) {
+                                          if (!snapshot.hasData) {
+                                            setState(() {
+                                              _isLoading = true;
+                                            });
+                                          }
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
                               ),

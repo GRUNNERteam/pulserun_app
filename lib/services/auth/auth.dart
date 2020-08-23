@@ -1,54 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pulserun_app/models/user.dart';
 
 class AuthService {
   // Data is store in Firebase instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  // Check for have user in app or not
-  // by using stream
-  Stream<User> get user {
-    return _auth.authStateChanges();
-  }
-
-  // UserModel _userFromFirebase(UserCredential result) {
-  //   return user != null
-  //       ? UserModel(
-  //           uid: result.user.uid,
-  //           displayName: result.user.displayName,
-  //           imageURL: result.user.photoURL,
-  //         )
-  //       : null;
-  // }
-
-  // Sign In with Email and Password
-  // Future signInWithEmailAndPassword(email, password) async {
-  //   try {
-  //     UserCredential result = await _auth.signInWithEmailAndPassword(
-  //         email: email.trim(), password: password);
-  //     return _userFromFirebase(result);
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return null;
-  //   }
-  // }
-
-  // // Register with Email and Password
-  // Future registerWithEmailAndPassword(email, password) async {
-  //   try {
-  //     UserCredential result = await _auth.createUserWithEmailAndPassword(
-  //         email: email, password: password);
-  //     return _userFromFirebase(result);
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return null;
-  //   }
-  // }
 
   // Sign Out
   Future signOutInstance() async {
     try {
-      if (await GoogleSignIn().isSignedIn()) {
+      bool isSignIn = await GoogleSignIn().isSignedIn();
+      if (isSignIn) {
         await GoogleSignIn().signOut();
       }
 
@@ -78,6 +39,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);
+      return null;
     }
   }
 }

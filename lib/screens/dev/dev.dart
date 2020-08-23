@@ -57,17 +57,17 @@ class DevPage extends StatelessWidget {
                   );
                 },
               ),
-              RaisedButton(
-                child: Text('MapPage'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MapPage(),
-                    ),
-                  );
-                },
-              ),
+              // RaisedButton(
+              //   child: Text('MapPage'),
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => MapPage(),
+              //       ),
+              //     );
+              //   },
+              // ),
               RaisedButton(
                 child: Text("AuthPage"),
                 onPressed: () {

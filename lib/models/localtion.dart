@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
-
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+
+import 'package:pulserun_app/repository/location_repository.dart';
 
 class LocationModel {
   List<PositionModel> position;
@@ -82,8 +83,7 @@ class LocationModel {
 class PositionModel {
   final double latitude;
   final double longitude;
-  final DateTime timestamp;
-  final bool mocked;
+  final double timestamp;
   final double altitude;
   final double accuracy;
   final double heading;
@@ -93,7 +93,6 @@ class PositionModel {
     this.latitude,
     this.longitude,
     this.timestamp,
-    this.mocked,
     this.altitude,
     this.accuracy,
     this.heading,
@@ -101,12 +100,11 @@ class PositionModel {
     this.speedAccuracy,
   });
 
-  PositionModel convertGeoPosToCustom(Position pos) {
+  PositionModel convertLocToPos(LocationData pos) {
     return PositionModel(
       latitude: pos.latitude,
       longitude: pos.longitude,
-      timestamp: pos.timestamp,
-      mocked: pos.mocked,
+      timestamp: pos.time,
       altitude: pos.altitude,
       accuracy: pos.accuracy,
       heading: pos.heading,
@@ -118,8 +116,7 @@ class PositionModel {
   PositionModel copyWith({
     double latitude,
     double longitude,
-    DateTime timestamp,
-    bool mocked,
+    double timestamp,
     double altitude,
     double accuracy,
     double heading,
@@ -130,7 +127,6 @@ class PositionModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       timestamp: timestamp ?? this.timestamp,
-      mocked: mocked ?? this.mocked,
       altitude: altitude ?? this.altitude,
       accuracy: accuracy ?? this.accuracy,
       heading: heading ?? this.heading,
@@ -143,8 +139,7 @@ class PositionModel {
     return {
       'latitude': latitude,
       'longitude': longitude,
-      'timestamp': timestamp?.millisecondsSinceEpoch,
-      'mocked': mocked,
+      'timestamp': timestamp,
       'altitude': altitude,
       'accuracy': accuracy,
       'heading': heading,
@@ -159,8 +154,7 @@ class PositionModel {
     return PositionModel(
       latitude: map['latitude'],
       longitude: map['longitude'],
-      timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
-      mocked: map['mocked'],
+      timestamp: map['timestamp'],
       altitude: map['altitude'],
       accuracy: map['accuracy'],
       heading: map['heading'],
@@ -176,7 +170,7 @@ class PositionModel {
 
   @override
   String toString() {
-    return 'PositionModel(latitude: $latitude, longitude: $longitude, timestamp: $timestamp, mocked: $mocked, altitude: $altitude, accuracy: $accuracy, heading: $heading, speed: $speed, speedAccuracy: $speedAccuracy)';
+    return 'PositionModel(latitude: $latitude, longitude: $longitude, timestamp: $timestamp, altitude: $altitude, accuracy: $accuracy, heading: $heading, speed: $speed, speedAccuracy: $speedAccuracy)';
   }
 
   @override
@@ -187,7 +181,6 @@ class PositionModel {
         o.latitude == latitude &&
         o.longitude == longitude &&
         o.timestamp == timestamp &&
-        o.mocked == mocked &&
         o.altitude == altitude &&
         o.accuracy == accuracy &&
         o.heading == heading &&
@@ -200,7 +193,6 @@ class PositionModel {
     return latitude.hashCode ^
         longitude.hashCode ^
         timestamp.hashCode ^
-        mocked.hashCode ^
         altitude.hashCode ^
         accuracy.hashCode ^
         heading.hashCode ^

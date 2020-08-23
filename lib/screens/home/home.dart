@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
             print('Loading');
             return LoadingWidget();
           } else if (state is HomeLoaded) {
-            return _body(state.currentStatusModel, state.userModel);
+            return _body(context, state.currentStatusModel, state.userModel);
           } else {
             // state Error
             return ShowErrorWidget();
@@ -48,7 +48,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _body(CurrentStatusModel status, UserModel user) {
+  Widget _body(
+      BuildContext context, CurrentStatusModel status, UserModel user) {
     return Stack(
       children: <Widget>[
         Column(
@@ -185,6 +186,23 @@ class _buildBottomNavBar extends StatelessWidget {
       currentIndex: index,
       onTap: (value) {
         switch (value) {
+          case 0:
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Not Available'),
+                content: const Text('Plan is not a available yet.'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+            break;
           case 2:
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => RunningPage()));

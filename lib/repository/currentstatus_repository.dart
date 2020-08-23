@@ -14,7 +14,13 @@ class CurrentStatus implements CurrentStatusRepository {
     CurrentStatusModel data;
     await _ref.get().then((snapshot) {
       if (snapshot.exists) {
+        // snapshot.data().forEach((key, value) {
+        //   var type = value.runtimeType;
+        //   print('$key : $type');
+        // });
         data = CurrentStatusModel.fromMap(snapshot.data());
+
+        print(data.toString());
       } else {
         // init value
         _ref.set(

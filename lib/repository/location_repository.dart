@@ -2,23 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/services/database/database.dart';
+import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
 abstract class LocationRepository {
-  Future<LocationModel> uploadToDB(
-      int planId, String runId, LocationModel data);
+  Future<LocationModel> uploadToDB(int planId, LocationModel data);
 }
 
-class LocationDB implements LocationRepository {
+class TestLocationDB implements LocationRepository {
   @override
-  Future<LocationModel> uploadToDB(
-      int planId, String runId, LocationModel data) {
-    LocationModel _data = data;
+  Future<LocationModel> uploadToDB(int planId, LocationModel data) async {
+    LocationModel _data;
     DocumentReference _ref = DatabaseService()
         .getUserRef()
         .collection('plan')
         .doc(planId.toString())
         .collection('run')
-        .doc(runId);
+        .doc();
     ;
+
+    await _ref.set(data.toMap());
+
+    return _data;
   }
 }

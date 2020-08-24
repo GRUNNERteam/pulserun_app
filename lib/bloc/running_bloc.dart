@@ -2,41 +2,35 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:meta/meta.dart';
 
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
+import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
-import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
 part 'running_event.dart';
 part 'running_state.dart';
 
 class RunningBloc extends Bloc<RunningEvent, RunningState> {
-  // location tracking
-  final _tracklocStreamController = StreamController<TrackingLocationService>();
-  // ignore: non_constant_identifier_names
-  StreamSink<TrackingLocationService> get trackloc_sink =>
-      _tracklocStreamController.sink;
-  // ignore: non_constant_identifier_names
-  Stream<TrackingLocationService> get trackloc_stream =>
-      _tracklocStreamController.stream;
-  // ignore: non_constant_identifier_names
-  final _tracklocEventController = StreamController<RunningEvent>();
-  // ignore: non_constant_identifier_names
-  Sink<RunningEvent> get trackloc_event_sink => _tracklocEventController.sink;
+  final Location _location;
+  final LocationRepository _locationRepository;
+
+  StreamSubscription _locationSubscription;
 
   final PlanRepository _planRepository;
   final CurrentStatusRepository _currentStatusRepository;
 
   RunningBloc(
+    this._location,
     this._planRepository,
     this._currentStatusRepository,
-  ) : super(RunningInitial()) {
-    _tracklocEventController.stream.listen((event) {});
-  }
+    this._locationRepository,
+  ) : super(RunningInitial());
 
   @override
   Stream<RunningState> mapEventToState(
@@ -57,15 +51,28 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     if (event is StartRunning) {
       try {
         yield RunningLoading();
-        yield RunningWorking();
+        _location.changeSettings(accuracy: LocationAccuracy.navigation);
+        _locationSubscription?.cancel();
+        _locationSubscription =
+            _location.onLocationChanged.listen((LocationData currentLocation) {
+          add(LocationChange(locationData: currentLocation));
+        });
+        final LocationData position = await _location.getLocation();
+        yield RunningWorking(
+            positionModel: PositionModel().convertLocToPos(position));
       } catch (e) {
         yield RunningError('StartRunning Error');
       }
     }
 
+    if (event is LocationChange && state is RunningWorking) {
+      yield RunningWorking(
+          positionModel: PositionModel().convertLocToPos(event.locationData));
+    }
     if (event is StopRunning) {
       try {
         yield RunningLoading();
+        _locationSubscription?.cancel();
         yield RunningResult();
       } catch (e) {
         yield RunningError('StopRunning Error');
@@ -73,8 +80,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     }
   }
 
-  dispose() {
-    _tracklocStreamController.close();
-    _tracklocEventController.close();
+  @override
+  Future<void> close() {
+    _locationSubscription.cancel();
+    return super.close();
   }
 }

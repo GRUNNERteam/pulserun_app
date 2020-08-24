@@ -2,9 +2,24 @@ import 'dart:async';
 
 import 'package:location/location.dart';
 import 'package:pulserun_app/models/localtion.dart';
+import 'package:pulserun_app/repository/location_repository.dart';
 
 class TrackingLocationService {
   LocationModel _storage;
+
+  void addToList(PositionModel pos) {
+    if (_storage == null) {
+      this._storage = LocationModel();
+      this._storage.addPos(pos);
+    } else {
+      this._storage.addPos(pos);
+    }
+  }
+
+  void uploadToDB() async {
+    LocationRepository _temp = TestLocationDB();
+    await _temp.uploadToDB(0, this._storage);
+  }
 }
 
 class LocationService {

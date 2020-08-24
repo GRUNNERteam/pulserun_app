@@ -2,15 +2,47 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
-class RunningPage extends StatelessWidget {
+class RunningPage extends StatefulWidget {
   const RunningPage({Key key}) : super(key: key);
+
+  @override
+  _RunningPageState createState() => _RunningPageState();
+}
+
+class _RunningPageState extends State<RunningPage> {
+  TrackingLocationService _trackingLocationService = TrackingLocationService();
+  GoogleMapController mapController;
+
+  Map<PolylineId, Polyline> _polylines = {};
+  List<LatLng> _polylineCoordinates = [];
+
+  void _addPolyLine() {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.red,
+      points: _polylineCoordinates,
+    );
+    _polylines[id] = polyline;
+  }
+
+  void _onMapCreated(GoogleMapController googleMapController) async {
+    mapController = googleMapController;
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +61,21 @@ class RunningPage extends StatelessWidget {
               return _buildbodyPlan(
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
-              return _buildbodyRunning(context);
+              if (state.positionModel != null) {
+                _trackingLocationService.addToList(state.positionModel);
+                try {
+                  mapController.animateCamera(CameraUpdate.newCameraPosition(
+                      LocationModel().convertPosToCam(state.positionModel)));
+                } catch (e) {
+                  print('Pos not found : $e');
+                }
+              }
+              _polylineCoordinates.add(LatLng(
+                  state.positionModel.latitude, state.positionModel.longitude));
+              _addPolyLine();
+              return _buildbodyRunning(context, state.positionModel);
             } else if (state is RunningResult) {
+              _trackingLocationService.uploadToDB();
               return _buildbodyResult(context);
             } else {
               return ShowErrorWidget();
@@ -66,7 +111,8 @@ class RunningPage extends StatelessWidget {
     );
   }
 
-  Widget _buildbodyRunning(BuildContext context) {
+  Widget _buildbodyRunning(BuildContext context, PositionModel pos) {
+    print('Widget Build : _buildbodyRunning');
     return Stack(
       children: <Widget>[
         Column(
@@ -129,12 +175,12 @@ class RunningPage extends StatelessWidget {
                   ),
                   Flexible(
                     child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(0, 0),
-                        zoom: 20,
-                        tilt: 45,
-                      ),
+                      initialCameraPosition:
+                          LocationModel().convertPosToCam(pos),
                       zoomControlsEnabled: false,
+                      myLocationEnabled: true,
+                      onMapCreated: _onMapCreated,
+                      polylines: Set<Polyline>.of(_polylines.values),
                     ),
                   ),
                 ],

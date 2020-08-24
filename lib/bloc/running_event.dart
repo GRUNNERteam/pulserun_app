@@ -13,9 +13,16 @@ class GetPlanAndStat extends RunningEvent {
 }
 
 class StartRunning extends RunningEvent {
-  RunningModel runningModel;
+  final RunningModel runningModel;
   StartRunning({
     this.runningModel,
+  });
+}
+
+class LocationChange extends RunningEvent {
+  final LocationData locationData;
+  LocationChange({
+    this.locationData,
   });
 }
 

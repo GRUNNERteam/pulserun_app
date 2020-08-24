@@ -1,29 +1,44 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as googleMap;
+import 'package:latlong/latlong.dart' as latlong;
 import 'package:location/location.dart';
 
-import 'package:pulserun_app/repository/location_repository.dart';
-
 class LocationModel {
-  List<PositionModel> position;
-  List<CameraPosition> camPosition;
+  List<PositionModel> position = List<PositionModel>();
+  List<googleMap.CameraPosition> camPosition = List<googleMap.CameraPosition>();
+  double totalDistance = 0;
+
+  final latlong.Distance _distance = latlong.Distance();
   LocationModel({
     this.position,
     this.camPosition,
   });
 
   void addPos(PositionModel pos) {
+    if (this.position == null) {
+      this.position = List<PositionModel>();
+      this.camPosition = List<googleMap.CameraPosition>();
+    }
     this.position.add(pos);
     this.camPosition.add(convertPosToCam(pos));
+    if (this.position.length > 1 && this.position.isNotEmpty) {
+      totalDistance = _distance.as(
+        latlong.LengthUnit.Kilometer,
+        latlong.LatLng(
+            this.position.last.latitude, this.position.last.longitude),
+        latlong.LatLng(pos.latitude, pos.longitude),
+      );
+    }
   }
 
-  CameraPosition convertPosToCam(PositionModel pos) {
+  googleMap.CameraPosition convertPosToCam(PositionModel pos) {
     // ref MapView
     // https://developers.google.com/maps/documentation/android-sdk/views
-    return CameraPosition(
-      target: LatLng(pos.latitude, pos.longitude),
+    return googleMap.CameraPosition(
+      target: googleMap.LatLng(pos.latitude, pos.longitude),
       bearing: pos.heading,
       tilt: 45,
       zoom: 20,
@@ -32,12 +47,21 @@ class LocationModel {
 
   LocationModel copyWith({
     List<PositionModel> position,
-    List<CameraPosition> camPosition,
+    List<googleMap.CameraPosition> camPosition,
   }) {
     return LocationModel(
       position: position ?? this.position,
       camPosition: camPosition ?? this.camPosition,
     );
+  }
+
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
   }
 
   Map<String, dynamic> toMap() {
@@ -53,8 +77,8 @@ class LocationModel {
     return LocationModel(
       position: List<PositionModel>.from(
           map['position']?.map((x) => PositionModel.fromMap(x))),
-      camPosition: List<CameraPosition>.from(
-          map['camPosition']?.map((x) => CameraPosition.fromMap(x))),
+      camPosition: List<googleMap.CameraPosition>.from(
+          map['camPosition']?.map((x) => googleMap.CameraPosition.fromMap(x))),
     );
   }
 

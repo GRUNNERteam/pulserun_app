@@ -36,20 +36,24 @@ class RunningLoaded extends RunningState {
 }
 
 class RunningWorking extends RunningState {
-  RunningModel runningModel;
+  final RunningModel runningModel;
+  final PositionModel positionModel;
   RunningWorking({
     this.runningModel,
+    this.positionModel,
   });
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is RunningWorking && o.runningModel == runningModel;
+    return o is RunningWorking &&
+        o.runningModel == runningModel &&
+        o.positionModel == positionModel;
   }
 
   @override
-  int get hashCode => runningModel.hashCode;
+  int get hashCode => runningModel.hashCode ^ positionModel.hashCode;
 }
 
 class RunningResult extends RunningState {}

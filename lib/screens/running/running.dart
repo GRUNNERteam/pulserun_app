@@ -128,7 +128,8 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current Distance'),
-                          Text('0 KM'),
+                          Text(_trackingLocationService.distanceCentToKM() +
+                              ' KM'),
                         ],
                       ),
                     ),

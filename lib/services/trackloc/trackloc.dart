@@ -20,6 +20,10 @@ class TrackingLocationService {
     LocationRepository _temp = TestLocationDB();
     await _temp.uploadToDB(0, this._storage);
   }
+
+  String distanceCentToKM() {
+    return (this._storage.totalDistance / 100000).toString() ?? '0';
+  }
 }
 
 class LocationService {

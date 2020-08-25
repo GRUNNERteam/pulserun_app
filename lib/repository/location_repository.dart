@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/localtion.dart';
-import 'package:pulserun_app/services/auth/auth.dart';
 import 'package:pulserun_app/services/database/database.dart';
-import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
 abstract class LocationRepository {
   Future<LocationModel> uploadToDB(int planId, LocationModel data);

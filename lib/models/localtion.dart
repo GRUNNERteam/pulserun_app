@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -7,31 +8,37 @@ import 'package:latlong/latlong.dart' as latlong;
 import 'package:location/location.dart';
 
 class LocationModel {
-  List<PositionModel> position = List<PositionModel>();
-  List<googleMap.CameraPosition> camPosition = List<googleMap.CameraPosition>();
+  List<PositionModel> position;
+  List<googleMap.CameraPosition> camPosition;
   double totalDistance = 0;
 
   final latlong.Distance _distance = latlong.Distance();
   LocationModel({
     this.position,
     this.camPosition,
+    this.totalDistance,
   });
 
   void addPos(PositionModel pos) {
     if (this.position == null) {
       this.position = List<PositionModel>();
       this.camPosition = List<googleMap.CameraPosition>();
+      this.totalDistance = 0;
     }
-    this.position.add(pos);
-    this.camPosition.add(convertPosToCam(pos));
-    if (this.position.length > 1 && this.position.isNotEmpty) {
-      totalDistance = _distance.as(
-        latlong.LengthUnit.Kilometer,
+    if (this.position.length > 1) {
+      print(this.position.last.latitude);
+      print(pos.latitude);
+      double temp = _distance.as(
+        latlong.LengthUnit.Centimeter,
         latlong.LatLng(
             this.position.last.latitude, this.position.last.longitude),
         latlong.LatLng(pos.latitude, pos.longitude),
       );
+      print(temp);
+      this.totalDistance = this.totalDistance + temp;
     }
+    this.position.add(pos);
+    this.camPosition.add(convertPosToCam(pos));
   }
 
   googleMap.CameraPosition convertPosToCam(PositionModel pos) {
@@ -48,10 +55,12 @@ class LocationModel {
   LocationModel copyWith({
     List<PositionModel> position,
     List<googleMap.CameraPosition> camPosition,
+    double totalDistance,
   }) {
     return LocationModel(
       position: position ?? this.position,
       camPosition: camPosition ?? this.camPosition,
+      totalDistance: totalDistance ?? this.totalDistance,
     );
   }
 
@@ -68,6 +77,7 @@ class LocationModel {
     return {
       'position': position?.map((x) => x?.toMap())?.toList(),
       'camPosition': camPosition?.map((x) => x?.toMap())?.toList(),
+      'totalDistance': totalDistance,
     };
   }
 
@@ -79,6 +89,7 @@ class LocationModel {
           map['position']?.map((x) => PositionModel.fromMap(x))),
       camPosition: List<googleMap.CameraPosition>.from(
           map['camPosition']?.map((x) => googleMap.CameraPosition.fromMap(x))),
+      totalDistance: map['totalDistance'],
     );
   }
 
@@ -89,7 +100,7 @@ class LocationModel {
 
   @override
   String toString() =>
-      'LocationModel(position: $position, camPosition: $camPosition)';
+      'LocationModel(position: $position, camPosition: $camPosition, totalDistance: $totalDistance)';
 
   @override
   bool operator ==(Object o) {
@@ -97,11 +108,13 @@ class LocationModel {
 
     return o is LocationModel &&
         listEquals(o.position, position) &&
-        listEquals(o.camPosition, camPosition);
+        listEquals(o.camPosition, camPosition) &&
+        o.totalDistance == totalDistance;
   }
 
   @override
-  int get hashCode => position.hashCode ^ camPosition.hashCode;
+  int get hashCode =>
+      position.hashCode ^ camPosition.hashCode ^ totalDistance.hashCode;
 }
 
 class PositionModel {

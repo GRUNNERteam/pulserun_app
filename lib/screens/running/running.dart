@@ -18,7 +18,7 @@ class RunningPage extends StatefulWidget {
 }
 
 class _RunningPageState extends State<RunningPage> {
-  TrackingLocationService _trackingLocationService = TrackingLocationService();
+  //TrackingLocationService _trackingLocationService = TrackingLocationService();
   GoogleMapController mapController;
 
   Map<PolylineId, Polyline> _polylines = {};
@@ -40,7 +40,6 @@ class _RunningPageState extends State<RunningPage> {
 
   @override
   void dispose() {
-    mapController.dispose();
     super.dispose();
   }
 
@@ -61,8 +60,10 @@ class _RunningPageState extends State<RunningPage> {
               return _buildbodyPlan(
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
+              return _buildbodyRunning(
+                  context, state.positionModel, state.distance ?? 0);
+            } else if (state is RunningDisplayChange) {
               if (state.positionModel != null) {
-                _trackingLocationService.addToList(state.positionModel);
                 try {
                   mapController.animateCamera(CameraUpdate.newCameraPosition(
                       LocationModel().convertPosToCam(state.positionModel)));
@@ -73,11 +74,14 @@ class _RunningPageState extends State<RunningPage> {
               _polylineCoordinates.add(LatLng(
                   state.positionModel.latitude, state.positionModel.longitude));
               _addPolyLine();
-              return _buildbodyRunning(context, state.positionModel);
+              // rebuild whole widget
+              // https://github.com/felangel/bloc/issues/174#issuecomment-477867469
+              return _buildbodyRunning(
+                  context, state.positionModel, state.distance);
             } else if (state is RunningResult) {
-              _trackingLocationService.uploadToDB();
               return _buildbodyResult(context);
             } else {
+              print('Error');
               return ShowErrorWidget();
             }
           },
@@ -111,8 +115,8 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyRunning(BuildContext context, PositionModel pos) {
-    print('Widget Build : _buildbodyRunning');
+  Widget _buildbodyRunning(
+      BuildContext context, PositionModel pos, double distance) {
     return Stack(
       children: <Widget>[
         Column(
@@ -128,8 +132,7 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current Distance'),
-                          Text(_trackingLocationService.distanceCentToKM() +
-                              ' KM'),
+                          Text((distance.toString() + ' KM') ?? 'Waiting'),
                         ],
                       ),
                     ),
@@ -137,6 +140,7 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
+                          // TODO : change to Real-Time Heart Rate
                           Text('100 bpm'),
                         ],
                       ),
@@ -181,7 +185,7 @@ class _RunningPageState extends State<RunningPage> {
                       zoomControlsEnabled: false,
                       myLocationEnabled: true,
                       onMapCreated: _onMapCreated,
-                      polylines: Set<Polyline>.of(_polylines.values),
+                      polylines: Set<Polyline>.of(this._polylines.values),
                     ),
                   ),
                 ],

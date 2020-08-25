@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:location/location.dart';
 import 'package:pulserun_app/models/localtion.dart';
-import 'package:pulserun_app/repository/location_repository.dart';
 
 class TrackingLocationService {
   LocationModel _storage;
@@ -16,13 +15,16 @@ class TrackingLocationService {
     }
   }
 
-  void uploadToDB() async {
-    LocationRepository _temp = TestLocationDB();
-    await _temp.uploadToDB(0, this._storage);
+  void cleanData() async {
+    this._storage = null;
   }
 
-  String distanceCentToKM() {
-    return (this._storage.totalDistance / 100000).toString() ?? '0';
+  double distanceCentToKM() {
+    return (this._storage.totalDistance / 100000) ?? 0.0;
+  }
+
+  LocationModel getData() {
+    return this._storage;
   }
 }
 

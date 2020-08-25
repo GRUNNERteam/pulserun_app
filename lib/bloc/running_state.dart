@@ -36,10 +36,10 @@ class RunningLoaded extends RunningState {
 }
 
 class RunningWorking extends RunningState {
-  final RunningModel runningModel;
+  final double distance;
   final PositionModel positionModel;
   RunningWorking({
-    this.runningModel,
+    this.distance,
     this.positionModel,
   });
 
@@ -48,12 +48,33 @@ class RunningWorking extends RunningState {
     if (identical(this, o)) return true;
 
     return o is RunningWorking &&
-        o.runningModel == runningModel &&
+        o.distance == distance &&
         o.positionModel == positionModel;
   }
 
   @override
-  int get hashCode => runningModel.hashCode ^ positionModel.hashCode;
+  int get hashCode => distance.hashCode ^ positionModel.hashCode;
+}
+
+class RunningDisplayChange extends RunningState {
+  final PositionModel positionModel;
+  final double distance;
+  const RunningDisplayChange(
+    this.positionModel,
+    this.distance,
+  );
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is RunningDisplayChange &&
+        o.positionModel == positionModel &&
+        o.distance == distance;
+  }
+
+  @override
+  int get hashCode => positionModel.hashCode ^ distance.hashCode;
 }
 
 class RunningResult extends RunningState {}

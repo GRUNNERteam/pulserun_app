@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pulserun_app/screens/auth/auth.dart';
 import 'package:pulserun_app/screens/home/home.dart';
-import 'package:pulserun_app/screens/login/login.dart';
-import 'package:pulserun_app/screens/map/map.dart';
-import 'package:pulserun_app/screens/register/register.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
 class DevPage extends StatelessWidget {
@@ -25,49 +21,6 @@ class DevPage extends StatelessWidget {
         child: Container(
           child: Column(
             children: <Widget>[
-              RaisedButton(
-                child: Text('HomePage'),
-                onPressed: () {
-                  return null;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                },
-              ),
-              RaisedButton(
-                child: Text('LoginPage'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    ),
-                  );
-                },
-              ),
-              RaisedButton(
-                child: Text('RegisterPage'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RegisterPage(),
-                    ),
-                  );
-                },
-              ),
-              // RaisedButton(
-              //   child: Text('MapPage'),
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) => MapPage(),
-              //       ),
-              //     );
-              //   },
-              // ),
               RaisedButton(
                 child: Text("AuthPage"),
                 onPressed: () {

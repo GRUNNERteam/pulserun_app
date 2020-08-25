@@ -10,15 +10,15 @@ import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
-import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/running_repository.dart';
 
 part 'running_event.dart';
 part 'running_state.dart';
 
 class RunningBloc extends Bloc<RunningEvent, RunningState> {
   final Location _location;
-  final LocationRepository _locationRepository;
+  final RunningRepository _runningRepository;
 
   StreamSubscription _locationSubscription;
 
@@ -27,9 +27,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
 
   RunningBloc(
     this._location,
+    this._runningRepository,
     this._planRepository,
     this._currentStatusRepository,
-    this._locationRepository,
   ) : super(RunningInitial());
 
   @override
@@ -38,7 +38,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
   ) async* {
     if (event is GetPlanAndStat) {
       try {
-        debugPrint('GetPlanAndStat Event');
+        _location.changeSettings(accuracy: LocationAccuracy.navigation);
         yield RunningLoading();
         final plan = await _planRepository.fetchPlan();
         final stat = await _currentStatusRepository.fetchCurrentStatus();
@@ -51,28 +51,46 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     if (event is StartRunning) {
       try {
         yield RunningLoading();
-        _location.changeSettings(accuracy: LocationAccuracy.navigation);
+
         _locationSubscription?.cancel();
+
+        final LocationData position = await _location.getLocation();
+        await _runningRepository.init();
+
+        final double distance = await _runningRepository
+            .working(PositionModel().convertLocToPos(position));
+        print(distance);
+        yield RunningWorking(
+            positionModel: PositionModel().convertLocToPos(position),
+            distance: 0.toDouble());
+
         _locationSubscription =
             _location.onLocationChanged.listen((LocationData currentLocation) {
           add(LocationChange(locationData: currentLocation));
         });
-        final LocationData position = await _location.getLocation();
-        yield RunningWorking(
-            positionModel: PositionModel().convertLocToPos(position));
       } catch (e) {
+        print('StartRunning Error : $e');
         yield RunningError('StartRunning Error');
       }
     }
 
-    if (event is LocationChange && state is RunningWorking) {
-      yield RunningWorking(
-          positionModel: PositionModel().convertLocToPos(event.locationData));
+    if (event is LocationChange) {
+      try {
+        final double distance = await _runningRepository
+            .working(PositionModel().convertLocToPos(event.locationData));
+        yield RunningDisplayChange(
+            PositionModel().convertLocToPos(event.locationData), distance);
+      } catch (e) {
+        print('LocationChange Error : $e');
+        yield RunningError('Location Error');
+      }
     }
+
     if (event is StopRunning) {
       try {
         yield RunningLoading();
         _locationSubscription?.cancel();
+
         yield RunningResult();
       } catch (e) {
         yield RunningError('StopRunning Error');

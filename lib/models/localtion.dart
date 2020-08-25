@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -25,18 +24,18 @@ class LocationModel {
       this.camPosition = List<googleMap.CameraPosition>();
       this.totalDistance = 0;
     }
+
     if (this.position.length > 1) {
-      print(this.position.last.latitude);
-      print(pos.latitude);
       double temp = _distance.as(
         latlong.LengthUnit.Centimeter,
         latlong.LatLng(
             this.position.last.latitude, this.position.last.longitude),
         latlong.LatLng(pos.latitude, pos.longitude),
       );
-      print(temp);
+
       this.totalDistance = this.totalDistance + temp;
     }
+
     this.position.add(pos);
     this.camPosition.add(convertPosToCam(pos));
   }

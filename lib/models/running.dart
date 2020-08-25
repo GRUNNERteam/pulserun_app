@@ -1,33 +1,52 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 
 class RunningModel {
-  int runId;
-  List<RunningModelItem> runningItem;
+  String runId;
+  //RunningModelItem runningItem;
+  DateTime createdAt = DateTime.now();
+  DateTime startTime;
+  DateTime endTime;
   RunningModel({
     this.runId,
-    this.runningItem,
+    this.startTime,
+    this.endTime,
   });
 
+  // void setRunningItem(RunningModelItem item) {
+  //   if (this.runningItem == null) {
+  //     this.runningItem = item;
+  //   }
+  // }
+
+  void setRunningId(DocumentReference ref) {
+    this.runId = ref.id;
+  }
+
+  // ignore: missing_return
+  Future<bool> setendTime() async {
+    try {
+      // ignore: await_only_futures
+      this.endTime = await DateTime.now();
+    } catch (e) {
+      print('setEndTime Error : $e');
+    }
+  }
+
   RunningModel copyWith({
-    int runId,
-    List<RunningModelItem> runningItem,
+    String runId,
+    DateTime startTime,
+    DateTime endTime,
   }) {
     return RunningModel(
       runId: runId ?? this.runId,
-      runningItem: runningItem ?? this.runningItem,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'runId': runId,
-      'runningItem': runningItem?.map((x) => x?.toMap())?.toList(),
-    };
   }
 
   factory RunningModel.fromMap(Map<String, dynamic> map) {
@@ -35,8 +54,8 @@ class RunningModel {
 
     return RunningModel(
       runId: map['runId'],
-      runningItem: List<RunningModelItem>.from(
-          map['runningItem']?.map((x) => RunningModelItem.fromMap(x))),
+      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
+      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime']),
     );
   }
 
@@ -46,7 +65,8 @@ class RunningModel {
       RunningModel.fromMap(json.decode(source));
 
   @override
-  String toString() => 'RunningModel(runId: $runId, runningItem: $runningItem)';
+  String toString() =>
+      'RunningModel(runId: $runId, startTime: $startTime, endTime: $endTime)';
 
   @override
   bool operator ==(Object o) {
@@ -54,11 +74,20 @@ class RunningModel {
 
     return o is RunningModel &&
         o.runId == runId &&
-        listEquals(o.runningItem, runningItem);
+        o.startTime == startTime &&
+        o.endTime == endTime;
   }
 
   @override
-  int get hashCode => runId.hashCode ^ runningItem.hashCode;
+  int get hashCode => runId.hashCode ^ startTime.hashCode ^ endTime.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'runId': runId,
+      'startTime': startTime?.millisecondsSinceEpoch,
+      'endTime': endTime?.millisecondsSinceEpoch,
+    };
+  }
 }
 
 class RunningModelItem {

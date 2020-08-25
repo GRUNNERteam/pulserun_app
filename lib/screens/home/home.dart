@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
   int _indexHotbar = 1;
   @override
   Widget build(BuildContext context) {
-    print('Created HomePage');
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
@@ -30,12 +29,10 @@ class _HomePageState extends State<HomePage> {
         bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
         body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
           if (state is HomeInitial) {
-            print('Init');
             BlocProvider.of<HomeCubit>(context)
                 .getUser(); // trigger to load data
             return LoadingWidget();
           } else if (state is HomeLoading) {
-            print('Loading');
             return LoadingWidget();
           } else if (state is HomeLoaded) {
             return _body(context, state.currentStatusModel, state.userModel);

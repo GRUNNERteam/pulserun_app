@@ -8,8 +8,8 @@ import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
-import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/running_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/theme/theme.dart';
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => HomeCubit(UserDB(), CurrentStatus())),
         BlocProvider(
             create: (context) => RunningBloc(
-                Location(), MockUpPlan(), CurrentStatus(), TestLocationDB())),
+                Location(), RunningData(), MockUpPlan(), CurrentStatus())),
       ],
       child: FutureBuilder(
         future: Firebase.initializeApp(),

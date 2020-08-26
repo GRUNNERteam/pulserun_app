@@ -28,9 +28,13 @@ class _AuthPageState extends State<AuthPage> {
   void initialize() async {
     try {
       if (FirebaseAuth.instance.currentUser != null) {
-        await _authService.signOutInstance();
+        // await _authService.signOutInstance();
+        // setState(() {
+        //   print('Sign Out Instance Complete!');
+        //   _isLoading = false;
+        // });
+
         setState(() {
-          print('Sign Out Instance Complete!');
           _isLoading = false;
         });
       } else {

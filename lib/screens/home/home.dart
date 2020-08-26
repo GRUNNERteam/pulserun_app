@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';

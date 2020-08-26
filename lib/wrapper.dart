@@ -59,6 +59,9 @@ class _WrapperState extends State<Wrapper> {
     if (!_initialized) {
       return LoadingWidget();
     }
+
+    print(FirebaseAuth.instance.currentUser);
+    print(_user);
     if (_user == null) {
       return AuthPage();
     } else {

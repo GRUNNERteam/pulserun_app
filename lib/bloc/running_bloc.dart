@@ -90,7 +90,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
       try {
         yield RunningLoading();
         _locationSubscription?.cancel();
-
+        await _runningRepository.stop();
         yield RunningResult();
       } catch (e) {
         yield RunningError('StopRunning Error');

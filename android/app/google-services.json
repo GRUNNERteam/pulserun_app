@@ -8,70 +8,26 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1025559605388:android:37465ade6387725a404ba9",
-        "android_client_info": {
-          "package_name": "com.example.test_hr"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "1025559605388-6qugp4usjo1s9kdhfdtadtmd5hca48vh.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.test_hr",
-            "certificate_hash": "d68b6b9c446c76ca475197b55750cf35fe6d1772"
-          }
-        },
-        {
-          "client_id": "1025559605388-66b63qrba6e8sfe6mm62ujpeae71sd5k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.test_hr",
-            "certificate_hash": "88e7ff41d584e34ae12ed280f79c57c81dc05ff2"
-          }
-        },
-        {
-          "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCdtMyqJWJknhpRq62L1odJQzspgWj3sik"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1025559605388-7afg4du20otphoeu78b3s0mago23vl7l.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "edu.isne.project.pulserunApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:1025559605388:android:f5fa551c753b93a2404ba9",
+        "mobilesdk_app_id": "1:1025559605388:android:243f1055021ed633404ba9",
         "android_client_info": {
           "package_name": "edu.isne.project.pulserunApp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1025559605388-inr4shku9lftud4c07ioh13qpgir50jl.apps.googleusercontent.com",
+          "client_id": "1025559605388-9thqd09rhibtp5er37eq9393b763ouit.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "edu.isne.project.pulserunApp",
             "certificate_hash": "5279c6e60776ba274a8ae6753c201d6f35497619"
+          }
+        },
+        {
+          "client_id": "1025559605388-eu1mcvl66ak8shh24cr426q1fc0e0vug.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.isne.project.pulserunApp",
+            "certificate_hash": "d68b6b9c446c76ca475197b55750cf35fe6d1772"
           }
         },
         {

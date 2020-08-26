@@ -8,7 +8,6 @@ import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
-import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
 class RunningPage extends StatefulWidget {
   const RunningPage({Key key}) : super(key: key);

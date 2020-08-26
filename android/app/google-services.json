@@ -22,14 +22,7 @@
             "certificate_hash": "5279c6e60776ba274a8ae6753c201d6f35497619"
           }
         },
-        {
-          "client_id": "1025559605388-eu1mcvl66ak8shh24cr426q1fc0e0vug.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "edu.isne.project.pulserunApp",
-            "certificate_hash": "d68b6b9c446c76ca475197b55750cf35fe6d1772"
-          }
-        },
+
         {
           "client_id": "1025559605388-p9dkk3uh871ueqisuqo3da499incd1g9.apps.googleusercontent.com",
           "client_type": 3

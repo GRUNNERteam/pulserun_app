@@ -9,6 +9,7 @@ import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
@@ -169,15 +170,15 @@ class _buildBottomNavBar extends StatelessWidget {
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.floorPlan),
-          label: 'Current Plan',
+          title: Text("Current Plan"),
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.home),
-          label: 'Home',
+          title: Text("HOME"),
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.runFast),
-          label: 'Run',
+          title: Text("RUN"),
         ),
       ],
       currentIndex: index,
@@ -254,6 +255,16 @@ class _menu extends StatelessWidget {
           ListTile(
             leading: Icon(MdiIcons.floorPlan),
             title: Text('Planing'),
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.logout),
+            title: Text('BLE'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BLE()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(MdiIcons.logout),

@@ -4,15 +4,19 @@ import 'package:pulserun_app/services/database/database.dart';
 
 abstract class CurrentStatusRepository {
   Future<CurrentStatusModel> fetchCurrentStatus();
+
+  Future<double> fetchDistanceToCurrentStatus();
 }
 
 class CurrentStatus implements CurrentStatusRepository {
+  DocumentReference _reference =
+      DatabaseService().getUserRef().collection('stat').doc('current');
+
   @override
   Future<CurrentStatusModel> fetchCurrentStatus() async {
-    DocumentReference _ref =
-        DatabaseService().getUserRef().collection('stat').doc('current');
     CurrentStatusModel data;
-    await _ref.get().then((snapshot) {
+
+    await _reference.get().then((snapshot) {
       if (snapshot.exists) {
         // snapshot.data().forEach((key, value) {
         //   var type = value.runtimeType;
@@ -23,11 +27,24 @@ class CurrentStatus implements CurrentStatusRepository {
         print(data.toString());
       } else {
         // init value
-        _ref.set(
+        _reference.set(
             CurrentStatusModel(bmi: 0, status: 'UNKOWNS', distance: 0).toMap());
         data = CurrentStatusModel(bmi: 0, status: 'UNKOWNS', distance: 0);
       }
     });
     return data;
+  }
+
+  @override
+  Future<double> fetchDistanceToCurrentStatus() async {
+    double data;
+    CollectionReference _ref =
+        DatabaseService().getUserRef().collection('plan');
+
+    await _ref.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        DocumentReference docRef = doc.reference;
+      });
+    });
   }
 }

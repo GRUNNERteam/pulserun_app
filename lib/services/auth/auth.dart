@@ -35,7 +35,11 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
       // Once signed in, return the UserCredential
-      return await _auth.signInWithCredential(credential);
+
+      UserCredential user = await _auth.signInWithCredential(credential);
+      print('signed in');
+      print(user);
+      return user;
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);

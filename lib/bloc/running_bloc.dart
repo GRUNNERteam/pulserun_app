@@ -22,6 +22,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
   final RunningRepository _runningRepository;
 
   StreamSubscription _locationSubscription;
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
 
   final PlanRepository _planRepository;
   final CurrentStatusRepository _currentStatusRepository;
@@ -53,11 +56,28 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
       try {
         yield RunningLoading();
 
+        _serviceEnabled = await _location.serviceEnabled();
+        if (!_serviceEnabled) {
+          _serviceEnabled = await _location.requestService();
+          if (!_serviceEnabled) {
+            add(GetPlanAndStat());
+          }
+        }
+
+        _permissionGranted = await _location.hasPermission();
+        if (_permissionGranted == PermissionStatus.denied) {
+          _permissionGranted = await _location.requestPermission();
+          if (_permissionGranted != PermissionStatus.granted) {
+            add(GetPlanAndStat());
+          }
+        }
+
         _locationSubscription?.cancel();
-
+        print('_location getLocation');
         final LocationData position = await _location.getLocation();
+        print(position);
         await _runningRepository.init();
-
+        print('init Running Completed');
         final double distance = await _runningRepository
             .working(PositionModel().convertLocToPos(position));
         print(distance);

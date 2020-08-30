@@ -188,60 +188,65 @@ class _RunningPageState extends State<RunningPage> {
   Widget _buildbodyResult(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Center(
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(8),
-                child: Text('Result'),
-              ),
-              Container(
-                height: 1,
-                color: Colors.grey,
-              ),
-              Container(
-                padding: EdgeInsets.all(12),
-                height: 150,
-                child: Row(
-                  children: <Widget>[],
-                ),
-              ),
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    Text('Location'),
-                    Container(
-                      height: 1,
-                      color: Colors.grey,
+        SingleChildScrollView(
+          child: Container(
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Text('Result'),
+                  ),
+                  Container(
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    height: 150,
+                    child: Row(
+                      children: <Widget>[],
                     ),
-                    Container(
-                      height: 400,
-                      padding: EdgeInsets.all(8),
-                      child: Flexible(
-                        child: GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: _polylineCoordinates.last,
-                            zoom: 20,
-                          ),
-                          onMapCreated: _onMapCreatedReult,
-                          polylines: Set<Polyline>.of(_polylines.values),
-                          markers: Set<Marker>.of(_markers.values),
+                  ),
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        Text('Location'),
+                        Container(
+                          height: 1,
+                          color: Colors.grey,
                         ),
-                      ),
+                        Container(
+                          height: 400,
+                          padding: EdgeInsets.all(8),
+                          child: Flexible(
+                            child: GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: _polylineCoordinates.last,
+                                zoom: 20,
+                              ),
+                              onMapCreated: _onMapCreatedReult,
+                              polylines: Set<Polyline>.of(_polylines.values),
+                              markers: Set<Marker>.of(_markers.values),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    child: RaisedButton(
+                      child: Text('Return to Home'),
+                      onPressed: () {
+                        BlocProvider.of<RunningBloc>(context)
+                            .add(GetPlanAndStat());
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                child: RaisedButton(
-                  child: Text('Return to Home'),
-                  onPressed: () {
-                    BlocProvider.of<RunningBloc>(context).add(GetPlanAndStat());
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ],

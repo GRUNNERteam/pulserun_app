@@ -10,6 +10,7 @@ import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
+import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
 
@@ -91,7 +92,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         yield RunningLoading();
         _locationSubscription?.cancel();
         await _runningRepository.stop();
-        yield RunningResult();
+        yield RunningResult(
+            locationServiceAndTracking: event.locationServiceAndTracking,
+            runningModel: event.runningModel);
       } catch (e) {
         yield RunningError('StopRunning Error');
       }

@@ -8,6 +8,7 @@ import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
 class RunningPage extends StatefulWidget {
   const RunningPage({Key key}) : super(key: key);
@@ -23,6 +24,8 @@ class _RunningPageState extends State<RunningPage> {
   Map<PolylineId, Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
 
+  Map<MarkerId, Marker> _markers = {};
+
   void _addPolyLine() {
     PolylineId id = PolylineId("poly");
     Polyline polyline = Polyline(
@@ -35,6 +38,92 @@ class _RunningPageState extends State<RunningPage> {
 
   void _onMapCreated(GoogleMapController googleMapController) async {
     mapController = googleMapController;
+  }
+
+  void _onMapCreatedReult(GoogleMapController googleMapController) async {
+    mapController = googleMapController;
+
+    await Future.delayed(Duration(seconds: 1)).then((_) {
+      // https://stackoverflow.com/questions/61723113/flutter-latlngbounds-not-showing-accurate-place
+      // fix latlngbounds
+
+      // the bounds you want to set
+      LatLngBounds bounds = LatLngBounds(
+        southwest: _polylineCoordinates.last,
+        northeast: _polylineCoordinates.first,
+      );
+      // calculating centre of the bounds
+      LatLng centerBounds = LatLng(
+          (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+          (bounds.northeast.longitude + bounds.southwest.longitude) / 2);
+
+      // setting map position to centre to start with
+      mapController.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: centerBounds,
+        zoom: 17,
+      )));
+      zoomToFit(mapController, bounds, centerBounds);
+    });
+  }
+
+  Future<void> zoomToFit(GoogleMapController controller, LatLngBounds bounds,
+      LatLng centerBounds) async {
+    bool keepZoomingOut = true;
+
+    while (keepZoomingOut) {
+      final LatLngBounds screenBounds = await controller.getVisibleRegion();
+      if (fits(bounds, screenBounds)) {
+        keepZoomingOut = false;
+        final double zoomLevel = await controller.getZoomLevel() - 0.5;
+        controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: centerBounds,
+          zoom: zoomLevel,
+        )));
+        break;
+      } else {
+        // Zooming out by 0.1 zoom level per iteration
+        final double zoomLevel = await controller.getZoomLevel() - 0.1;
+        controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: centerBounds,
+          zoom: zoomLevel,
+        )));
+      }
+    }
+  }
+
+  bool fits(LatLngBounds fitBounds, LatLngBounds screenBounds) {
+    final bool northEastLatitudeCheck =
+        screenBounds.northeast.latitude >= fitBounds.northeast.latitude;
+    final bool northEastLongitudeCheck =
+        screenBounds.northeast.longitude >= fitBounds.northeast.longitude;
+
+    final bool southWestLatitudeCheck =
+        screenBounds.southwest.latitude <= fitBounds.southwest.latitude;
+    final bool southWestLongitudeCheck =
+        screenBounds.southwest.longitude <= fitBounds.southwest.longitude;
+
+    return northEastLatitudeCheck &&
+        northEastLongitudeCheck &&
+        southWestLatitudeCheck &&
+        southWestLongitudeCheck;
+  }
+
+  void _addMarker(LatLng position, String id,
+      {BitmapDescriptor descriptor = BitmapDescriptor.defaultMarker}) {
+    MarkerId markerId = MarkerId(id);
+    Marker marker = Marker(
+      markerId: markerId,
+      icon: descriptor,
+      position: position,
+      infoWindow: InfoWindow(title: id),
+    );
+    _markers[markerId] = marker;
+  }
+
+  void _mapResult() {
+    _addMarker(_polylineCoordinates.first, 'Start',
+        descriptor: BitmapDescriptor.defaultMarkerWithHue(200));
+    _addMarker(_polylineCoordinates.last, 'End');
   }
 
   @override
@@ -51,11 +140,17 @@ class _RunningPageState extends State<RunningPage> {
             if (state is RunningInitial) {
               // syntax change
               // https://github.com/felangel/bloc/issues/603
+              this._markers.clear();
+              this._polylineCoordinates.clear();
+              this._polylines.clear();
               BlocProvider.of<RunningBloc>(context).add(GetPlanAndStat());
               return LoadingWidget();
             } else if (state is RunningLoading) {
               return LoadingWidget();
             } else if (state is RunningLoaded) {
+              this._markers.clear();
+              this._polylineCoordinates.clear();
+              this._polylines.clear();
               return _buildbodyPlan(
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
@@ -78,6 +173,7 @@ class _RunningPageState extends State<RunningPage> {
               return _buildbodyRunning(
                   context, state.positionModel, state.distance);
             } else if (state is RunningResult) {
+              _mapResult();
               return _buildbodyResult(context);
             } else {
               print('Error');
@@ -96,7 +192,45 @@ class _RunningPageState extends State<RunningPage> {
           child: Column(
             children: <Widget>[
               Container(
+                padding: EdgeInsets.all(8),
                 child: Text('Result'),
+              ),
+              Container(
+                height: 1,
+                color: Colors.grey,
+              ),
+              Container(
+                padding: EdgeInsets.all(12),
+                height: 150,
+                child: Row(
+                  children: <Widget>[],
+                ),
+              ),
+              Container(
+                child: Column(
+                  children: <Widget>[
+                    Text('Location'),
+                    Container(
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                    Container(
+                      height: 400,
+                      padding: EdgeInsets.all(8),
+                      child: Flexible(
+                        child: GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: _polylineCoordinates.last,
+                            zoom: 20,
+                          ),
+                          onMapCreated: _onMapCreatedReult,
+                          polylines: Set<Polyline>.of(_polylines.values),
+                          markers: Set<Marker>.of(_markers.values),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 child: RaisedButton(

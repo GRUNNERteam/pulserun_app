@@ -77,7 +77,27 @@ class RunningDisplayChange extends RunningState {
   int get hashCode => positionModel.hashCode ^ distance.hashCode;
 }
 
-class RunningResult extends RunningState {}
+class RunningResult extends RunningState {
+  final RunningModel runningModel;
+  final LocationServiceAndTracking locationServiceAndTracking;
+  RunningResult({
+    this.runningModel,
+    this.locationServiceAndTracking,
+  });
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is RunningResult &&
+        o.runningModel == runningModel &&
+        o.locationServiceAndTracking == locationServiceAndTracking;
+  }
+
+  @override
+  int get hashCode =>
+      runningModel.hashCode ^ locationServiceAndTracking.hashCode;
+}
 
 class RunningError extends RunningState {
   final String message;

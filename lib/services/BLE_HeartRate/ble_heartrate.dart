@@ -5,6 +5,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
+class BluetoothLowEnergyService {
+  final FlutterBlue _flutterBlue = FlutterBlue.instance;
+
+  BluetoothDevice _device;
+  List<BluetoothService> _services;
+
+  void scanFordevices() {
+    // Start scanning
+    this._flutterBlue.startScan(timeout: Duration(seconds: 4));
+    // Listen to scan results
+    var subscription = this._flutterBlue.scanResults.listen((results) {
+      // do something with scan results
+      for (ScanResult r in results) {
+        print('${r.device.name} found! rssi: ${r.rssi}');
+      }
+    });
+    // Stop scanning
+    _flutterBlue.stopScan();
+  }
+
+  Future<void> connectTodevice() async {
+    // Connect to the device
+    await _device.connect();
+    // Disconnect from device
+    _device.disconnect();
+  }
+
+  Future<void> discoverServices() async {
+    this._services = await _device.discoverServices();
+    _services.forEach((service) {
+      // do something with service
+    });
+  }
+}
+
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
 

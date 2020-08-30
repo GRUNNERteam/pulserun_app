@@ -7,6 +7,7 @@ import 'package:pulserun_app/services/trackloc/trackloc.dart';
 abstract class LocationRepository {
   Future<LocationModel> uploadToDB();
   Future<double> getDistance();
+  TrackingLocationService getService();
   Future<bool> setService();
   Future<bool> setPos(PositionModel pos);
   Future<bool> setRef(DocumentReference docRef);
@@ -51,6 +52,12 @@ class TestLocationDB implements LocationRepository {
   @override
   Future<double> getDistance() {
     // TODO: implement getDistance
+    throw UnimplementedError();
+  }
+
+  @override
+  TrackingLocationService getService() {
+    // TODO: implement getService
     throw UnimplementedError();
   }
 }
@@ -101,5 +108,10 @@ class LocationServiceAndTracking implements LocationRepository {
   Future<double> getDistance() async {
     // ignore: await_only_futures
     return await _trackingLocationService.distanceCentToKM();
+  }
+
+  @override
+  TrackingLocationService getService() {
+    return this._trackingLocationService;
   }
 }

@@ -18,6 +18,14 @@ class LocationModel {
     this.totalDistance,
   });
 
+  PositionModel getFirst() {
+    return this.position.first ?? null;
+  }
+
+  PositionModel getLast() {
+    return this.position.last ?? null;
+  }
+
   void addPos(PositionModel pos) {
     if (this.position == null) {
       this.position = List<PositionModel>();

@@ -59,7 +59,8 @@ class RunningData extends RunningRepository {
   Future<RunningModel> stop() async {
     await this._runningModel.setendTime();
     await this._reference.update(this._runningModel.toMap());
-
+    final double disT = await this._locationRepository.getDistance();
+    await this._currentStatusRepository.updateDistance(disT);
     await this._locationRepository.uploadToDB();
     return this._runningModel;
   }

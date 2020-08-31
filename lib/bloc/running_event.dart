@@ -26,4 +26,11 @@ class LocationChange extends RunningEvent {
   });
 }
 
-class StopRunning extends RunningEvent {}
+class StopRunning extends RunningEvent {
+  final LocationServiceAndTracking locationServiceAndTracking;
+  final RunningModel runningModel;
+  StopRunning({
+    this.locationServiceAndTracking,
+    this.runningModel,
+  });
+}

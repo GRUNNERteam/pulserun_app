@@ -499,7 +499,7 @@ class _status extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      distance.toString() + " KM",
+                      double.parse(distance).toStringAsFixed(3) + " KM",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18.0,

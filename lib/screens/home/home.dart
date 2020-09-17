@@ -2,6 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -12,12 +13,17 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
+List<BluetoothService> services;
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  BluetoothDevice _device;
+  List<BluetoothService> _services;
+
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _indexHotbar = 1;
   @override
@@ -99,7 +105,40 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Expanded(
+            StreamBuilder<List<BluetoothDevice>>(
+              stream: Stream.periodic(Duration(seconds: 5))
+                  .asyncMap((_) => FlutterBlue.instance.connectedDevices),
+              initialData: [],
+              builder: (c, snapshot) => Column(
+                children: snapshot.data
+                    .map((d) => ListTile(
+                          title: Text(d.name),
+                          subtitle: Text("connected"),
+                          trailing: StreamBuilder<BluetoothDeviceState>(
+                            stream: d.state,
+                            initialData: BluetoothDeviceState.disconnected,
+                            builder: (c, snapshot) {
+                              if (snapshot.data ==
+                                  BluetoothDeviceState.connected) {
+                                return RaisedButton(
+                                  child: Text('List service'),
+                                  onPressed: () async => _services =
+                                      await _device.discoverServices(),
+                                  /* onPressed: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              DeviceScreen(device: d))),*/
+                                );
+                              }
+                              return Text(snapshot.data.toString());
+                            },
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+            ListTile(),
+            /*Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 color: Colors.grey.shade100,
@@ -142,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            )
+            )*/
           ],
         ),
         _status(

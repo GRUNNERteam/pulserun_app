@@ -84,11 +84,11 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
-                            Navigator.push(
+                            /* Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => HomePage()),
-                            );
+                            );*/
                             return DeviceScreen(device: r.device);
                           })),
                         ),

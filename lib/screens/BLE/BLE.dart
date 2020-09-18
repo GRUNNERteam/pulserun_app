@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
+import '../home/home.dart';
+
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -82,6 +84,11 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()),
+                            );
                             return DeviceScreen(device: r.device);
                           })),
                         ),
@@ -230,18 +237,6 @@ class DeviceScreen extends StatelessWidget {
                       )
                     ],
                   ),
-                ),
-              ),
-            ),
-            StreamBuilder<int>(
-              stream: device.mtu,
-              initialData: 0,
-              builder: (c, snapshot) => ListTile(
-                title: Text('MTU Size'),
-                subtitle: Text('${snapshot.data} bytes'),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => device.requestMtu(223),
                 ),
               ),
             ),

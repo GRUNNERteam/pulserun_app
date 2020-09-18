@@ -13,7 +13,10 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
+import '../../services/BLE_HeartRate/ble_heartrate.dart';
+
 List<BluetoothService> services;
+BluetoothDevice device;
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,9 +24,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  BluetoothDevice _device;
-  List<BluetoothService> _services;
-
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _indexHotbar = 1;
   @override
@@ -113,22 +113,32 @@ class _HomePageState extends State<HomePage> {
                 children: snapshot.data
                     .map((d) => ListTile(
                           title: Text(d.name),
-                          subtitle: Text("connected"),
+                          //subtitle: Text("connected"),
+                          subtitle: StreamBuilder<List<BluetoothService>>(
+                            stream: d.services,
+                            initialData: [],
+                            builder: (c, snapshot) {
+                              return Text(snapshot.data.toString());
+                            },
+                          ),
                           trailing: StreamBuilder<BluetoothDeviceState>(
                             stream: d.state,
                             initialData: BluetoothDeviceState.disconnected,
                             builder: (c, snapshot) {
                               if (snapshot.data ==
                                   BluetoothDeviceState.connected) {
-                                return RaisedButton(
-                                  child: Text('List service'),
-                                  onPressed: () async => _services =
-                                      await _device.discoverServices(),
-                                  /* onPressed: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              DeviceScreen(device: d))),*/
-                                );
+                                return IconButton(
+                                    icon: Icon(Icons.search),
+                                    onPressed: () {
+                                      d.discoverServices();
+                                    });
+                              } else if (snapshot.data ==
+                                  BluetoothDeviceState.disconnected) {
+                                return IconButton(
+                                    icon: Icon(Icons.bluetooth_disabled),
+                                    onPressed: () {
+                                      d.disconnect();
+                                    });
                               }
                               return Text(snapshot.data.toString());
                             },
@@ -137,51 +147,6 @@ class _HomePageState extends State<HomePage> {
                     .toList(),
               ),
             ),
-            ListTile(),
-            /*Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                color: Colors.grey.shade100,
-                child: ListView(
-                  padding: EdgeInsets.only(top: 45),
-                  children: <Widget>[
-                    Text(
-                      "Activity",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[],
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Text(
-                      "History",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[],
-                    ),
-                  ],
-                ),
-              ),
-            )*/
           ],
         ),
         _status(
@@ -248,6 +213,26 @@ class _buildBottomNavBar extends StatelessWidget {
       },
     );
   }
+}
+
+List<Widget> _buildServiceTiles(List<BluetoothService> services) {
+  return services
+      .map(
+        (s) => ServiceTile(
+          service: s,
+          characteristicTiles: s.characteristics
+              .map(
+                (c) => CharacteristicTile(
+                  onNotificationPressed: () async {
+                    await c.setNotifyValue(!c.isNotifying);
+                    await c.read();
+                  },
+                ),
+              )
+              .toList(),
+        ),
+      )
+      .toList();
 }
 
 class _menu extends StatelessWidget {

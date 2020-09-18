@@ -111,16 +111,9 @@ class _HomePageState extends State<HomePage> {
               initialData: [],
               builder: (c, snapshot) => Column(
                 children: snapshot.data
-                    .map((d) => ListTile(
+                    .map((d) => ExpansionTile(
                           title: Text(d.name),
                           //subtitle: Text("connected"),
-                          subtitle: StreamBuilder<List<BluetoothService>>(
-                            stream: d.services,
-                            initialData: [],
-                            builder: (c, snapshot) {
-                              return Text(snapshot.data.toString());
-                            },
-                          ),
                           trailing: StreamBuilder<BluetoothDeviceState>(
                             stream: d.state,
                             initialData: BluetoothDeviceState.disconnected,
@@ -143,6 +136,17 @@ class _HomePageState extends State<HomePage> {
                               return Text(snapshot.data.toString());
                             },
                           ),
+                          children: [
+                            StreamBuilder<List<BluetoothService>>(
+                              stream: d.services,
+                              initialData: [],
+                              builder: (c, snapshot) {
+                                return Column(
+                                  children: _buildServiceTiles(snapshot.data),
+                                );
+                              },
+                            ),
+                          ],
                         ))
                     .toList(),
               ),

@@ -5,6 +5,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
 import '../home/home.dart';
+import '../home/home.dart';
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
@@ -169,6 +170,11 @@ class DeviceScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(device.name),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => HomePage())),
+          ),
           StreamBuilder<BluetoothDeviceState>(
             stream: device.state,
             initialData: BluetoothDeviceState.connecting,

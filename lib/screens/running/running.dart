@@ -334,6 +334,7 @@ class _RunningPageState extends State<RunningPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
+                    ExpansionTile(title: Text("data")),
                     RaisedButton(
                       child: Text('Stop'),
                       onPressed: () {
@@ -346,7 +347,8 @@ class _RunningPageState extends State<RunningPage> {
               ),
             ),
           ],
-        )
+        ),
+        Column(children: <Widget>[ExpansionTile(title: Text("data"))]),
       ],
     );
   }

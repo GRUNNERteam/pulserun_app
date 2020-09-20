@@ -285,7 +285,10 @@ class DeviceScreen extends StatelessWidget {
               title: Text('Heart Rate'),
               trailing: IconButton(
                   icon: Icon(Icons.update),
-                  onPressed: () {
+                  onPressed: () async {
+                    await characteristic
+                        .setNotifyValue(!characteristic.isNotifying);
+                    await characteristic.read();
                     characteristic.value.forEach((value) {
                       loggerNoStack.i(value.toString(), 'VALUE');
                     });
@@ -293,8 +296,15 @@ class DeviceScreen extends StatelessWidget {
               children: [
                 //StreamBuilder(stream: characteristic.value, builder: null),
                 ListTile(
-                    //title: Text(characteristic.deviceId.toString()),
-                    )
+                  title: StreamBuilder(
+                    stream: characteristic.value,
+                    initialData: characteristic.lastValue,
+                    builder: (context, snapshot) {
+                      return Text(snapshot.data.toString());
+                    },
+                  ),
+                  //title: Text(characteristic.deviceId.toString()),
+                ),
               ],
             ),
           ],

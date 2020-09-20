@@ -13,10 +13,12 @@ import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'running_event.dart';
 part 'running_state.dart';
 
+//https://github.com/amugofjava/provider-bloc-example/tree/master/lib
 class RunningBloc extends Bloc<RunningEvent, RunningState> {
   final Location _location;
   final RunningRepository _runningRepository;
@@ -26,6 +28,17 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
   PermissionStatus _permissionGranted;
   LocationData _locationData;
 
+  StreamSubscription _stopwatchSubscription;
+  final Stopwatch _stopwatch = Stopwatch();
+
+  /// The current state of the stopwatch: stop, start or reset.
+  final BehaviorSubject<RunningState> _stopwatchState =
+      BehaviorSubject<RunningState>.seeded(RunningResult());
+
+  /// The current time of the stopwatch. We seed it with 00:00:00 so that we have a value on first run.
+  final BehaviorSubject<String> stopwatchTime =
+      BehaviorSubject<String>.seeded('00:00:00');
+
   final PlanRepository _planRepository;
   final CurrentStatusRepository _currentStatusRepository;
 
@@ -34,7 +47,29 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     this._runningRepository,
     this._planRepository,
     this._currentStatusRepository,
-  ) : super(RunningInitial());
+  ) : super(RunningInitial()) {
+    _setupStopWatch();
+  }
+  // setup stopWatch
+
+  _setupStopWatch() {
+    _stopwatchState.listen((event) {
+      switch (event.runtimeType) {
+        case RunningWorking:
+          print('Start stopwatch');
+          _start();
+          break;
+        case RunningResult:
+          print('Stop stopwatch');
+          _stop();
+          break;
+        case RunningLoading:
+          print('Reset stopwatch');
+          _reset();
+          break;
+      }
+    });
+  }
 
   @override
   Stream<RunningState> mapEventToState(
@@ -42,6 +77,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
   ) async* {
     if (event is GetPlanAndStat) {
       try {
+        _reset();
         _location.changeSettings(accuracy: LocationAccuracy.navigation);
         yield RunningLoading();
         final plan = await _planRepository.fetchPlan();
@@ -55,6 +91,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     if (event is StartRunning) {
       try {
         yield RunningLoading();
+        _start();
 
         _serviceEnabled = await _location.serviceEnabled();
         if (!_serviceEnabled) {
@@ -110,6 +147,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     if (event is StopRunning) {
       try {
         yield RunningLoading();
+        _stop();
         _locationSubscription?.cancel();
         await _runningRepository.stop();
         yield RunningResult(
@@ -121,9 +159,54 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     }
   }
 
+  void _start() {
+    _stopwatch.start();
+
+    _stopwatchSubscription =
+        Stream.periodic(Duration(milliseconds: 50)).listen((tick) {
+      final elapsed = _stopwatch.elapsed;
+
+      final int hundreds = (elapsed.inMilliseconds / 10).truncate();
+      final int seconds = (hundreds / 100).truncate();
+      final int minutes = (seconds / 60).truncate();
+
+      String hundredsStr = (hundreds % 100).toString().padLeft(2, '0');
+      String minutesStr = (minutes % 60).toString().padLeft(2, '0');
+      String secondsStr = (seconds % 60).toString().padLeft(2, '0');
+
+      var t = '$minutesStr:$secondsStr:$hundredsStr';
+
+      stopwatchTime.add(t);
+    });
+  }
+
+  /// We stop the stopwatch and then cancel the subscription. There is no point the
+  /// Observable firing every 50 milliseconds if there is no-one listening to it.
+  void _stop() {
+    _stopwatch.stop();
+
+    if (_stopwatchSubscription != null) {
+      _stopwatchSubscription.cancel();
+    }
+  }
+
+  /// Reset the stopwatch back to zero.
+  void _reset() {
+    _stopwatch.reset();
+
+    /// Push out our reset time.
+    stopwatchTime.add('00:00:00');
+
+    /// Put as back to the stopped state.
+    _stopwatchState.add(RunningResult());
+  }
+
   @override
   Future<void> close() {
     _locationSubscription.cancel();
+    _stopwatchSubscription.cancel();
+    stopwatchTime.close();
+    _stopwatchState.close();
     return super.close();
   }
 }

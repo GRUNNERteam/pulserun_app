@@ -9,7 +9,8 @@ import '../home/home.dart';
 import '../home/home.dart';
 
 List<BluetoothService> service_;
-BluetoothService HR;
+BluetoothService heartrate;
+BluetoothCharacteristic characteristic;
 var logger = Logger(
   printer: PrettyPrinter(),
 );
@@ -148,11 +149,6 @@ class DeviceScreen extends StatelessWidget {
     ];
   }
 
-  Widget _buildServiceTiles() {
-    return ExpansionTile(
-      title: Text("data"),
-    );
-  }
   /*List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
         .map(
@@ -247,7 +243,6 @@ class DeviceScreen extends StatelessWidget {
                           onPressed: () async {
                             service_ = await device.discoverServices();
                             loggerNoStack.i('REFRESH');
-
                             service_.forEach((service_) {
                               if (service_.uuid
                                       .toString()
@@ -256,15 +251,20 @@ class DeviceScreen extends StatelessWidget {
                                   "180D") {
                                 loggerNoStack.i(service_.uuid.toString(),
                                     'FOUND HEART RATE');
+                                heartrate = service_;
                               }
                             });
-                            /*if (service_.last.uuid
-                                    .toString()
-                                    .toUpperCase()
-                                    .substring(4, 8) !=
-                                "180D") {
-                              service_.removeLast();
-                            }*/
+                            heartrate.characteristics.forEach((HR) {
+                              if (HR.uuid
+                                      .toString()
+                                      .toUpperCase()
+                                      .substring(4, 8) ==
+                                  "2A37") {
+                                loggerNoStack.i(HR.uuid.toString(),
+                                    'FOUND characteristics');
+                                characteristic = HR;
+                              }
+                            });
                           }),
                       IconButton(
                         icon: SizedBox(
@@ -281,18 +281,21 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
-            //StreamBuilder(builder: null),
-            /*ExpansionTile(
-              title: Text("data"),
-            ),*/
-            StreamBuilder<List<BluetoothService>>(
-              stream: device.services,
-              initialData: [],
-              builder: (c, snapshot) {
-                return Column(
-                    //children: _buildServiceTiles(snapshot.data),
-                    );
-              },
+            ExpansionTile(
+              title: Text('Heart Rate'),
+              trailing: IconButton(
+                  icon: Icon(Icons.update),
+                  onPressed: () {
+                    characteristic.value.forEach((value) {
+                      loggerNoStack.i(value.toString(), 'VALUE');
+                    });
+                  }),
+              children: [
+                //StreamBuilder(stream: characteristic.value, builder: null),
+                ListTile(
+                    //title: Text(characteristic.deviceId.toString()),
+                    )
+              ],
             ),
           ],
         ),

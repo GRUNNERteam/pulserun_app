@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                 children: snapshot.data
                     .map((d) => ExpansionTile(
                           title: Text(d.name),
-                          //subtitle: Text("connected"),
+                          subtitle: Text("connected"),
                           trailing: StreamBuilder<BluetoothDeviceState>(
                             stream: d.state,
                             initialData: BluetoothDeviceState.disconnected,

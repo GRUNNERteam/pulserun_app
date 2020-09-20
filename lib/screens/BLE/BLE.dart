@@ -3,9 +3,19 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
+import 'package:logger/logger.dart';
 
 import '../home/home.dart';
 import '../home/home.dart';
+
+List<BluetoothService> service_;
+BluetoothService HR;
+var logger = Logger(
+  printer: PrettyPrinter(),
+);
+var loggerNoStack = Logger(
+  printer: PrettyPrinter(methodCount: 0),
+);
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
@@ -138,7 +148,12 @@ class DeviceScreen extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildServiceTiles(List<BluetoothService> services) {
+  Widget _buildServiceTiles() {
+    return ExpansionTile(
+      title: Text("data"),
+    );
+  }
+  /*List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
         .map(
           (s) => ServiceTile(
@@ -162,7 +177,7 @@ class DeviceScreen extends StatelessWidget {
           ),
         )
         .toList();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -228,9 +243,29 @@ class DeviceScreen extends StatelessWidget {
                     index: snapshot.data ? 1 : 0,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.refresh),
-                        onPressed: () => device.discoverServices(),
-                      ),
+                          icon: Icon(Icons.refresh),
+                          onPressed: () async {
+                            service_ = await device.discoverServices();
+                            loggerNoStack.i('REFRESH');
+
+                            service_.forEach((service_) {
+                              if (service_.uuid
+                                      .toString()
+                                      .toUpperCase()
+                                      .substring(4, 8) ==
+                                  "180D") {
+                                loggerNoStack.i(service_.uuid.toString(),
+                                    'FOUND HEART RATE');
+                              }
+                            });
+                            /*if (service_.last.uuid
+                                    .toString()
+                                    .toUpperCase()
+                                    .substring(4, 8) !=
+                                "180D") {
+                              service_.removeLast();
+                            }*/
+                          }),
                       IconButton(
                         icon: SizedBox(
                           child: CircularProgressIndicator(
@@ -246,13 +281,17 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
+            //StreamBuilder(builder: null),
+            /*ExpansionTile(
+              title: Text("data"),
+            ),*/
             StreamBuilder<List<BluetoothService>>(
               stream: device.services,
               initialData: [],
               builder: (c, snapshot) {
                 return Column(
-                  children: _buildServiceTiles(snapshot.data),
-                );
+                    //children: _buildServiceTiles(snapshot.data),
+                    );
               },
             ),
           ],

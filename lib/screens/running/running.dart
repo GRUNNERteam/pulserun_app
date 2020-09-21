@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
@@ -329,6 +330,42 @@ class _RunningPageState extends State<RunningPage> {
                 ],
               ),
             ),
+            StreamBuilder<List<BluetoothDevice>>(
+                stream: Stream.periodic(Duration(seconds: 5))
+                    .asyncMap((_) => FlutterBlue.instance.connectedDevices),
+                initialData: [],
+                builder: (c, snapshot) => Column(
+                      children: snapshot.data
+                          .map((device) => ListTile(
+                                leading: StreamBuilder<BluetoothDeviceState>(
+                                  stream: device.state,
+                                  initialData: BluetoothDeviceState.connected,
+                                  builder: (context, snapshot) {
+                                    switch (snapshot.data) {
+                                      case BluetoothDeviceState.connected:
+                                        return Icon(Icons.bluetooth_connected);
+                                      case BluetoothDeviceState.disconnected:
+                                        return Icon(Icons.bluetooth_disabled);
+                                        break;
+                                      default:
+                                        return Icon(Icons.bluetooth_disabled);
+                                    }
+                                  },
+                                ),
+                                title: Text(device.name),
+                                trailing: StreamBuilder<BluetoothDeviceState>(
+                                  stream: device.state,
+                                  initialData: BluetoothDeviceState.connected,
+                                  builder: (context, snapshot) {
+                                    return Text(snapshot.data
+                                        .toString()
+                                        .split('.')
+                                        .last);
+                                  },
+                                ),
+                              ))
+                          .toList(),
+                    )),
             Expanded(
               child: Container(
                 child: Row(

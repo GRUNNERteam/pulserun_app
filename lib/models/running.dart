@@ -2,13 +2,9 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:pulserun_app/models/heartrate.dart';
-import 'package:pulserun_app/models/localtion.dart';
-
 class RunningModel {
   String runId;
   //RunningModelItem runningItem;
-  DateTime createdAt = DateTime.now();
   DateTime startTime;
   DateTime endTime;
   RunningModel({
@@ -27,7 +23,7 @@ class RunningModel {
     this.runId = ref.id;
   }
 
-  // ignore: missing_return
+// ignore: missing_return
   Future<bool> setendTime() async {
     try {
       // ignore: await_only_futures
@@ -37,26 +33,22 @@ class RunningModel {
     }
   }
 
-  RunningModel copyWith({
-    String runId,
-    DateTime startTime,
-    DateTime endTime,
-  }) {
-    return RunningModel(
-      runId: runId ?? this.runId,
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-    );
-  }
-
-  factory RunningModel.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
-    return RunningModel(
-      runId: map['runId'],
-      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime']),
-    );
+  Map<String, dynamic> toMap() {
+    if (endTime != null) {
+      return {
+        'runId': runId,
+        'startTime': Timestamp.fromMillisecondsSinceEpoch(
+            startTime?.millisecondsSinceEpoch),
+        'endTime': Timestamp.fromMillisecondsSinceEpoch(
+            endTime?.millisecondsSinceEpoch)
+      };
+    } else {
+      return {
+        'runId': runId,
+        'startTime': Timestamp.fromMillisecondsSinceEpoch(
+            startTime?.millisecondsSinceEpoch),
+      };
+    }
   }
 
   String toJson() => json.encode(toMap());
@@ -81,88 +73,30 @@ class RunningModel {
   @override
   int get hashCode => runId.hashCode ^ startTime.hashCode ^ endTime.hashCode;
 
-  Map<String, dynamic> toMap() {
-    return {
-      'runId': runId,
-      'startTime': startTime?.millisecondsSinceEpoch,
-      'endTime': endTime?.millisecondsSinceEpoch,
-    };
-  }
-}
-
-class RunningModelItem {
-  DateTime startTime;
-  DateTime endTime;
-  LocationModel tracking;
-  HeartRateModel heartrate;
-
-  RunningModelItem(
-    this.startTime,
-    this.endTime,
-    this.tracking,
-    this.heartrate,
-  );
-
-  RunningModelItem copyWith({
+  RunningModel copyWith({
+    String runId,
     DateTime startTime,
     DateTime endTime,
-    LocationModel tracking,
-    HeartRateModel heartrate,
   }) {
-    return RunningModelItem(
-      startTime ?? this.startTime,
-      endTime ?? this.endTime,
-      tracking ?? this.tracking,
-      heartrate ?? this.heartrate,
+    return RunningModel(
+      runId: runId ?? this.runId,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'startTime': startTime?.millisecondsSinceEpoch,
-      'endTime': endTime?.millisecondsSinceEpoch,
-      'tracking': tracking?.toMap(),
-      'heartrate': heartrate?.toMap(),
-    };
-  }
-
-  factory RunningModelItem.fromMap(Map<String, dynamic> map) {
+  factory RunningModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-
-    return RunningModelItem(
-      DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      DateTime.fromMillisecondsSinceEpoch(map['endTime']),
-      LocationModel.fromMap(map['tracking']),
-      HeartRateModel.fromMap(map['heartrate']),
+    Timestamp startts = map['startTime'];
+    Timestamp endts = map['endTime'] ?? null;
+    return RunningModel(
+      runId: map['runId'],
+      startTime: startts.toDate(),
+      endTime: endts.toDate() ?? null,
     );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory RunningModelItem.fromJson(String source) =>
-      RunningModelItem.fromMap(json.decode(source));
-
-  @override
-  String toString() {
-    return 'RunningModelItem(startTime: $startTime, endTime: $endTime, tracking: $tracking, heartrate: $heartrate)';
-  }
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-
-    return o is RunningModelItem &&
-        o.startTime == startTime &&
-        o.endTime == endTime &&
-        o.tracking == tracking &&
-        o.heartrate == heartrate;
-  }
-
-  @override
-  int get hashCode {
-    return startTime.hashCode ^
-        endTime.hashCode ^
-        tracking.hashCode ^
-        heartrate.hashCode;
   }
 }
+
+//  this.runId,
+//   this.startTime,
+//   this.endTime,

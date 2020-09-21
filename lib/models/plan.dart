@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PlanModel {
   int planId;
   double targetHeartRate;
@@ -14,17 +16,18 @@ class PlanModel {
     return {
       'planId': planId,
       'targetHeartRate': targetHeartRate,
-      'start': start?.millisecondsSinceEpoch,
+      'start':
+          Timestamp.fromMillisecondsSinceEpoch(start?.millisecondsSinceEpoch),
     };
   }
 
   factory PlanModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-
+    Timestamp startts = map['start'];
     return PlanModel(
       planId: map['planId'],
       targetHeartRate: map['targetHeartRate'],
-      start: DateTime.fromMillisecondsSinceEpoch(map['start']),
+      start: startts.toDate(),
     );
   }
 

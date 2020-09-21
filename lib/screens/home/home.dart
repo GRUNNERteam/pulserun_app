@@ -215,26 +215,6 @@ class _buildBottomNavBar extends StatelessWidget {
   }
 }
 
-List<Widget> _buildServiceTiles(List<BluetoothService> services) {
-  return services
-      .map(
-        (s) => ServiceTile(
-          service: s,
-          characteristicTiles: s.characteristics
-              .map(
-                (c) => CharacteristicTile(
-                  onNotificationPressed: () async {
-                    await c.setNotifyValue(!c.isNotifying);
-                    await c.read();
-                  },
-                ),
-              )
-              .toList(),
-        ),
-      )
-      .toList();
-}
-
 class _menu extends StatelessWidget {
   const _menu({
     Key key,

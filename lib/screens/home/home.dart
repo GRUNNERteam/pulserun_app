@@ -15,9 +15,6 @@ import 'package:pulserun_app/services/auth/auth.dart';
 
 import '../../services/BLE_HeartRate/ble_heartrate.dart';
 
-List<BluetoothService> services;
-BluetoothDevice device;
-
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -103,48 +100,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-              ),
-            ),
-            StreamBuilder<List<BluetoothDevice>>(
-              stream: Stream.periodic(Duration(seconds: 5))
-                  .asyncMap((_) => FlutterBlue.instance.connectedDevices),
-              initialData: [],
-              builder: (c, snapshot) => Column(
-                children: snapshot.data
-                    .map((d) => ListTile(
-                          title: Text(d.name),
-                          //subtitle: Text("connected"),
-                          subtitle: StreamBuilder<List<BluetoothService>>(
-                            stream: d.services,
-                            initialData: [],
-                            builder: (c, snapshot) {
-                              return Text(snapshot.data.toString());
-                            },
-                          ),
-                          trailing: StreamBuilder<BluetoothDeviceState>(
-                            stream: d.state,
-                            initialData: BluetoothDeviceState.disconnected,
-                            builder: (c, snapshot) {
-                              if (snapshot.data ==
-                                  BluetoothDeviceState.connected) {
-                                return IconButton(
-                                    icon: Icon(Icons.search),
-                                    onPressed: () {
-                                      d.discoverServices();
-                                    });
-                              } else if (snapshot.data ==
-                                  BluetoothDeviceState.disconnected) {
-                                return IconButton(
-                                    icon: Icon(Icons.bluetooth_disabled),
-                                    onPressed: () {
-                                      d.disconnect();
-                                    });
-                              }
-                              return Text(snapshot.data.toString());
-                            },
-                          ),
-                        ))
-                    .toList(),
               ),
             ),
           ],

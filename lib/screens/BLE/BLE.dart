@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
 import '../home/home.dart';
@@ -44,7 +45,7 @@ class FindDevicesScreen extends StatelessWidget {
           child: Column(
             children: <Widget>[
               StreamBuilder<List<BluetoothDevice>>(
-                stream: Stream.periodic(Duration(seconds: 5))
+                stream: Stream.periodic(Duration(seconds: 3))
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),
                 initialData: [],
                 builder: (c, snapshot) => Column(
@@ -60,10 +61,13 @@ class FindDevicesScreen extends StatelessWidget {
                                     BluetoothDeviceState.connected) {
                                   return RaisedButton(
                                     child: Text('OPEN'),
-                                    onPressed: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                DeviceScreen(device: d))),
+                                    onPressed: () async {
+                                      await d.discoverServices();
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DeviceScreen(device: d)));
+                                    },
                                   );
                                 }
                                 return Text(snapshot.data.toString());

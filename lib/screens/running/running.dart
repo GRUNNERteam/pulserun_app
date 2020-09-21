@@ -9,7 +9,21 @@ import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
+import 'package:logger/logger.dart';
+
+int vhr = 0;
+List<BluetoothService> service;
+BluetoothService heartrate;
+BluetoothCharacteristic characteristic;
+
+var logger = Logger(
+  printer: PrettyPrinter(),
+);
+var loggerNoStack = Logger(
+  printer: PrettyPrinter(methodCount: 0),
+);
 
 class RunningPage extends StatefulWidget {
   const RunningPage({Key key}) : super(key: key);
@@ -279,8 +293,16 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
+                          Text(characteristic.value.toString()),
                           // TODO : change to Real-Time Heart Rate
-                          Text('100 bpm'),
+                          // StreamBuilder<List<int>>(
+                          //   stream: characteristic.value,
+                          //   initialData: characteristic.lastValue,
+                          //   builder: (context, snapshot) {
+                          //     loggerNoStack.i(snapshot.data.toString());
+                          //     return Text("snapshot.data.toString()");
+                          //   },
+                          // ),
                         ],
                       ),
                     ),
@@ -331,39 +353,84 @@ class _RunningPageState extends State<RunningPage> {
               ),
             ),
             StreamBuilder<List<BluetoothDevice>>(
-                stream: Stream.periodic(Duration(seconds: 5))
+                stream: Stream.periodic(Duration(seconds: 3))
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),
                 initialData: [],
                 builder: (c, snapshot) => Column(
                       children: snapshot.data
-                          .map((device) => ListTile(
-                                leading: StreamBuilder<BluetoothDeviceState>(
-                                  stream: device.state,
-                                  initialData: BluetoothDeviceState.connected,
-                                  builder: (context, snapshot) {
-                                    switch (snapshot.data) {
-                                      case BluetoothDeviceState.connected:
-                                        return Icon(Icons.bluetooth_connected);
-                                      case BluetoothDeviceState.disconnected:
-                                        return Icon(Icons.bluetooth_disabled);
-                                        break;
-                                      default:
-                                        return Icon(Icons.bluetooth_disabled);
-                                    }
-                                  },
-                                ),
-                                title: Text(device.name),
-                                trailing: StreamBuilder<BluetoothDeviceState>(
-                                  stream: device.state,
-                                  initialData: BluetoothDeviceState.connected,
-                                  builder: (context, snapshot) {
-                                    return Text(snapshot.data
-                                        .toString()
-                                        .split('.')
-                                        .last);
-                                  },
-                                ),
-                              ))
+                          .map((device) => ExpansionTile(
+                                  leading: StreamBuilder<BluetoothDeviceState>(
+                                    stream: device.state,
+                                    initialData: BluetoothDeviceState.connected,
+                                    builder: (context, snapshot) {
+                                      switch (snapshot.data) {
+                                        case BluetoothDeviceState.connected:
+                                          return Icon(
+                                              Icons.bluetooth_connected);
+                                        case BluetoothDeviceState.disconnected:
+                                          return Icon(Icons.bluetooth_disabled);
+                                          break;
+                                        default:
+                                          return Icon(Icons.bluetooth_disabled);
+                                      }
+                                    },
+                                  ),
+                                  title: Text(device.name),
+                                  subtitle: StreamBuilder<BluetoothDeviceState>(
+                                    stream: device.state,
+                                    initialData: BluetoothDeviceState.connected,
+                                    builder: (context, snapshot) {
+                                      return Text(snapshot.data
+                                          .toString()
+                                          .split('.')
+                                          .last);
+                                    },
+                                  ),
+                                  trailing: IconButton(
+                                      icon: Icon(Icons.check),
+                                      onPressed: () async {
+                                        service =
+                                            await device.discoverServices();
+                                        loggerNoStack
+                                            .i("Selected " + device.name);
+                                        service.forEach((service_) {
+                                          if (service_.uuid
+                                                  .toString()
+                                                  .toUpperCase()
+                                                  .substring(4, 8) ==
+                                              "180D") {
+                                            loggerNoStack.i(
+                                                service_.uuid.toString() +
+                                                    'FOUND service',
+                                                'FOUND HEART RATE');
+                                            heartrate = service_;
+                                          }
+                                        });
+                                        heartrate.characteristics.forEach((hr) {
+                                          if (hr.uuid
+                                                  .toString()
+                                                  .toUpperCase()
+                                                  .substring(4, 8) ==
+                                              "2A37") {
+                                            loggerNoStack.i(
+                                                hr.uuid.toString() +
+                                                    " FOUND characteristics",
+                                                'FOUND characteristics');
+                                            characteristic = hr;
+                                          }
+                                        });
+                                        await characteristic.setNotifyValue(
+                                            !characteristic.isNotifying);
+                                        await characteristic.read();
+                                      }),
+                                  children: <Widget>[
+                                    StreamBuilder<bool>(
+                                      stream: device.isDiscoveringServices,
+                                      builder: (context, snapshot) {
+                                        return Text(snapshot.data.toString());
+                                      },
+                                    ),
+                                  ]))
                           .toList(),
                     )),
             Expanded(

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/screens/running/running.dart';
@@ -61,8 +62,8 @@ class FindDevicesScreen extends StatelessWidget {
                                     BluetoothDeviceState.connected) {
                                   return RaisedButton(
                                     child: Text('OPEN'),
-                                    onPressed: () async {
-                                      await d.discoverServices();
+                                    onPressed: () {
+                                      currentdevice = d;
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
@@ -88,11 +89,6 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomePage()),
-                            );
                             return DeviceScreen(device: r.device);
                           })),
                         ),
@@ -183,6 +179,19 @@ class DeviceScreen extends StatelessWidget {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
                   text = 'DISCONNECT';
+                  currentdevice = device;
+                  /*AlertDialog(
+                    title: Text(snapshot.data.toString()),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: Text("OK"),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RunningPage())),
+                      )
+                    ],
+                  );*/
                   break;
                 case BluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
@@ -227,7 +236,9 @@ class DeviceScreen extends StatelessWidget {
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.refresh),
-                        onPressed: () => device.discoverServices(),
+                        onPressed: () {
+                          device.discoverServices();
+                        },
                       ),
                       IconButton(
                         icon: SizedBox(
@@ -238,21 +249,69 @@ class DeviceScreen extends StatelessWidget {
                           height: 18.0,
                         ),
                         onPressed: null,
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            StreamBuilder<List<BluetoothService>>(
-              stream: device.services,
-              initialData: [],
-              builder: (c, snapshot) {
-                return Column(
-                  children: _buildServiceTiles(snapshot.data),
-                );
+            StreamBuilder<BluetoothDeviceState>(
+              stream: device.state,
+              builder: (context, snapshot) {
+                switch (snapshot.data) {
+                  case BluetoothDeviceState.connected:
+                    return Container(
+                      color: Colors.lightGreenAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.offline_pin),
+                            title: Text("Status: " +
+                                snapshot.data.toString().split('.').last),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                  case BluetoothDeviceState.disconnected:
+                    return Container(
+                      color: Colors.redAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.highlight_off),
+                            title: Text("Status: " +
+                                snapshot.data.toString().split('.').last),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                  default:
+                    return Container(
+                      color: Colors.yellowAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.cached),
+                            title: Text("Status: reconnecting"),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                }
               },
-            ),
+            )
+            // StreamBuilder<List<BluetoothService>>(
+            //   stream: device.services,
+            //   initialData: [],
+            //   builder: (c, snapshot) {
+            //     return Column(
+            //       children: _buildServiceTiles(snapshot.data),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

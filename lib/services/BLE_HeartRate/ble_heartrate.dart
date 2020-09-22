@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 
 class BluetoothLowEnergyService {
   final FlutterBlue _flutterBlue = FlutterBlue.instance;
@@ -35,8 +36,20 @@ class BluetoothLowEnergyService {
   Future<void> discoverServices() async {
     this._services = await _device.discoverServices();
     _services.forEach((service) {
-      // do something with service
+      if (service.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
+        heartrate = service;
+        loggerNoStack.i("service");
+      }
     });
+    heartrate.characteristics.forEach((hr) {
+      if (hr.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
+        loggerNoStack.i(hr.uuid.toString() + " FOUND characteristics",
+            'FOUND characteristics');
+        characteristic = hr;
+      }
+    });
+    await characteristic.setNotifyValue(!characteristic.isNotifying);
+    await characteristic.read();
   }
 }
 

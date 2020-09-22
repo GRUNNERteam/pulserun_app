@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -13,7 +14,7 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 import 'package:logger/logger.dart';
 
-int vhr = 0;
+BluetoothDevice currentdevice = null;
 List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
@@ -559,8 +560,46 @@ class _RunningPageState extends State<RunningPage> {
                         borderRadius: BorderRadius.circular(200),
                       ),
                       onPressed: () {
-                        BlocProvider.of<RunningBloc>(context)
-                            .add(StartRunning());
+                        if (currentdevice == null) {
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (context) => CupertinoActionSheet(
+                              title: Text("Please Select Your Device"),
+                              actions: [
+                                CupertinoActionSheetAction(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => BLE()));
+                                  },
+                                  child: Text("Select Device"),
+                                  isDefaultAction: true,
+                                ),
+                              ],
+                              cancelButton: CupertinoActionSheetAction(
+                                onPressed: () {},
+                                child: Text("cance"),
+                              ),
+                            ),
+                          );
+                        } else {
+                          BlocProvider.of<RunningBloc>(context)
+                              .add(StartRunning());
+                        }
+                        /*showCupertinoModalPopup(
+                          context: context,
+                          builder: (context) => CupertinoActionSheet(
+                            title: Text("Select Device"),
+                            actions: [
+                              CupertinoActionSheetAction(
+                                onPressed: () {},
+                                child: Text("data"),
+                                isDefaultAction: true,
+                              ),
+                            ],
+                          ),
+                        );*/
                       },
                       child: ColorizeAnimatedTextKit(
                         text: ["Start"],

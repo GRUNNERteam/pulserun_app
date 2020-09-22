@@ -18,6 +18,7 @@ BluetoothDevice currentdevice = null;
 List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
+List<int> hr;
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -294,16 +295,16 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
-                          Text(characteristic.value.toString()),
+                          //Text(characteristic.value.toString()),
                           // TODO : change to Real-Time Heart Rate
-                          // StreamBuilder<List<int>>(
-                          //   stream: characteristic.value,
-                          //   initialData: characteristic.lastValue,
-                          //   builder: (context, snapshot) {
-                          //     loggerNoStack.i(snapshot.data.toString());
-                          //     return Text("snapshot.data.toString()");
-                          //   },
-                          // ),
+                          StreamBuilder<List<int>>(
+                            stream: characteristic.value,
+                            initialData: characteristic.lastValue,
+                            builder: (context, snapshot) {
+                              loggerNoStack.i(snapshot.data.toString());
+                              return Text(snapshot.data.toString());
+                            },
+                          ),
                         ],
                       ),
                     ),

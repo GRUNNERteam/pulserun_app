@@ -63,6 +63,7 @@ class FindDevicesScreen extends StatelessWidget {
                                   return RaisedButton(
                                     child: Text('OPEN'),
                                     onPressed: () {
+                                      discover(d);
                                       currentdevice = d;
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
@@ -89,6 +90,7 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
+                            discover(r.device);
                             return DeviceScreen(device: r.device);
                           })),
                         ),
@@ -165,6 +167,7 @@ class DeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    discover(device);
     return Scaffold(
       appBar: AppBar(
         title: Text(device.name),
@@ -239,6 +242,7 @@ class DeviceScreen extends StatelessWidget {
                         icon: Icon(Icons.refresh),
                         onPressed: () {
                           device.discoverServices();
+                          discover(device);
                         },
                       ),
                       IconButton(
@@ -256,11 +260,13 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             StreamBuilder<BluetoothDeviceState>(
               stream: device.state,
               builder: (context, snapshot) {
                 switch (snapshot.data) {
                   case BluetoothDeviceState.connected:
+                    discover(device);
                     return Container(
                       color: Colors.lightGreenAccent,
                       child: Column(
@@ -303,7 +309,71 @@ class DeviceScreen extends StatelessWidget {
                     break;
                 }
               },
-            )
+            ),
+            StreamBuilder<List<int>>(
+              stream: characteristic.value,
+              initialData: characteristic.lastValue,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  discover(device);
+                  loggerNoStack.i("wait");
+                  //getheartrate(characteristic);
+                  return Text("wait");
+                } // else if (snapshot.data.toString() == '[]') discover(device);
+                //loggerNoStack.i(snapshot.data.toString());
+                else
+                  return Text(snapshot.data.toString());
+              },
+            ),
+            /* StreamBuilder<bool>(
+              stream: device.isDiscoveringServices,
+              builder: (context, snapshot) {
+                switch (snapshot.data) {
+                  case true:
+                    return Container(
+                      color: Colors.lightGreenAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.offline_pin),
+                            title: Text("Status: " +
+                                snapshot.data.toString().split('.').last),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                  case false:
+                    discover(device);
+                    loggerNoStack.i(characteristic.deviceId.toString());
+                    return Container(
+                      color: Colors.redAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.highlight_off),
+                            title: Text("Status: " + snapshot.data.toString()),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                  default:
+                    return Container(
+                      color: Colors.lightGreenAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.device_unknown),
+                            title: Text("Status: " + snapshot.data.toString()),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                }
+              },
+            ),*/
             // StreamBuilder<List<BluetoothService>>(
             //   stream: device.services,
             //   initialData: [],
@@ -340,4 +410,23 @@ class BluetoothOffScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> discover(BluetoothDevice _device) async {
+  service = await _device.discoverServices();
+
+  service.forEach((service) {
+    if (service.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
+      heartrate = service;
+    }
+  });
+  heartrate.characteristics.forEach((hr) {
+    if (hr.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
+      characteristic = hr;
+    }
+  });
+  loggerNoStack.i(characteristic.descriptors.toString());
+  await characteristic.setNotifyValue(true);
+  await characteristic.read();
+  loggerNoStack.i("หลัง");
 }

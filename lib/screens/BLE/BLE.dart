@@ -175,11 +175,12 @@ class DeviceScreen extends StatelessWidget {
             builder: (c, snapshot) {
               VoidCallback onPressed;
               String text;
+              currentdevice = device;
+              loggerNoStack.i(currentdevice.name.toString());
               switch (snapshot.data) {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
                   text = 'DISCONNECT';
-                  currentdevice = device;
                   /*AlertDialog(
                     title: Text(snapshot.data.toString()),
                     actions: [

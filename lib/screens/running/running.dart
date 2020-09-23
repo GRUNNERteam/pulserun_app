@@ -295,14 +295,16 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
-                          //Text(characteristic.value.toString()),
                           // TODO : change to Real-Time Heart Rate
                           StreamBuilder<List<int>>(
                             stream: characteristic.value,
                             initialData: characteristic.lastValue,
                             builder: (context, snapshot) {
-                              loggerNoStack.i(snapshot.data.toString());
-                              return Text(snapshot.data.toString());
+                              final value = snapshot.data;
+                              return Text(snapshot.data.last
+                                  .toString()
+                                  .split(' ')
+                                  .toString());
                             },
                           ),
                         ],
@@ -382,49 +384,30 @@ class _RunningPageState extends State<RunningPage> {
                                     stream: device.state,
                                     initialData: BluetoothDeviceState.connected,
                                     builder: (context, snapshot) {
-                                      return Text(snapshot.data
-                                          .toString()
-                                          .split('.')
-                                          .last);
+                                      if (currentdevice.name == device.name)
+                                        return Text("Accesss");
+                                      else
+                                        return Text("denied");
                                     },
                                   ),
-                                  trailing: IconButton(
-                                      icon: Icon(Icons.check),
-                                      onPressed: () async {
-                                        service =
-                                            await device.discoverServices();
-                                        loggerNoStack
-                                            .i("Selected " + device.name);
-                                        service.forEach((service_) {
-                                          if (service_.uuid
-                                                  .toString()
-                                                  .toUpperCase()
-                                                  .substring(4, 8) ==
-                                              "180D") {
-                                            loggerNoStack.i(
-                                                service_.uuid.toString() +
-                                                    'FOUND service',
-                                                'FOUND HEART RATE');
-                                            heartrate = service_;
-                                          }
-                                        });
-                                        heartrate.characteristics.forEach((hr) {
-                                          if (hr.uuid
-                                                  .toString()
-                                                  .toUpperCase()
-                                                  .substring(4, 8) ==
-                                              "2A37") {
-                                            loggerNoStack.i(
-                                                hr.uuid.toString() +
-                                                    " FOUND characteristics",
-                                                'FOUND characteristics');
-                                            characteristic = hr;
-                                          }
-                                        });
-                                        await characteristic.setNotifyValue(
-                                            !characteristic.isNotifying);
-                                        await characteristic.read();
-                                      }),
+                                  trailing: StreamBuilder<BluetoothDeviceState>(
+                                    stream: device.state,
+                                    initialData: BluetoothDeviceState.connected,
+                                    builder: (context, snapshot) {
+                                      if (currentdevice.name == device.name)
+                                        return Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                          size: 36.0,
+                                        );
+                                      else
+                                        return Icon(
+                                          Icons.cancel,
+                                          color: Colors.red,
+                                          size: 36.0,
+                                        );
+                                    },
+                                  ),
                                   children: <Widget>[
                                     StreamBuilder<bool>(
                                       stream: device.isDiscoveringServices,
@@ -588,19 +571,6 @@ class _RunningPageState extends State<RunningPage> {
                           BlocProvider.of<RunningBloc>(context)
                               .add(StartRunning());
                         }
-                        /*showCupertinoModalPopup(
-                          context: context,
-                          builder: (context) => CupertinoActionSheet(
-                            title: Text("Select Device"),
-                            actions: [
-                              CupertinoActionSheetAction(
-                                onPressed: () {},
-                                child: Text("data"),
-                                isDefaultAction: true,
-                              ),
-                            ],
-                          ),
-                        );*/
                       },
                       child: ColorizeAnimatedTextKit(
                         text: ["Start"],

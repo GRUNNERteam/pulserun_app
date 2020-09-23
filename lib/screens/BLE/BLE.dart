@@ -63,7 +63,7 @@ class FindDevicesScreen extends StatelessWidget {
                                   return RaisedButton(
                                     child: Text('OPEN'),
                                     onPressed: () {
-                                      discover(d);
+                                      //discover(d);
                                       currentdevice = d;
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
@@ -90,7 +90,7 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
-                            discover(r.device);
+                            //discover(r.device);
                             return DeviceScreen(device: r.device);
                           })),
                         ),
@@ -139,32 +139,6 @@ class DeviceScreen extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildServiceTiles(List<BluetoothService> services) {
-    return services
-        .map(
-          (s) => ServiceTile(
-            service: s,
-            characteristicTiles: s.characteristics
-                .map(
-                  (c) => CharacteristicTile(
-                    characteristic: c,
-                    onReadPressed: () => c.read(),
-                    onWritePressed: () async {
-                      await c.write(_getRandomBytes(), withoutResponse: true);
-                      await c.read();
-                    },
-                    onNotificationPressed: () async {
-                      await c.setNotifyValue(!c.isNotifying);
-                      await c.read();
-                    },
-                  ),
-                )
-                .toList(),
-          ),
-        )
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     discover(device);
@@ -179,23 +153,12 @@ class DeviceScreen extends StatelessWidget {
               VoidCallback onPressed;
               String text;
               currentdevice = device;
-              loggerNoStack.i(currentdevice.name.toString());
+
               switch (snapshot.data) {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
+
                   text = 'DISCONNECT';
-                  /*AlertDialog(
-                    title: Text(snapshot.data.toString()),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: Text("OK"),
-                        onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RunningPage())),
-                      )
-                    ],
-                  );*/
                   break;
                 case BluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
@@ -241,7 +204,7 @@ class DeviceScreen extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.refresh),
                         onPressed: () {
-                          device.discoverServices();
+                          //device.discoverServices();
                           discover(device);
                         },
                       ),
@@ -260,24 +223,30 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             StreamBuilder<BluetoothDeviceState>(
               stream: device.state,
               builder: (context, snapshot) {
                 switch (snapshot.data) {
                   case BluetoothDeviceState.connected:
-                    discover(device);
-                    return Container(
-                      color: Colors.lightGreenAccent,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.offline_pin),
-                            title: Text("Status: " +
-                                snapshot.data.toString().split('.').last),
-                          ),
-                        ],
-                      ),
+                    //discover(device);
+                    return AlertDialog(
+                      title: Text(device.name),
+                      content: Text("Status: " +
+                          snapshot.data.toString().split('.').last),
+                      elevation: 24.0,
+                      backgroundColor: Colors.lightGreenAccent,
+                      actions: [
+                        FlatButton(
+                            onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RunningPage()),
+                                ),
+                            color: Colors.redAccent,
+                            child: Text(
+                              "Running",
+                            ))
+                      ],
                     );
                     break;
                   case BluetoothDeviceState.disconnected:
@@ -310,79 +279,20 @@ class DeviceScreen extends StatelessWidget {
                 }
               },
             ),
-            StreamBuilder<List<int>>(
+
+            /* StreamBuilder<List<int>>(
               stream: characteristic.value,
               initialData: characteristic.lastValue,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  discover(device);
-                  loggerNoStack.i("wait");
-                  //getheartrate(characteristic);
-                  return Text("wait");
+                  Text(snapshot.data.last.toString());
                 } // else if (snapshot.data.toString() == '[]') discover(device);
                 //loggerNoStack.i(snapshot.data.toString());
                 else
-                  return Text(snapshot.data.toString());
-              },
-            ),
-            /* StreamBuilder<bool>(
-              stream: device.isDiscoveringServices,
-              builder: (context, snapshot) {
-                switch (snapshot.data) {
-                  case true:
-                    return Container(
-                      color: Colors.lightGreenAccent,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.offline_pin),
-                            title: Text("Status: " +
-                                snapshot.data.toString().split('.').last),
-                          ),
-                        ],
-                      ),
-                    );
-                    break;
-                  case false:
-                    discover(device);
-                    loggerNoStack.i(characteristic.deviceId.toString());
-                    return Container(
-                      color: Colors.redAccent,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.highlight_off),
-                            title: Text("Status: " + snapshot.data.toString()),
-                          ),
-                        ],
-                      ),
-                    );
-                    break;
-                  default:
-                    return Container(
-                      color: Colors.lightGreenAccent,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.device_unknown),
-                            title: Text("Status: " + snapshot.data.toString()),
-                          ),
-                        ],
-                      ),
-                    );
-                    break;
-                }
+                  Text("OK");
+                // Text(value.toString() ?? '');
               },
             ),*/
-            // StreamBuilder<List<BluetoothService>>(
-            //   stream: device.services,
-            //   initialData: [],
-            //   builder: (c, snapshot) {
-            //     return Column(
-            //       children: _buildServiceTiles(snapshot.data),
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),
@@ -412,6 +322,8 @@ class BluetoothOffScreen extends StatelessWidget {
   }
 }
 
+Future<void> getval(BluetoothDevice _device) async {}
+
 Future<void> discover(BluetoothDevice _device) async {
   service = await _device.discoverServices();
 
@@ -420,13 +332,13 @@ Future<void> discover(BluetoothDevice _device) async {
       heartrate = service;
     }
   });
+
   heartrate.characteristics.forEach((hr) {
     if (hr.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
       characteristic = hr;
     }
   });
-  loggerNoStack.i(characteristic.descriptors.toString());
-  await characteristic.setNotifyValue(true);
+
+  await characteristic.setNotifyValue(!characteristic.isNotifying);
   await characteristic.read();
-  loggerNoStack.i("หลัง");
 }

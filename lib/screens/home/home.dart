@@ -2,7 +2,6 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -12,8 +11,6 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
-
-import '../../services/BLE_HeartRate/ble_heartrate.dart';
 
 class HomePage extends StatefulWidget {
   @override

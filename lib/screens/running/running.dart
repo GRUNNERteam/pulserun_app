@@ -295,7 +295,6 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
-
                           // TODO : change to Real-Time Heart Rate
                           StreamBuilder(
                             stream: characteristic.value,

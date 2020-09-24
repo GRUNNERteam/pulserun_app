@@ -1,12 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
-
-import '../home/home.dart';
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
@@ -63,8 +59,7 @@ class FindDevicesScreen extends StatelessWidget {
                                   return RaisedButton(
                                     child: Text('OPEN'),
                                     onPressed: () {
-                                      //discover(d);
-                                      discover(d);
+                                      discover();
                                       currentdevice = d;
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
@@ -91,7 +86,6 @@ class FindDevicesScreen extends StatelessWidget {
                           onTap: () => Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             r.device.connect();
-                            //discover(r.device);
                             return DeviceScreen(device: r.device);
                           })),
                         ),
@@ -130,19 +124,8 @@ class DeviceScreen extends StatelessWidget {
 
   final BluetoothDevice device;
 
-  List<int> _getRandomBytes() {
-    final math = Random();
-    return [
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255)
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
-    //discover(device);
     return Scaffold(
       appBar: AppBar(
         title: Text(device.name),
@@ -204,7 +187,7 @@ class DeviceScreen extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.refresh),
                         onPressed: () {
-                          discover(device);
+                          discover();
                         },
                       ),
                       IconButton(
@@ -227,8 +210,6 @@ class DeviceScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 switch (snapshot.data) {
                   case BluetoothDeviceState.connected:
-                    //discover(device);
-                    //loggerNoStack.i('discover(device);');
                     return AlertDialog(
                       title: Text(device.name),
                       content: Text("Status: " +
@@ -238,7 +219,7 @@ class DeviceScreen extends StatelessWidget {
                       actions: [
                         FlatButton(
                             onPressed: () {
-                              discover(device);
+                              discover();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -282,16 +263,6 @@ class DeviceScreen extends StatelessWidget {
                 }
               },
             ),
-            // ListTile(
-            //   title: Text("data"),
-            //   subtitle: StreamBuilder<List<int>>(
-            //     stream: characteristic.value,
-            //     initialData: characteristic.lastValue,
-            //     builder: (context, snapshot) {
-            //       return Text(snapshot.data.toString());
-            //     },
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -321,22 +292,14 @@ class BluetoothOffScreen extends StatelessWidget {
   }
 }
 
-Future<void> getval(BluetoothDevice _device) async {
-  await characteristic.setNotifyValue(!characteristic.isNotifying);
-}
-
-Future<bool> discover(BluetoothDevice _device) async {
+Future<bool> discover() async {
   service = await currentdevice.discoverServices();
   currentdevice.services.forEach((service) {
     service.forEach((c) {
       if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
         c.characteristics.forEach((element) async {
           if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
-            loggerNoStack.i(element.toString(), "element");
             characteristic = element;
-            loggerNoStack.i(characteristic.toString(), "characteristic");
-            //loggerNoStack.i(element.lastValue, "A");
-            //element.setNotifyValue(!element.isNotifying);
             await characteristic.setNotifyValue(!characteristic.isNotifying);
             return true;
           }
@@ -344,18 +307,4 @@ Future<bool> discover(BluetoothDevice _device) async {
       }
     });
   });
-
-  /* service.forEach((service) {
-    if (service.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-      heartrate = service;
-    }
-  });
-
-  heartrate.characteristics.forEach((hr) {
-    if (hr.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
-      characteristic = hr;
-    }
-  });*/
-
-  //await characteristic.setNotifyValue(!characteristic.isNotifying);
 }

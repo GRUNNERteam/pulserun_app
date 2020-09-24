@@ -299,15 +299,30 @@ class _RunningPageState extends State<RunningPage> {
                           // TODO : change to Real-Time Heart Rate
                           StreamBuilder(
                             stream: characteristic.value,
-                            initialData: null,
+                            initialData: characteristic.lastValue,
                             builder: (c, snapshot) {
                               final value = snapshot.data;
                               if (!snapshot.hasData) {
-                                return Text('NO data');
+                                return Text('Loading');
                               } else if (snapshot.hasError)
                                 return Text('ERROR');
-                              else
-                                return Text(value.toString());
+                              else if (snapshot.data
+                                      .toString()
+                                      .split(',')
+                                      .last
+                                      .split(']')
+                                      .first
+                                      .toString() ==
+                                  '[')
+                                return Text('wait');
+                              else if (snapshot.hasData)
+                                return Text(snapshot.data
+                                    .toString()
+                                    .split(',')
+                                    .last
+                                    .split(']')
+                                    .first
+                                    .toString());
                             },
                           ),
                         ],
@@ -599,9 +614,4 @@ class _RunningPageState extends State<RunningPage> {
       ],
     );
   }
-}
-
-Future<void> getval() async {
-  // await characteristic.setNotifyValue(!characteristic.isNotifying);
-  // await characteristic.read();
 }

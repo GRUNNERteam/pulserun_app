@@ -330,13 +330,14 @@ Future<bool> discover(BluetoothDevice _device) async {
   currentdevice.services.forEach((service) {
     service.forEach((c) {
       if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-        c.characteristics.forEach((element) {
+        c.characteristics.forEach((element) async {
           if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
             loggerNoStack.i(element.toString(), "element");
             characteristic = element;
             loggerNoStack.i(characteristic.toString(), "characteristic");
             //loggerNoStack.i(element.lastValue, "A");
             //element.setNotifyValue(!element.isNotifying);
+            await characteristic.setNotifyValue(!characteristic.isNotifying);
             return true;
           }
         });

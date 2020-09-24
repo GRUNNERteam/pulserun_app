@@ -14,11 +14,11 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 import 'package:logger/logger.dart';
 
-BluetoothDevice currentdevice = null;
+BluetoothDevice currentdevice;
 List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
-List<int> hr;
+List<int> hr = [0];
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -295,16 +295,19 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
+
                           // TODO : change to Real-Time Heart Rate
-                          StreamBuilder<List<int>>(
+                          StreamBuilder(
                             stream: characteristic.value,
-                            initialData: characteristic.lastValue,
-                            builder: (context, snapshot) {
+                            initialData: null,
+                            builder: (c, snapshot) {
                               final value = snapshot.data;
-                              return Text(snapshot.data.last
-                                  .toString()
-                                  .split(' ')
-                                  .toString());
+                              if (!snapshot.hasData) {
+                                return Text('NO data');
+                              } else if (snapshot.hasError)
+                                return Text('ERROR');
+                              else
+                                return Text(value.toString());
                             },
                           ),
                         ],
@@ -596,4 +599,9 @@ class _RunningPageState extends State<RunningPage> {
       ],
     );
   }
+}
+
+Future<void> getval() async {
+  // await characteristic.setNotifyValue(!characteristic.isNotifying);
+  // await characteristic.read();
 }

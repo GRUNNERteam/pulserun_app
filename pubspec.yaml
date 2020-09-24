@@ -55,7 +55,6 @@ dependencies:
   flutter_blue: ^0.7.2
   rxdart: ^0.24.1
   intl: ^0.16.1
-  
 
 dev_dependencies:
   flutter_test:

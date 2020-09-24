@@ -11,7 +11,6 @@ import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
-import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 import 'package:logger/logger.dart';
 
 BluetoothDevice currentdevice;

@@ -9,6 +9,8 @@ import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
+import 'package:pulserun_app/screens/home/components/dob_select.dart';
+import 'package:pulserun_app/screens/home/components/heightweight_select.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
@@ -23,25 +25,37 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        drawer: _menu(),
-        bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
-        body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
-          if (state is HomeInitial) {
-            BlocProvider.of<HomeCubit>(context)
-                .getUser(); // trigger to load data
-            return LoadingWidget();
-          } else if (state is HomeLoading) {
-            return LoadingWidget();
-          } else if (state is HomeLoaded) {
-            return _body(context, state.currentStatusModel, state.userModel);
-          } else {
-            // state Error
-            return ShowErrorWidget();
+      child: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+        if (state is HomeInitial) {
+          BlocProvider.of<HomeCubit>(context).getUser(); // trigger to load data
+          return LoadingWidget();
+        } else if (state is HomeLoading) {
+          return LoadingWidget();
+        } else if (state is HomeRequestData) {
+          if (state.userModel.birthDate == null) {
+            return Scaffold(
+              body: DoBSelectBox(),
+            );
           }
-        }),
-      ),
+          if (state.currentStatusModel.height == null ||
+              state.currentStatusModel.weight == null) {
+            return Scaffold(
+              body: HeightWeightSelectBox(),
+            );
+          }
+        } else if (state is HomeLoaded) {
+          return Scaffold(
+            key: _scaffoldKey,
+            drawer: _menu(),
+            bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
+            body: _body(context, state.currentStatusModel, state.userModel),
+          );
+          //return _body(context, state.currentStatusModel, state.userModel);
+        } else {
+          // state Error
+          return ShowErrorWidget();
+        }
+      }),
     );
   }
 
@@ -146,7 +160,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         _status(
-          bmi: status.bmi.toString(),
+          bmi: status.bmi.toStringAsFixed(2),
           currentStatus: status.status.toString(),
           distance: status.distance.toString(),
         ),
@@ -435,6 +449,8 @@ class _status extends StatelessWidget {
                         fontSize: 18.0,
                         color: Colors.black87,
                       ),
+                      overflow: TextOverflow.fade,
+                      softWrap: false,
                       textAlign: TextAlign.center,
                     )
                   ],

@@ -31,6 +31,24 @@ class HomeLoaded extends HomeState {
   int get hashCode => currentStatusModel.hashCode ^ userModel.hashCode;
 }
 
+class HomeRequestData extends HomeState {
+  final CurrentStatusModel currentStatusModel;
+  final UserModel userModel;
+  const HomeRequestData(this.currentStatusModel, this.userModel);
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is HomeRequestData &&
+        o.currentStatusModel == currentStatusModel &&
+        o.userModel == userModel;
+  }
+
+  @override
+  int get hashCode => currentStatusModel.hashCode ^ userModel.hashCode;
+}
+
 class HomeError extends HomeState {
   final String message;
   const HomeError(this.message);

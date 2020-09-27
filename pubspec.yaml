@@ -56,7 +56,6 @@ dependencies:
   rxdart: ^0.24.1
   intl: ^0.16.1
   table_calendar: ^2.2.3
-  
 
 dev_dependencies:
   flutter_test:

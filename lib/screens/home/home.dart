@@ -12,6 +12,7 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/home/components/dob_select.dart';
 import 'package:pulserun_app/screens/home/components/heightweight_select.dart';
+import 'package:pulserun_app/screens/home/components/history_card.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
@@ -119,6 +120,57 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                color: Colors.grey.shade100,
+                child: ListView(
+                  padding: EdgeInsets.only(top: 45),
+                  children: <Widget>[
+                    Text(
+                      "Activity",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      "Last 5 History",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      height: 200,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             StreamBuilder<List<BluetoothDevice>>(
               stream: Stream.periodic(Duration(seconds: 5))
                   .asyncMap((_) => FlutterBlue.instance.connectedDevices),

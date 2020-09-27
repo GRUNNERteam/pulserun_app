@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/running.dart';
@@ -13,6 +14,7 @@ abstract class RunningRepository {
   Future<void> init();
   Future<double> working(PositionModel pos);
   Future<RunningModel> stop();
+  Future<void> setestimatedTime(String et);
 }
 
 class RunningData extends RunningRepository {
@@ -63,5 +65,10 @@ class RunningData extends RunningRepository {
     await this._currentStatusRepository.updateDistance(disT);
     await this._locationRepository.uploadToDB();
     return this._runningModel;
+  }
+
+  @override
+  Future<void> setestimatedTime(String et) async {
+    this._runningModel.estimatedTime = et;
   }
 }

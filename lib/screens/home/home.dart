@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(top: 45),
                   children: <Widget>[
                     Text(
-                      "Activity",
+                      "Device",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -136,14 +136,68 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(
-                      height: 5,
+                      height: 20,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[],
-                    ),
-                    SizedBox(
-                      height: 15,
+                    Container(
+                      child: StreamBuilder<List<BluetoothDevice>>(
+                        stream: Stream.periodic(Duration(seconds: 5)).asyncMap(
+                            (_) => FlutterBlue.instance.connectedDevices),
+                        initialData: [],
+                        builder: (c, snapshot) {
+                          if (snapshot.hasData) {
+                            return Column(
+                              children: snapshot.data
+                                  .map(
+                                    (d) => ListTile(
+                                      title: Text(d.name),
+                                      //subtitle: Text("connected"),
+                                      subtitle:
+                                          StreamBuilder<List<BluetoothService>>(
+                                        stream: d.services,
+                                        initialData: [],
+                                        builder: (c, snapshot) {
+                                          return Text(snapshot.data.toString());
+                                        },
+                                      ),
+                                      trailing:
+                                          StreamBuilder<BluetoothDeviceState>(
+                                        stream: d.state,
+                                        initialData:
+                                            BluetoothDeviceState.disconnected,
+                                        builder: (c, snapshot) {
+                                          if (snapshot.data ==
+                                              BluetoothDeviceState.connected) {
+                                            return IconButton(
+                                                icon: Icon(Icons.search),
+                                                onPressed: () {
+                                                  d.discoverServices();
+                                                });
+                                          } else if (snapshot.data ==
+                                              BluetoothDeviceState
+                                                  .disconnected) {
+                                            return IconButton(
+                                                icon: Icon(
+                                                    Icons.bluetooth_disabled),
+                                                onPressed: () {
+                                                  d.disconnect();
+                                                });
+                                          }
+                                          return Text(snapshot.data.toString());
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            );
+                          } else {
+                            return Column(
+                              children: <Widget>[
+                                Text('No device/Not Found'),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ),
                     Text(
                       "Last 5 History",
@@ -171,46 +225,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-            StreamBuilder<List<BluetoothDevice>>(
-              stream: Stream.periodic(Duration(seconds: 5))
-                  .asyncMap((_) => FlutterBlue.instance.connectedDevices),
-              initialData: [],
-              builder: (c, snapshot) => Column(
-                children: snapshot.data
-                    .map((d) => ListTile(
-                          title: Text(d.name),
-                          //subtitle: Text("connected"),
-                          subtitle: StreamBuilder<List<BluetoothService>>(
-                            stream: d.services,
-                            initialData: [],
-                            builder: (c, snapshot) {
-                              return Text(snapshot.data.toString());
-                            },
-                          ),
-                          trailing: StreamBuilder<BluetoothDeviceState>(
-                            stream: d.state,
-                            initialData: BluetoothDeviceState.disconnected,
-                            builder: (c, snapshot) {
-                              if (snapshot.data ==
-                                  BluetoothDeviceState.connected) {
-                                return IconButton(
-                                    icon: Icon(Icons.search),
-                                    onPressed: () {
-                                      d.discoverServices();
-                                    });
-                              } else if (snapshot.data ==
-                                  BluetoothDeviceState.disconnected) {
-                                return IconButton(
-                                    icon: Icon(Icons.bluetooth_disabled),
-                                    onPressed: () {
-                                      d.disconnect();
-                                    });
-                              }
-                              return Text(snapshot.data.toString());
-                            },
-                          ),
-                        ))
-                    .toList(),
               ),
             ),
           ],

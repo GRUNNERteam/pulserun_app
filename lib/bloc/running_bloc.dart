@@ -147,8 +147,11 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     if (event is StopRunning) {
       try {
         yield RunningLoading();
+        this.stopwatchTime.asyncMap((event) => null);
         _stop();
         _locationSubscription?.cancel();
+        String et = await stopwatchTime.first;
+        await _runningRepository.setestimatedTime(et);
         await _runningRepository.stop();
         yield RunningResult(
             locationServiceAndTracking: event.locationServiceAndTracking,

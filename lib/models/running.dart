@@ -7,10 +7,12 @@ class RunningModel {
   //RunningModelItem runningItem;
   DateTime startTime;
   DateTime endTime;
+  String estimatedTime;
   RunningModel({
     this.runId,
     this.startTime,
     this.endTime,
+    this.estimatedTime,
   });
 
   // void setRunningItem(RunningModelItem item) {
@@ -40,7 +42,8 @@ class RunningModel {
         'startTime': Timestamp.fromMillisecondsSinceEpoch(
             startTime?.millisecondsSinceEpoch),
         'endTime': Timestamp.fromMillisecondsSinceEpoch(
-            endTime?.millisecondsSinceEpoch)
+            endTime?.millisecondsSinceEpoch),
+        'estimatedTime': estimatedTime,
       };
     } else {
       return {
@@ -57,8 +60,9 @@ class RunningModel {
       RunningModel.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'RunningModel(runId: $runId, startTime: $startTime, endTime: $endTime)';
+  String toString() {
+    return 'RunningModel(runId: $runId, startTime: $startTime, endTime: $endTime, estimatedTime: $estimatedTime)';
+  }
 
   @override
   bool operator ==(Object o) {
@@ -67,21 +71,29 @@ class RunningModel {
     return o is RunningModel &&
         o.runId == runId &&
         o.startTime == startTime &&
-        o.endTime == endTime;
+        o.endTime == endTime &&
+        o.estimatedTime == estimatedTime;
   }
 
   @override
-  int get hashCode => runId.hashCode ^ startTime.hashCode ^ endTime.hashCode;
+  int get hashCode {
+    return runId.hashCode ^
+        startTime.hashCode ^
+        endTime.hashCode ^
+        estimatedTime.hashCode;
+  }
 
   RunningModel copyWith({
     String runId,
     DateTime startTime,
     DateTime endTime,
+    String estimatedTime,
   }) {
     return RunningModel(
       runId: runId ?? this.runId,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
+      estimatedTime: estimatedTime ?? this.estimatedTime,
     );
   }
 
@@ -93,6 +105,7 @@ class RunningModel {
       runId: map['runId'],
       startTime: startts.toDate(),
       endTime: endts.toDate() ?? null,
+      estimatedTime: map['estimatedTime'] ?? null,
     );
   }
 }

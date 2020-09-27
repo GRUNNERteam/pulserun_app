@@ -11,6 +11,7 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/home/components/dob_select.dart';
 import 'package:pulserun_app/screens/home/components/heightweight_select.dart';
+import 'package:pulserun_app/screens/home/components/history_card.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
@@ -139,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                       height: 15,
                     ),
                     Text(
-                      "History",
+                      "Last 5 History",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -149,9 +150,18 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[],
+                    Container(
+                      height: 200,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                          historyCard(),
+                        ],
+                      ),
                     ),
                   ],
                 ),

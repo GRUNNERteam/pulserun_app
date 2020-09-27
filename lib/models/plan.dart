@@ -2,10 +2,74 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum PlanGoalType {
+  none,
+  step,
+  weight,
+  avgHeartRate,
+}
+
+class PlanWeekly {}
+
+class PlanGoalModel {
+  PlanGoalType planType;
+  double goal;
+  PlanGoalModel({
+    this.planType,
+    this.goal,
+  });
+
+  PlanGoalModel copyWith({
+    PlanGoalType planType,
+    double goal,
+  }) {
+    return PlanGoalModel(
+      planType: planType ?? this.planType,
+      goal: goal ?? this.goal,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'planType': planType,
+      'goal': goal,
+    };
+  }
+
+  factory PlanGoalModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return PlanGoalModel(
+      planType: map['planType'],
+      goal: map['goal'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory PlanGoalModel.fromJson(String source) =>
+      PlanGoalModel.fromMap(json.decode(source));
+
+  @override
+  String toString() => 'PlanGoalModel(planType: $planType, goal: $goal)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is PlanGoalModel && o.planType == planType && o.goal == goal;
+  }
+
+  @override
+  int get hashCode => planType.hashCode ^ goal.hashCode;
+}
+
 class PlanModel {
   int planId;
+  PlanGoalModel goal;
   double targetHeartRate;
   DateTime start;
+
   PlanModel({
     this.planId,
     this.targetHeartRate,

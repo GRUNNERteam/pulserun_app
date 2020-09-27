@@ -299,7 +299,8 @@ class _RunningPageState extends State<RunningPage> {
                             stream: characteristic.value,
                             initialData: characteristic.lastValue,
                             builder: (c, snapshot) {
-                              final value = snapshot.data;
+                              int value;
+                              loggerNoStack.i(snapshot.data.toString());
                               if (!snapshot.hasData) {
                                 return Text('Loading');
                               } else if (snapshot.hasError)
@@ -311,16 +312,20 @@ class _RunningPageState extends State<RunningPage> {
                                       .split(']')
                                       .first
                                       .toString() ==
-                                  '[')
-                                return Text('wait');
-                              else if (snapshot.hasData)
-                                return Text(snapshot.data
+                                  '[') {
+                                value = 0;
+                                return Text(value.toString());
+                              } else if (snapshot.hasData) {
+                                value = int.parse((snapshot.data
                                     .toString()
                                     .split(',')
                                     .last
                                     .split(']')
                                     .first
-                                    .toString());
+                                    .toString()));
+
+                                return Text(value.toString());
+                              }
                             },
                           ),
                         ],
@@ -372,68 +377,6 @@ class _RunningPageState extends State<RunningPage> {
                 ],
               ),
             ),
-            StreamBuilder<List<BluetoothDevice>>(
-                stream: Stream.periodic(Duration(seconds: 3))
-                    .asyncMap((_) => FlutterBlue.instance.connectedDevices),
-                initialData: [],
-                builder: (c, snapshot) => Column(
-                      children: snapshot.data
-                          .map((device) => ExpansionTile(
-                                  leading: StreamBuilder<BluetoothDeviceState>(
-                                    stream: device.state,
-                                    initialData: BluetoothDeviceState.connected,
-                                    builder: (context, snapshot) {
-                                      switch (snapshot.data) {
-                                        case BluetoothDeviceState.connected:
-                                          return Icon(
-                                              Icons.bluetooth_connected);
-                                        case BluetoothDeviceState.disconnected:
-                                          return Icon(Icons.bluetooth_disabled);
-                                          break;
-                                        default:
-                                          return Icon(Icons.bluetooth_disabled);
-                                      }
-                                    },
-                                  ),
-                                  title: Text(device.name),
-                                  subtitle: StreamBuilder<BluetoothDeviceState>(
-                                    stream: device.state,
-                                    initialData: BluetoothDeviceState.connected,
-                                    builder: (context, snapshot) {
-                                      if (currentdevice.name == device.name)
-                                        return Text("Accesss");
-                                      else
-                                        return Text("denied");
-                                    },
-                                  ),
-                                  trailing: StreamBuilder<BluetoothDeviceState>(
-                                    stream: device.state,
-                                    initialData: BluetoothDeviceState.connected,
-                                    builder: (context, snapshot) {
-                                      if (currentdevice.name == device.name)
-                                        return Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green,
-                                          size: 36.0,
-                                        );
-                                      else
-                                        return Icon(
-                                          Icons.cancel,
-                                          color: Colors.red,
-                                          size: 36.0,
-                                        );
-                                    },
-                                  ),
-                                  children: <Widget>[
-                                    StreamBuilder<bool>(
-                                      stream: device.isDiscoveringServices,
-                                      builder: (context, snapshot) {
-                                        return Text(snapshot.data.toString());
-                                      },
-                                    ),
-                                  ]))
-                          .toList(),
-                    )),
             Expanded(
               child: Container(
                 child: Row(

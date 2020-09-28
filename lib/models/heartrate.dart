@@ -8,8 +8,10 @@ class HeartRateModel {
     this.hrList,
   });
 
-  void addItem(HeartRateItem value) {
-    this.hrList.add(value);
+  void addItem(int heartrate, DateTime time) {
+    HeartRateItem temp;
+    temp.addItem(heartrate, time);
+    this.hrList.add(temp);
   }
 
   HeartRateModel copyWith({
@@ -55,17 +57,23 @@ class HeartRateModel {
 }
 
 class HeartRateItem {
-  final double hr;
+  int hr;
 
-  final DateTime ts;
+  DateTime ts;
 
   HeartRateItem(
     this.hr,
     this.ts,
   );
 
+  HeartRateItem addItem(int hr, DateTime ts) {
+    this.hr = hr;
+    this.ts = ts;
+    return HeartRateItem(this.hr, this.ts);
+  }
+
   HeartRateItem copyWith({
-    double hr,
+    int hr,
     DateTime ts,
   }) {
     return HeartRateItem(

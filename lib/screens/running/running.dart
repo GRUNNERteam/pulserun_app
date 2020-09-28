@@ -8,8 +8,10 @@ import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 
@@ -18,6 +20,7 @@ List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
 List<int> hr = [0];
+final HeartRateRepository _heartRateRepository = TestHeartRate();
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -271,6 +274,7 @@ class _RunningPageState extends State<RunningPage> {
 
   Widget _buildbodyRunning(
       BuildContext context, PositionModel pos, double distance) {
+    HeartRateModel _heartRateModel;
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     return Stack(
       children: <Widget>[
@@ -324,7 +328,7 @@ class _RunningPageState extends State<RunningPage> {
                                     .split(']')
                                     .first
                                     .toString()));
-
+                                //_heartRateRepository.insertdb(50);
                                 return Text(value.toString());
                               }
                             },

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/plan.dart';
-import 'package:pulserun_app/repository/location_repository.dart';
-import 'package:pulserun_app/services/auth/auth.dart';
+
 import 'package:pulserun_app/services/database/database.dart';
 
 abstract class PlanRepository {

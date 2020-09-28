@@ -271,6 +271,7 @@ class _RunningPageState extends State<RunningPage> {
 
   Widget _buildbodyRunning(
       BuildContext context, PositionModel pos, double distance) {
+    final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     return Stack(
       children: <Widget>[
         Column(
@@ -335,7 +336,13 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Timer'),
-                          Text('0:0'),
+                          StreamBuilder<String>(
+                              stream: bloc.stopwatchTime,
+                              builder: (context, snapshot) {
+                                return snapshot.hasData
+                                    ? Text(snapshot.data)
+                                    : Text('');
+                              }),
                         ],
                       ),
                     ),

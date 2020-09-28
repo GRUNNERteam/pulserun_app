@@ -1,4 +1,6 @@
 import 'dart:ffi';
+import 'dart:math';
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
@@ -10,6 +12,8 @@ abstract class CurrentStatusRepository {
   Future<double> fetchDistanceToCurrentStatus();
 
   Future<void> updateDistance(double value);
+  Future<void> updateUserHW(double height, double weight);
+
 }
 
 class CurrentStatus implements CurrentStatusRepository {
@@ -22,11 +26,27 @@ class CurrentStatus implements CurrentStatusRepository {
 
     await _reference.get().then((snapshot) {
       if (snapshot.exists) {
-        // snapshot.data().forEach((key, value) {
-        //   var type = value.runtimeType;
-        //   print('$key : $type');
-        // });
         data = CurrentStatusModel.fromMap(snapshot.data());
+        if (data.height != null && data.weight != null) {
+          // https://www.thecalculatorsite.com/articles/health/bmi-formula-for-bmi-calculations.php
+          double hpow = pow(data.height / 100, 2);
+          print(hpow);
+          double bmi = (data.weight / hpow);
+          if (bmi < 18.5) {
+            data.status = 'Underweight';
+          } else if (bmi >= 18.5 && bmi < 25) {
+            data.status = 'Normal';
+          } else if (bmi >= 25 && bmi < 30) {
+            data.status = 'Overweight';
+          } else if (bmi > 30) {
+            data.status = 'Obesity';
+          }
+          data.bmi = bmi;
+          _reference.update({
+            'bmi': bmi,
+            'status': data.status,
+          });
+        }
 
         print(data.toString());
       } else {
@@ -64,5 +84,18 @@ class CurrentStatus implements CurrentStatusRepository {
         _reference.update({'distance': distance});
       }
     });
+  }
+
+  @override
+  Future<void> updateUserHW(double height, double weight) async {
+    if (height == null || weight == null) {
+      return null;
+    }
+
+    await _reference.update({
+      'weight': weight.toDouble(),
+      'height': height.toDouble(),
+    });
+    print('Update Weight and Height complete');
   }
 }

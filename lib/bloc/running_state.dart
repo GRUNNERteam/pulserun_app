@@ -38,9 +38,11 @@ class RunningLoaded extends RunningState {
 class RunningWorking extends RunningState {
   final double distance;
   final PositionModel positionModel;
+  final int heartrate;
   RunningWorking({
     this.distance,
     this.positionModel,
+    this.heartrate,
   });
 
   @override
@@ -49,19 +51,23 @@ class RunningWorking extends RunningState {
 
     return o is RunningWorking &&
         o.distance == distance &&
-        o.positionModel == positionModel;
+        o.positionModel == positionModel &&
+        o.heartrate == heartrate;
   }
 
   @override
-  int get hashCode => distance.hashCode ^ positionModel.hashCode;
+  int get hashCode =>
+      distance.hashCode ^ positionModel.hashCode ^ heartrate.hashCode;
 }
 
 class RunningDisplayChange extends RunningState {
   final PositionModel positionModel;
   final double distance;
+  final int hearrate;
   const RunningDisplayChange(
     this.positionModel,
     this.distance,
+    this.hearrate,
   );
 
   @override
@@ -70,11 +76,13 @@ class RunningDisplayChange extends RunningState {
 
     return o is RunningDisplayChange &&
         o.positionModel == positionModel &&
-        o.distance == distance;
+        o.distance == distance &&
+        o.hearrate == hearrate;
   }
 
   @override
-  int get hashCode => positionModel.hashCode ^ distance.hashCode;
+  int get hashCode =>
+      positionModel.hashCode ^ distance.hashCode ^ hearrate.hashCode;
 }
 
 class RunningResult extends RunningState {

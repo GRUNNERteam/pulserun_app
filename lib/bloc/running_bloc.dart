@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
@@ -142,8 +143,10 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
       try {
         final double distance = await _runningRepository
             .working(PositionModel().convertLocToPos(event.locationData));
+        final hr = await _heartRateRepository.gethr();
+        log(hr.toString(), name: 'HeartRate');
         yield RunningDisplayChange(
-            PositionModel().convertLocToPos(event.locationData), distance);
+            PositionModel().convertLocToPos(event.locationData), distance, hr);
       } catch (e) {
         print('LocationChange Error : $e');
         yield RunningError('Location Error');

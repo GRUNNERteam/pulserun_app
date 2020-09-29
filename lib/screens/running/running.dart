@@ -173,8 +173,8 @@ class _RunningPageState extends State<RunningPage> {
               return _buildbodyPlan(
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
-              return _buildbodyRunning(
-                  context, state.positionModel, state.distance ?? 0);
+              return _buildbodyRunning(context, state.positionModel,
+                  state.distance ?? 0, state.heartrate ?? 0);
             } else if (state is RunningDisplayChange) {
               if (state.positionModel != null) {
                 try {
@@ -190,7 +190,7 @@ class _RunningPageState extends State<RunningPage> {
               // rebuild whole widget
               // https://github.com/felangel/bloc/issues/174#issuecomment-477867469
               return _buildbodyRunning(
-                  context, state.positionModel, state.distance);
+                  context, state.positionModel, state.distance, state.hearrate);
             } else if (state is RunningResult) {
               _mapResult();
               return _buildbodyResult(context);
@@ -276,7 +276,7 @@ class _RunningPageState extends State<RunningPage> {
   }
 
   Widget _buildbodyRunning(
-      BuildContext context, PositionModel pos, double distance) {
+      BuildContext context, PositionModel pos, double distance, int hr) {
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     return Stack(
       children: <Widget>[
@@ -330,7 +330,6 @@ class _RunningPageState extends State<RunningPage> {
                                     .split(']')
                                     .first
                                     .toString()));
-
                                 return Text(value.toString());
                               }
                             },

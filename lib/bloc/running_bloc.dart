@@ -10,6 +10,7 @@ import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
+import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
@@ -42,11 +43,14 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
   final PlanRepository _planRepository;
   final CurrentStatusRepository _currentStatusRepository;
 
+  final HeartRateRepository _heartRateRepository;
+
   RunningBloc(
     this._location,
     this._runningRepository,
     this._planRepository,
     this._currentStatusRepository,
+    this._heartRateRepository,
   ) : super(RunningInitial()) {
     _setupStopWatch();
   }
@@ -114,7 +118,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         final LocationData position = await _location.getLocation();
         print(position);
         await _runningRepository.init();
+        await _heartRateRepository.init();
         print('init Running Completed');
+
         final double distance = await _runningRepository
             .working(PositionModel().convertLocToPos(position));
         print(distance);

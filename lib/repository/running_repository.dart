@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
@@ -6,6 +8,8 @@ import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+
+String idR;
 
 abstract class RunningRepository {
   Future<RunningModel> fetch(LocationModel loc, HeartRateModel hr);
@@ -44,9 +48,8 @@ class RunningData extends RunningRepository {
     this._reference = this._reference.collection('run').doc();
     this._runningModel =
         RunningModel(runId: this._reference.id, startTime: DateTime.now());
-
+    idR = this._reference.id;
     await this._reference.set(this._runningModel.toMap());
-
     // Location
     this
         ._locationRepository

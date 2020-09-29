@@ -14,13 +14,13 @@ import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
+import 'package:pulserun_app/screens/home/home.dart';
 
 BluetoothDevice currentdevice;
 List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
 List<int> hr = [0];
-final HeartRateRepository _heartRateRepository = TestHeartRate();
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -259,7 +259,10 @@ class _RunningPageState extends State<RunningPage> {
                       onPressed: () {
                         BlocProvider.of<RunningBloc>(context)
                             .add(GetPlanAndStat());
-                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomePage()));
                       },
                     ),
                   ),
@@ -274,7 +277,6 @@ class _RunningPageState extends State<RunningPage> {
 
   Widget _buildbodyRunning(
       BuildContext context, PositionModel pos, double distance) {
-    HeartRateModel _heartRateModel;
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     return Stack(
       children: <Widget>[
@@ -328,7 +330,7 @@ class _RunningPageState extends State<RunningPage> {
                                     .split(']')
                                     .first
                                     .toString()));
-                                //_heartRateRepository.insertdb(50);
+
                                 return Text(value.toString());
                               }
                             },
@@ -532,8 +534,10 @@ class _RunningPageState extends State<RunningPage> {
                                 ),
                               ],
                               cancelButton: CupertinoActionSheetAction(
-                                onPressed: () {},
-                                child: Text("cance"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("cancel"),
                               ),
                             ),
                           );

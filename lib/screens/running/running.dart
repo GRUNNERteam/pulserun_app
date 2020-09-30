@@ -20,7 +20,9 @@ BluetoothDevice currentdevice;
 List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
-List<int> hr = [0];
+HearRateModel heartRateModel = HearRateModel();
+
+List<int> hr;
 
 var logger = Logger(
   printer: PrettyPrinter(),
@@ -167,6 +169,7 @@ class _RunningPageState extends State<RunningPage> {
             } else if (state is RunningLoading) {
               return LoadingWidget();
             } else if (state is RunningLoaded) {
+              heartRateModel.clear();
               this._markers.clear();
               this._polylineCoordinates.clear();
               this._polylines.clear();
@@ -307,7 +310,6 @@ class _RunningPageState extends State<RunningPage> {
                             initialData: characteristic.lastValue,
                             builder: (c, snapshot) {
                               int value;
-                              loggerNoStack.i(snapshot.data.toString());
                               if (!snapshot.hasData) {
                                 return Text('Loading');
                               } else if (snapshot.hasError)
@@ -330,6 +332,11 @@ class _RunningPageState extends State<RunningPage> {
                                     .split(']')
                                     .first
                                     .toString()));
+
+                                /*heartRateModel.add(HeartRateModel(
+                                    hr: value, time: DateTime.now()));*/
+                                heartRateModel.add_model(value);
+                                //loggerNoStack.i(heartRateModel.toString());
                                 return Text(value.toString());
                               }
                             },
@@ -385,6 +392,17 @@ class _RunningPageState extends State<RunningPage> {
                       onMapCreated: _onMapCreated,
                       polylines: Set<Polyline>.of(this._polylines.values),
                     ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 50.0),
+              child: Column(
+                children: [
+                  Card(
+                    color: Colors.red,
+                    child: Text("data"),
                   ),
                 ],
               ),

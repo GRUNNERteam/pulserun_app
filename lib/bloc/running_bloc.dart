@@ -15,6 +15,7 @@ import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'running_event.dart';
@@ -143,8 +144,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
       try {
         final double distance = await _runningRepository
             .working(PositionModel().convertLocToPos(event.locationData));
-        final hr = await _heartRateRepository.gethr();
-        log(hr.toString(), name: 'HeartRate');
+        final hr = 0;
         yield RunningDisplayChange(
             PositionModel().convertLocToPos(event.locationData), distance, hr);
       } catch (e) {

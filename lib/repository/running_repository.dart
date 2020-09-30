@@ -8,11 +8,12 @@ import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 
 String idR;
 
 abstract class RunningRepository {
-  Future<RunningModel> fetch(LocationModel loc, HeartRateModel hr);
+  Future<RunningModel> fetch(LocationModel loc);
 
   Future<void> init();
   Future<double> working(PositionModel pos);
@@ -24,13 +25,14 @@ class RunningData extends RunningRepository {
   final LocationRepository _locationRepository = LocationServiceAndTracking();
   final CurrentStatusRepository _currentStatusRepository = CurrentStatus();
   final HeartRateRepository _heartRateRepository = TestHeartRate();
+
   RunningModel _runningModel;
   DocumentReference _reference;
 
   DateTime startTime;
 
   @override
-  Future<RunningModel> fetch(LocationModel loc, HeartRateModel hr) async {
+  Future<RunningModel> fetch(LocationModel loc) async {
     throw UnimplementedError();
   }
 
@@ -60,6 +62,10 @@ class RunningData extends RunningRepository {
 
   @override
   Future<RunningModel> stop() async {
+    loggerNoStack.i(heartRateModel.toString());
+    await this._heartRateRepository.init();
+    loggerNoStack.i(heartRateModel.toString());
+    await this._heartRateRepository.addDB();
     await this._runningModel.setendTime();
     await this._reference.update(this._runningModel.toMap());
     final double disT = await this._locationRepository.getDistance();

@@ -226,7 +226,7 @@ class _menu extends StatelessWidget {
             title: Text('Planing'),
           ),
           ListTile(
-            leading: Icon(MdiIcons.logout),
+            leading: Icon(MdiIcons.bluetooth),
             title: Text('BLE'),
             onTap: () {
               Navigator.push(

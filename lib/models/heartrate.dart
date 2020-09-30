@@ -1,91 +1,93 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class HeartRateModel {
-  List<HeartRateItem> hrList;
-  HeartRateModel({
-    this.hrList,
+class HearRateModel {
+  List<HeartRateItem> heartRate;
+  HearRateModel({
+    this.heartRate,
   });
 
-  void addItem(int heartrate, DateTime time) {
-    HeartRateItem temp;
-    temp.addItem(heartrate, time);
-    this.hrList.add(temp);
+  void add_model(int add_hr) {
+    if (this.heartRate == null) {
+      this.heartRate = List<HeartRateItem>();
+    }
+
+    this.heartRate.add(HeartRateItem(hr: add_hr, time: DateTime.now()));
   }
 
-  HeartRateModel copyWith({
-    List<HeartRateItem> hrList,
+  void clear() {
+    if (this.heartRate != null) {
+      this.heartRate.clear();
+    }
+  }
+
+  HearRateModel copyWith({
+    List<HeartRateItem> heartRate,
   }) {
-    return HeartRateModel(
-      hrList: hrList ?? this.hrList,
+    return HearRateModel(
+      heartRate: heartRate ?? this.heartRate,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'hrList': hrList?.map((x) => x?.toMap())?.toList(),
+      'heartRate': heartRate?.map((x) => x?.toMap())?.toList(),
     };
   }
 
-  factory HeartRateModel.fromMap(Map<String, dynamic> map) {
+  factory HearRateModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
 
-    return HeartRateModel(
-      hrList: List<HeartRateItem>.from(
-          map['hrList']?.map((x) => HeartRateItem.fromMap(x))),
+    return HearRateModel(
+      heartRate: List<HeartRateItem>.from(
+          map['heartRate']?.map((x) => HeartRateItem.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory HeartRateModel.fromJson(String source) =>
-      HeartRateModel.fromMap(json.decode(source));
+  factory HearRateModel.fromJson(String source) =>
+      HearRateModel.fromMap(json.decode(source));
 
   @override
-  String toString() => 'HeartRateModel(hrList: $hrList)';
+  String toString() => 'HearRateModel(heartRate: $heartRate)';
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is HeartRateModel && listEquals(o.hrList, hrList);
+    return o is HearRateModel && listEquals(o.heartRate, heartRate);
   }
 
   @override
-  int get hashCode => hrList.hashCode;
+  int get hashCode => heartRate.hashCode;
 }
 
 class HeartRateItem {
-  int hr;
+  final int hr;
 
-  DateTime ts;
-
-  HeartRateItem(
+  final DateTime time;
+  HeartRateItem({
     this.hr,
-    this.ts,
-  );
-
-  HeartRateItem addItem(int hr, DateTime ts) {
-    this.hr = hr;
-    this.ts = ts;
-    return HeartRateItem(this.hr, this.ts);
-  }
+    this.time,
+  });
 
   HeartRateItem copyWith({
     int hr,
-    DateTime ts,
+    DateTime time,
   }) {
     return HeartRateItem(
-      hr ?? this.hr,
-      ts ?? this.ts,
+      hr: hr ?? this.hr,
+      time: time ?? this.time,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'hr': hr,
-      'ts': ts?.millisecondsSinceEpoch,
+      'time': time?.millisecondsSinceEpoch,
     };
   }
 
@@ -93,8 +95,8 @@ class HeartRateItem {
     if (map == null) return null;
 
     return HeartRateItem(
-      map['hr'],
-      DateTime.fromMillisecondsSinceEpoch(map['ts']),
+      hr: map['hr'],
+      time: DateTime.fromMillisecondsSinceEpoch(map['time']),
     );
   }
 
@@ -104,15 +106,15 @@ class HeartRateItem {
       HeartRateItem.fromMap(json.decode(source));
 
   @override
-  String toString() => 'HeartRateItem(hr: $hr, ts: $ts)';
+  String toString() => 'HeartRateItem(hr: $hr, time: $time)';
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is HeartRateItem && o.hr == hr && o.ts == ts;
+    return o is HeartRateItem && o.hr == hr && o.time == time;
   }
 
   @override
-  int get hashCode => hr.hashCode ^ ts.hashCode;
+  int get hashCode => hr.hashCode ^ time.hashCode;
 }

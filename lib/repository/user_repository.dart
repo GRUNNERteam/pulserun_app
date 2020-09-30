@@ -22,10 +22,10 @@ class UserDB implements UserRepository {
         print('Create User');
         var currentUser = FirebaseAuth.instance.currentUser;
         _ref.set(UserModel(currentUser.uid, currentUser.displayName,
-                currentUser.photoURL, currentUser.email, null)
+                currentUser.photoURL, currentUser.email, null, null)
             .toMap());
         data = UserModel(currentUser.uid, currentUser.displayName,
-            currentUser.photoURL, currentUser.email, null);
+            currentUser.photoURL, currentUser.email, null, null);
       }
     });
 
@@ -38,8 +38,12 @@ class UserDB implements UserRepository {
       return null;
     }
     String formattedDate = DateFormat('yyyy-MM-dd').format(dob);
+    int targetHR = 220 - (DateTime.now().year - dob.year);
     await _ref.update({
       'birthDate': dob.toString(),
+    });
+    await _ref.update({
+      'targetHeartrate': targetHR,
     });
     print('Update DoB complete');
   }

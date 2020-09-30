@@ -26,13 +26,6 @@ class LocationChange extends RunningEvent {
   });
 }
 
-class HeartRateChange extends RunningEvent {
-  final HeartRateChange heartRateChange;
-  HeartRateChange({
-    this.heartRateChange,
-  });
-}
-
 class StopRunning extends RunningEvent {
   final LocationServiceAndTracking locationServiceAndTracking;
   final RunningModel runningModel;

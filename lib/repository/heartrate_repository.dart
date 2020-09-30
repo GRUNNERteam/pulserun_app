@@ -21,11 +21,15 @@ class TestHeartRate implements HeartRateRepository {
   Future<void> init() async {
     this._reference = await _planRepository.getRef(); //เอาแพลนไอดี
     this._reference = this._reference.collection('run').doc(idR);
-    //this._reference = this._reference.collection(idR).doc();
+
     loggerNoStack.i(this._reference.path);
   }
 
   Future<void> addDB() async {
-    _reference.collection('heartrate').doc().set(heartRateModel.toMap());
+    this
+        ._reference
+        .collection('heartrate')
+        .doc('heartrate')
+        .set(heartRateModel.toMap());
   }
 }

@@ -6,6 +6,7 @@ class UserModel {
   final String photoURL;
   final String email;
   String birthDate;
+  final int targetHeartrate;
 
   UserModel(
     this.uid,
@@ -13,6 +14,7 @@ class UserModel {
     this.photoURL,
     this.email,
     this.birthDate,
+    this.targetHeartrate,
   );
 
   @override
@@ -21,7 +23,8 @@ class UserModel {
         displayName.hashCode ^
         photoURL.hashCode ^
         email.hashCode ^
-        birthDate.hashCode;
+        birthDate.hashCode ^
+        targetHeartrate.hashCode;
   }
 
   Map<String, dynamic> toMap() {
@@ -31,6 +34,7 @@ class UserModel {
       'photoURL': photoURL,
       'email': email,
       'birthDate': birthDate,
+      'targetHeartrate': targetHeartrate,
     };
   }
 
@@ -43,6 +47,7 @@ class UserModel {
       map['photoURL'],
       map['email'],
       map['birthDate'],
+      map['targetHeartrate'],
     );
   }
 
@@ -57,6 +62,7 @@ class UserModel {
     String photoURL,
     String email,
     String birthDate,
+    int targetHeartrate,
   }) {
     return UserModel(
       uid ?? this.uid,
@@ -64,12 +70,13 @@ class UserModel {
       photoURL ?? this.photoURL,
       email ?? this.email,
       birthDate ?? this.birthDate,
+      targetHeartrate ?? this.targetHeartrate,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, displayName: $displayName, photoURL: $photoURL, email: $email, birthDate: $birthDate)';
+    return 'UserModel(uid: $uid, displayName: $displayName, photoURL: $photoURL, email: $email, birthDate: $birthDate, targetHeartrate: $targetHeartrate)';
   }
 
   @override
@@ -81,6 +88,7 @@ class UserModel {
         o.displayName == displayName &&
         o.photoURL == photoURL &&
         o.email == email &&
-        o.birthDate == birthDate;
+        o.birthDate == birthDate &&
+        o.targetHeartrate == targetHeartrate;
   }
 }

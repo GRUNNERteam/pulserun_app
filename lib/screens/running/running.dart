@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -281,6 +282,8 @@ class _RunningPageState extends State<RunningPage> {
   Widget _buildbodyRunning(
       BuildContext context, PositionModel pos, double distance, int hr) {
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
+    int value;
+
     return Stack(
       children: <Widget>[
         Column(
@@ -304,12 +307,10 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
-                          // TODO : change to Real-Time Heart Rate
                           StreamBuilder(
                             stream: characteristic.value,
                             initialData: characteristic.lastValue,
                             builder: (c, snapshot) {
-                              int value;
                               if (!snapshot.hasData) {
                                 return Text('Loading');
                               } else if (snapshot.hasError)
@@ -322,7 +323,6 @@ class _RunningPageState extends State<RunningPage> {
                                       .first
                                       .toString() ==
                                   '[') {
-                                value = 0;
                                 return Text(value.toString());
                               } else if (snapshot.hasData) {
                                 value = int.parse((snapshot.data
@@ -332,11 +332,7 @@ class _RunningPageState extends State<RunningPage> {
                                     .split(']')
                                     .first
                                     .toString()));
-
-                                /*heartRateModel.add(HeartRateModel(
-                                    hr: value, time: DateTime.now()));*/
                                 heartRateModel.add_model(value);
-                                //loggerNoStack.i(heartRateModel.toString());
                                 return Text(value.toString());
                               }
                             },
@@ -400,9 +396,41 @@ class _RunningPageState extends State<RunningPage> {
               padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 50.0),
               child: Column(
                 children: [
-                  Card(
-                    color: Colors.red,
-                    child: Text("data"),
+                  StreamBuilder(
+                    stream: characteristic.value,
+                    initialData: characteristic.lastValue,
+                    builder: (c, snapshot) {
+                      int check;
+                      if (!snapshot.hasData) {
+                        return Text('Loading');
+                      } else if (snapshot.hasError)
+                        return Text('ERROR');
+                      else if (snapshot.data
+                              .toString()
+                              .split(',')
+                              .last
+                              .split(']')
+                              .first
+                              .toString() ==
+                          '[') {
+                        return Text('slow');
+                      } else if (snapshot.hasData) {
+                        check = int.parse((snapshot.data
+                            .toString()
+                            .split(',')
+                            .last
+                            .split(']')
+                            .first
+                            .toString()));
+                        DateTime birthday = DateTime(1990, 1, 20);
+                        int today = DateTime.now().year;
+                        int b = birthday.year;
+                        int ans = today - b;
+                        loggerNoStack.i(today.toString() + "__" + b.toString());
+                        loggerNoStack.i(ans.toString());
+                        return Text('Fast');
+                      }
+                    },
                   ),
                 ],
               ),

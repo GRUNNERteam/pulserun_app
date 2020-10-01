@@ -446,6 +446,7 @@ class _RunningPageState extends State<RunningPage> {
                               tZone = 'Speed Up';
                             } else
                               tZone = 'Loading';
+                            loggerNoStack.i(DateTime.now());
                             return Text(tZone);
                           }
                           return Text("Loading");

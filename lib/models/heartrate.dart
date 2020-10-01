@@ -87,16 +87,17 @@ class HeartRateItem {
   Map<String, dynamic> toMap() {
     return {
       'hr': hr,
-      'time': time?.millisecondsSinceEpoch,
+      'time': Timestamp.fromMillisecondsSinceEpoch(time?.millisecondsSinceEpoch)
     };
   }
 
   factory HeartRateItem.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
 
+    Timestamp tmestamp = map['time'];
     return HeartRateItem(
       hr: map['hr'],
-      time: DateTime.fromMillisecondsSinceEpoch(map['time']),
+      time: tmestamp.toDate(),
     );
   }
 

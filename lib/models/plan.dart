@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlanModel {
   int planId;
-  double targetHeartRate;
+  int targetHeartRate;
   DateTime start;
   PlanModel({
     this.planId,
@@ -56,7 +56,7 @@ class PlanModel {
 
   PlanModel copyWith({
     int planId,
-    double targetHeartRate,
+    int targetHeartRate,
     DateTime start,
   }) {
     return PlanModel(

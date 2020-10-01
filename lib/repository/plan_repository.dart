@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/plan.dart';
-
+import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/services/database/database.dart';
 
 abstract class PlanRepository {
@@ -23,13 +24,18 @@ class MockUpPlan implements PlanRepository {
 
     PlanModel data;
 
-    await _ref.get().then((snapshot) {
+    await _ref.get().then((snapshot) async {
       if (snapshot.exists) {
         data = PlanModel.fromMap(snapshot.data());
       } else {
+        UserRepository userRepository = UserDB();
+        UserModel userModel = await userRepository.fetchUser();
+
         // Createing Plan
         data = PlanModel(
-            planId: planid, targetHeartRate: 180, start: DateTime.now());
+            planId: planid,
+            targetHeartRate: userModel.targetHeartrate,
+            start: DateTime.now());
 
         _ref.set(data.toMap());
       }

@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
                   MockUpPlan(),
                   CurrentStatus(),
                   TestHeartRate(),
+                  UserDB(),
                 )),
       ],
       child: FutureBuilder(

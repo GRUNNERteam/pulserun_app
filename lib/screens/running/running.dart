@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -12,7 +11,6 @@ import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
-import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
@@ -177,8 +175,12 @@ class _RunningPageState extends State<RunningPage> {
               return _buildbodyPlan(
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
-              return _buildbodyRunning(context, state.positionModel,
-                  state.distance ?? 0, state.heartrate ?? 0);
+              return _buildbodyRunning(
+                  context,
+                  state.positionModel,
+                  state.distance ?? 0,
+                  state.heartrate ?? 0,
+                  state.targetheartrate);
             } else if (state is RunningDisplayChange) {
               if (state.positionModel != null) {
                 try {
@@ -193,8 +195,8 @@ class _RunningPageState extends State<RunningPage> {
               _addPolyLine();
               // rebuild whole widget
               // https://github.com/felangel/bloc/issues/174#issuecomment-477867469
-              return _buildbodyRunning(
-                  context, state.positionModel, state.distance, state.hearrate);
+              return _buildbodyRunning(context, state.positionModel,
+                  state.distance, state.hearrate, state.targetheartrate);
             } else if (state is RunningResult) {
               _mapResult();
               return _buildbodyResult(context);
@@ -279,8 +281,8 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyRunning(
-      BuildContext context, PositionModel pos, double distance, int hr) {
+  Widget _buildbodyRunning(BuildContext context, PositionModel pos,
+      double distance, int hr, int thr) {
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     int value;
 
@@ -422,13 +424,8 @@ class _RunningPageState extends State<RunningPage> {
                             .split(']')
                             .first
                             .toString()));
-                        DateTime birthday = DateTime(1990, 1, 20);
-                        int today = DateTime.now().year;
-                        int b = birthday.year;
-                        int ans = today - b;
-                        loggerNoStack.i(today.toString() + "__" + b.toString());
-                        loggerNoStack.i(ans.toString());
-                        return Text('Fast');
+
+                        return Text(thr.toString());
                       }
                     },
                   ),

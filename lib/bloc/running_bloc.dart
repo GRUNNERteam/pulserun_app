@@ -156,6 +156,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         final hr = 0;
         final UserModel userModel = await _userRepository.fetchUser();
         final int targetHR = userModel.targetHeartrate;
+
         yield RunningDisplayChange(
           PositionModel().convertLocToPos(event.locationData),
           distance,

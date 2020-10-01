@@ -285,7 +285,9 @@ class _RunningPageState extends State<RunningPage> {
       double distance, int hr, int thr) {
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     int value;
-
+    String tZone = 'Loading';
+    int check;
+    double zone;
     return Stack(
       children: <Widget>[
         Column(
@@ -395,39 +397,61 @@ class _RunningPageState extends State<RunningPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 50.0),
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 30.0),
               child: Column(
                 children: [
-                  StreamBuilder(
-                    stream: characteristic.value,
-                    initialData: characteristic.lastValue,
-                    builder: (c, snapshot) {
-                      int check;
-                      if (!snapshot.hasData) {
-                        return Text('Loading');
-                      } else if (snapshot.hasError)
-                        return Text('ERROR');
-                      else if (snapshot.data
-                              .toString()
-                              .split(',')
-                              .last
-                              .split(']')
-                              .first
-                              .toString() ==
-                          '[') {
-                        return Text('slow');
-                      } else if (snapshot.hasData) {
-                        check = int.parse((snapshot.data
-                            .toString()
-                            .split(',')
-                            .last
-                            .split(']')
-                            .first
-                            .toString()));
-
-                        return Text(thr.toString());
-                      }
-                    },
+                  Center(
+                    child: Container(
+                      color: Colors.blue[100],
+                      padding: EdgeInsets.all(30.0),
+                      child: StreamBuilder(
+                        stream: characteristic.value,
+                        initialData: characteristic.lastValue,
+                        builder: (c, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Text('Loading');
+                          } else if (snapshot.hasError)
+                            return Text('ERROR');
+                          else if (snapshot.data
+                                  .toString()
+                                  .split(',')
+                                  .last
+                                  .split(']')
+                                  .first
+                                  .toString() ==
+                              '[') {
+                            return Text(tZone);
+                          } else if (snapshot.hasData) {
+                            check = int.parse((snapshot.data
+                                .toString()
+                                .split(',')
+                                .last
+                                .split(']')
+                                .first
+                                .toString()));
+                            zone = (100 * check) / thr;
+                            if (zone >= 100) {
+                              tZone = 'Dangerous slowdown or rest';
+                            } else if (zone >= 90 && zone < 100) {
+                              tZone = 'Zone 5';
+                            } else if (zone >= 80 && zone < 90) {
+                              tZone = 'Zone 4';
+                            } else if (zone >= 70 && zone < 80) {
+                              tZone = 'Zone 3';
+                            } else if (zone >= 60 && zone < 70) {
+                              tZone = 'Zone 2';
+                            } else if (zone >= 50 && zone < 60) {
+                              tZone = 'Zone 1';
+                            } else if (zone < 50) {
+                              tZone = 'Speed Up';
+                            } else
+                              tZone = 'Loading';
+                            return Text(tZone);
+                          }
+                          return Text("Loading");
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),

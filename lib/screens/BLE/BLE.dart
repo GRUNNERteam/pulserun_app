@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/screens/running/running.dart';
+import 'package:nice_button/nice_button.dart';
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
@@ -93,7 +94,6 @@ class DeviceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(device.name),
         actions: <Widget>[
           StreamBuilder<BluetoothDeviceState>(
             stream: device.state,
@@ -130,108 +130,103 @@ class DeviceScreen extends StatelessWidget {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            StreamBuilder<BluetoothDeviceState>(
-              stream: device.state,
-              initialData: BluetoothDeviceState.connecting,
-              builder: (c, snapshot) => ListTile(
-                leading: (snapshot.data == BluetoothDeviceState.connected)
-                    ? Icon(Icons.bluetooth_connected)
-                    : Icon(Icons.bluetooth_disabled),
-                title: Text(
-                    'Device is ${snapshot.data.toString().split('.')[1]}.'),
-                subtitle: Text('${device.id}'),
-                trailing: StreamBuilder<bool>(
-                  stream: device.isDiscoveringServices,
-                  initialData: false,
-                  builder: (c, snapshot) => IndexedStack(
-                    index: snapshot.data ? 1 : 0,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.refresh),
-                        onPressed: () {
-                          discover();
-                        },
-                      ),
-                      IconButton(
-                        icon: SizedBox(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.grey),
-                          ),
-                          width: 18.0,
-                          height: 18.0,
-                        ),
-                        onPressed: null,
-                      ),
-                    ],
-                  ),
-                ),
+      body: Container(
+        color: Colors.blueAccent[100],
+        padding: EdgeInsets.all(60),
+        child: Center(
+          child: Column(
+            children: [
+              Text(device.name,
+                  textAlign: TextAlign.center, style: TextStyle(fontSize: 40)),
+              StreamBuilder<BluetoothDeviceState>(
+                stream: device.state,
+                builder: (context, snapshot) {
+                  switch (snapshot.data) {
+                    case BluetoothDeviceState.connected:
+                      return Container(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                          child: Card(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                            child: Icon(
+                              Icons.bluetooth_connected,
+                              size: 250,
+                              color: Colors.black,
+                            ),
+                          ));
+
+                      break;
+                    case BluetoothDeviceState.disconnected:
+                      return Container(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                          child: Card(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                            child: Icon(
+                              Icons.bluetooth_disabled,
+                              size: 250,
+                              color: Colors.black,
+                            ),
+                          ));
+                      break;
+                    default:
+                      break;
+                  }
+                },
               ),
-            ),
-            StreamBuilder<BluetoothDeviceState>(
-              stream: device.state,
-              builder: (context, snapshot) {
-                switch (snapshot.data) {
-                  case BluetoothDeviceState.connected:
-                    return AlertDialog(
-                      title: Text(device.name),
-                      content: Text("Status: " +
-                          snapshot.data.toString().split('.').last),
-                      elevation: 24.0,
-                      backgroundColor: Colors.lightGreenAccent,
-                      actions: [
-                        FlatButton(
-                            onPressed: () {
-                              discover();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RunningPage()),
-                              );
-                            },
-                            color: Colors.redAccent,
-                            child: Text(
-                              "Running",
-                            ))
-                      ],
-                    );
-                    break;
-                  case BluetoothDeviceState.disconnected:
-                    return AlertDialog(
-                      title: Text(device.name),
-                      content: Text("Status: " +
-                          snapshot.data.toString().split('.').last),
-                      elevation: 24.0,
-                      backgroundColor: Colors.lightGreenAccent,
-                      actions: [
-                        FlatButton(
-                            onPressed: () => null,
-                            color: Colors.lightGreenAccent,
-                            child: Text(
-                              "Wait",
-                            ))
-                      ],
-                    );
-                    break;
-                  default:
-                    return Container(
-                      color: Colors.yellowAccent,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.cached),
-                            title: Text("Status: reconnecting"),
+              StreamBuilder<BluetoothDeviceState>(
+                stream: device.state,
+                builder: (context, snapshot) {
+                  switch (snapshot.data) {
+                    case BluetoothDeviceState.connected:
+                      return Container(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            discover();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RunningPage()),
+                            );
+                          },
+                          color: Colors.lightGreenAccent,
+                          child: Text(
+                            'RUN',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 90,
+                            ),
                           ),
-                        ],
-                      ),
-                    );
-                    break;
-                }
-              },
-            ),
-          ],
+                        ),
+                      );
+                      break;
+
+                    default:
+                      return Container(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                        child: RaisedButton(
+                          onPressed: null,
+                          color: Colors.lightGreenAccent,
+                          child: Text(
+                            'RUN',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 90,
+                            ),
+                          ),
+                        ),
+                      );
+                      break;
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

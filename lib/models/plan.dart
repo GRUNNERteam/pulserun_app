@@ -3,17 +3,24 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum PlanGoalType {
-  none,
+  distance,
   step,
-  weight,
-  avgHeartRate,
+  heartRate,
+}
+
+extension PlanGoalTypeExtension on PlanGoalType {
+  // Helper functions
+  String enumToString(Object o) => o.toString().split('.').last;
+
+  T enumFromString<T>(String key, List<T> values) =>
+      values.firstWhere((v) => key == enumToString(v), orElse: () => null);
 }
 
 class PlanWeekly {}
 
 class PlanGoalModel {
   PlanGoalType planType;
-  double goal;
+  String goal;
   PlanGoalModel({
     this.planType,
     this.goal,
@@ -31,7 +38,7 @@ class PlanGoalModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'planType': planType,
+      'planType': planType.index,
       'goal': goal,
     };
   }
@@ -40,7 +47,7 @@ class PlanGoalModel {
     if (map == null) return null;
 
     return PlanGoalModel(
-      planType: map['planType'],
+      planType: PlanGoalType.values[map['planType']],
       goal: map['goal'],
     );
   }
@@ -65,23 +72,28 @@ class PlanGoalModel {
 }
 
 class PlanModel {
-  int planId;
+  String planId;
   PlanGoalModel goal;
   double targetHeartRate;
   DateTime start;
+  int breakDay;
 
   PlanModel({
     this.planId,
+    this.goal,
     this.targetHeartRate,
     this.start,
+    this.breakDay,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'planId': planId,
+      'goal': goal.toMap(),
       'targetHeartRate': targetHeartRate,
       'start':
           Timestamp.fromMillisecondsSinceEpoch(start?.millisecondsSinceEpoch),
+      'breakDay': breakDay,
     };
   }
 
@@ -90,8 +102,10 @@ class PlanModel {
     Timestamp startts = map['start'];
     return PlanModel(
       planId: map['planId'],
+      goal: PlanGoalModel.fromMap(map['goal']),
       targetHeartRate: map['targetHeartRate'],
       start: startts.toDate(),
+      breakDay: map['breakDay'],
     );
   }
 
@@ -101,32 +115,43 @@ class PlanModel {
       PlanModel.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'PlanModel(planId: $planId, targetHeartRate: $targetHeartRate, start: $start)';
-
-  @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
     return o is PlanModel &&
         o.planId == planId &&
+        o.goal == goal &&
         o.targetHeartRate == targetHeartRate &&
-        o.start == start;
+        o.start == start &&
+        o.breakDay == breakDay;
   }
 
   @override
   int get hashCode =>
-      planId.hashCode ^ targetHeartRate.hashCode ^ start.hashCode;
+      planId.hashCode ^
+      goal.hashCode ^
+      targetHeartRate.hashCode ^
+      start.hashCode ^
+      breakDay.hashCode;
 
   PlanModel copyWith({
     int planId,
+    PlanGoalModel goal,
     double targetHeartRate,
     DateTime start,
+    int breakDay,
   }) {
     return PlanModel(
       planId: planId ?? this.planId,
+      goal: goal ?? this.goal,
       targetHeartRate: targetHeartRate ?? this.targetHeartRate,
       start: start ?? this.start,
+      breakDay: breakDay ?? this.breakDay,
     );
+  }
+
+  @override
+  String toString() {
+    return 'PlanModel(planId: $planId, goal: $goal, targetHeartRate: $targetHeartRate, start: $start, breakDay: $breakDay)';
   }
 }

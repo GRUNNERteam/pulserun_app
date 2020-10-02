@@ -29,6 +29,25 @@ class UserDB implements UserRepository {
       }
     });
 
+    // cleanup false data
+
+    await _ref
+        .collection('plan')
+        .doc('0')
+        .collection('run')
+        .get()
+        .then((docSnapshot) {
+      if (docSnapshot.docs.isNotEmpty) {
+        docSnapshot.docs.forEach((QueryDocumentSnapshot doc) {
+          doc.reference.collection('location').get().then((snapshot) {
+            if (snapshot.docs.isEmpty) {
+              doc.reference.delete();
+            }
+          });
+        });
+      }
+    });
+
     return data;
   }
 

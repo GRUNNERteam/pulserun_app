@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:location/location.dart';
+import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -33,11 +34,14 @@ class MyApp extends StatelessWidget {
             create: (context) => RunningBloc(
                   Location(),
                   RunningData(),
-                  MockUpPlan(),
+                  PlanData(),
                   CurrentStatus(),
                   TestHeartRate(),
                   UserDB(),
                 )),
+        BlocProvider(
+          create: (context) => PlanBloc(PlanData(), CurrentStatus()),
+        )
       ],
       child: FutureBuilder(
         future: Firebase.initializeApp(),

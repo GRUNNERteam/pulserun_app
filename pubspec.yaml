@@ -59,6 +59,9 @@ dependencies:
   intl: ^0.16.1
   age: ^0.0.1
   nice_button: ^0.1.7
+  table_calendar: ^2.2.3
+  jiffy: ^3.0.1
+  flutter_slidable: ^0.5.7
 
 dev_dependencies:
   flutter_test:

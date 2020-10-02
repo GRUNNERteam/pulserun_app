@@ -1,17 +1,21 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CurrentStatusModel {
   double bmi;
   String status;
   double distance;
   double weight;
   double height;
+  DocumentReference planRef;
   CurrentStatusModel({
     this.bmi,
     this.status,
     this.distance,
     this.weight,
     this.height,
+    this.planRef,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +25,7 @@ class CurrentStatusModel {
       'distance': distance,
       'weight': weight,
       'height': height,
+      'planRef': planRef,
     };
   }
 
@@ -51,6 +56,7 @@ class CurrentStatusModel {
       distance: map['distance'],
       weight: map['weight'],
       height: map['height'],
+      planRef: map['planRef'],
     );
   }
 
@@ -68,7 +74,8 @@ class CurrentStatusModel {
         o.status == status &&
         o.distance == distance &&
         o.weight == weight &&
-        o.height == height;
+        o.height == height &&
+        o.planRef == planRef;
   }
 
   @override
@@ -77,7 +84,8 @@ class CurrentStatusModel {
         status.hashCode ^
         distance.hashCode ^
         weight.hashCode ^
-        height.hashCode;
+        height.hashCode ^
+        planRef.hashCode;
   }
 
   CurrentStatusModel copyWith({
@@ -86,6 +94,7 @@ class CurrentStatusModel {
     double distance,
     double weight,
     double height,
+    DocumentReference planRef,
   }) {
     return CurrentStatusModel(
       bmi: bmi ?? this.bmi,
@@ -93,11 +102,12 @@ class CurrentStatusModel {
       distance: distance ?? this.distance,
       weight: weight ?? this.weight,
       height: height ?? this.height,
+      planRef: planRef ?? this.planRef,
     );
   }
 
   @override
   String toString() {
-    return 'CurrentStatusModel(bmi: $bmi, status: $status, distance: $distance, weight: $weight, height: $height)';
+    return 'CurrentStatusModel(bmi: $bmi, status: $status, distance: $distance, weight: $weight, height: $height, planRef: $planRef)';
   }
 }

@@ -9,6 +9,7 @@ import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
+import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
@@ -31,7 +32,13 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => HomeCubit(UserDB(), CurrentStatus())),
         BlocProvider(
             create: (context) => RunningBloc(
-                Location(), RunningData(), PlanData(), CurrentStatus())),
+                  Location(),
+                  RunningData(),
+                  PlanData(),
+                  CurrentStatus(),
+                  TestHeartRate(),
+                  UserDB(),
+                )),
         BlocProvider(
           create: (context) => PlanBloc(PlanData(), CurrentStatus()),
         )

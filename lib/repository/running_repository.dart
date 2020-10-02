@@ -18,10 +18,12 @@ abstract class RunningRepository {
 }
 
 class RunningData extends RunningRepository {
+  /// ###Important Note### : Change Repostioy before production(Corrent reps)
   final PlanRepository _planRepository = PlanData();
   final LocationRepository _locationRepository = LocationServiceAndTracking();
   final CurrentStatusRepository _currentStatusRepository = CurrentStatus();
   final HeartRateRepository _heartRateRepository = TestHeartRate();
+
   RunningModel _runningModel;
   DocumentReference _reference;
 

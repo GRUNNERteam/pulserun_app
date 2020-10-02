@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
@@ -13,7 +14,9 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/home/components/dob_select.dart';
 import 'package:pulserun_app/screens/home/components/heightweight_select.dart';
 import 'package:pulserun_app/screens/home/components/history_card.dart';
+import 'package:pulserun_app/screens/plan/plan.dart';
 import 'package:pulserun_app/screens/running/running.dart';
+import 'package:pulserun_app/screens/schedule/schedule.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
 
 import '../../services/BLE_HeartRate/ble_heartrate.dart';
@@ -138,67 +141,68 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      child: StreamBuilder<List<BluetoothDevice>>(
-                        stream: Stream.periodic(Duration(seconds: 5)).asyncMap(
-                            (_) => FlutterBlue.instance.connectedDevices),
-                        initialData: [],
-                        builder: (c, snapshot) {
-                          if (snapshot.hasData) {
-                            return Column(
-                              children: snapshot.data
-                                  .map(
-                                    (d) => ListTile(
-                                      title: Text(d.name),
-                                      //subtitle: Text("connected"),
-                                      subtitle:
-                                          StreamBuilder<List<BluetoothService>>(
-                                        stream: d.services,
-                                        initialData: [],
-                                        builder: (c, snapshot) {
-                                          return Text(snapshot.data.toString());
-                                        },
-                                      ),
-                                      trailing:
-                                          StreamBuilder<BluetoothDeviceState>(
-                                        stream: d.state,
-                                        initialData:
-                                            BluetoothDeviceState.disconnected,
-                                        builder: (c, snapshot) {
-                                          if (snapshot.data ==
-                                              BluetoothDeviceState.connected) {
-                                            return IconButton(
-                                                icon: Icon(Icons.search),
-                                                onPressed: () {
-                                                  d.discoverServices();
-                                                });
-                                          } else if (snapshot.data ==
-                                              BluetoothDeviceState
-                                                  .disconnected) {
-                                            return IconButton(
-                                                icon: Icon(
-                                                    Icons.bluetooth_disabled),
-                                                onPressed: () {
-                                                  d.disconnect();
-                                                });
-                                          }
-                                          return Text(snapshot.data.toString());
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                            );
-                          } else {
-                            return Column(
-                              children: <Widget>[
-                                Text('No device/Not Found'),
-                              ],
-                            );
-                          }
-                        },
-                      ),
-                    ),
+                    // Container(
+                    //   child: StreamBuilder<List<BluetoothDevice>>(
+                    //     stream: Stream.periodic(Duration(seconds: 5)).asyncMap(
+                    //         (_) => FlutterBlue.instance.connectedDevices),
+                    //     initialData: [],
+                    //     builder: (c, snapshot) {
+                    //       if (snapshot.hasData) {
+                    //         return Column(
+                    //           children: snapshot.data
+                    //               .map(
+                    //                 (d) => ListTile(
+                    //                   title: Text(d.name),
+                    //                   //subtitle: Text("connected"),
+                    //                   subtitle:
+                    //                       StreamBuilder<List<BluetoothService>>(
+                    //                     stream: d.services,
+                    //                     initialData: [],
+                    //                     builder: (c, snapshot) {
+                    //                       return Text(snapshot.data.toString());
+                    //                     },
+                    //                   ),
+                    //                   trailing:
+                    //                       StreamBuilder<BluetoothDeviceState>(
+                    //                     stream: d.state,
+                    //                     initialData:
+                    //                         BluetoothDeviceState.disconnected,
+                    //                     builder: (c, snapshot) {
+                    //                       if (snapshot.data ==
+                    //                           BluetoothDeviceState.connected) {
+                    //                         return IconButton(
+                    //                             icon: Icon(Icons.search),
+                    //                             onPressed: () {
+                    //                               d.discoverServices();
+                    //                             });
+                    //                       } else if (snapshot.data ==
+                    //                           BluetoothDeviceState
+                    //                               .disconnected) {
+                    //                         return IconButton(
+                    //                             icon: Icon(
+                    //                                 Icons.bluetooth_disabled),
+                    //                             onPressed: () {
+                    //                               d.disconnect();
+                    //                             });
+                    //                       }
+                    //                       return Text(snapshot.data.toString());
+                    //                     },
+                    //                   ),
+                    //                 ),
+                    //               )
+                    //               .toList(),
+                    //         );
+                    //       } else {
+                    //         return Column(
+                    //           children: <Widget>[
+                    //             Text('No device/Not Found'),
+                    //           ],
+                    //         );
+                    //       }
+                    //     },
+                    //   ),
+                    // ),
+
                     Text(
                       "Last 5 History",
                       style: TextStyle(
@@ -268,21 +272,25 @@ class _buildBottomNavBar extends StatelessWidget {
       onTap: (value) {
         switch (value) {
           case 0:
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Not Available'),
-                content: const Text('Plan is not a available yet.'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('Close'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            );
+            // showDialog(
+            //   context: context,
+            //   builder: (context) => AlertDialog(
+            //     title: Text('Not Available'),
+            //     content: const Text('Plan is not a available yet.'),
+            //     actions: <Widget>[
+            //       FlatButton(
+            //         child: Text('Close'),
+            //         onPressed: () {
+            //           Navigator.of(context).pop();
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // );
+            BlocProvider.of<PlanBloc>(context).add(GetPlanById());
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => PlanPage()));
+
             break;
           case 2:
             Navigator.push(context,
@@ -356,18 +364,35 @@ class _menu extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(MdiIcons.floorPlan),
-            title: Text('Planing'),
+            leading: Icon(MdiIcons.account),
+            title: Text('Profile'),
+            onTap: () {},
           ),
           ListTile(
-            leading: Icon(MdiIcons.logout),
-            title: Text('BLE'),
+            leading: Icon(MdiIcons.floorPlan),
+            title: Text('Plan'),
+            onTap: () {
+              BlocProvider.of<PlanBloc>(context).add(GetPlanLists());
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PlanPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.calendar),
+            title: Text('Schedule'),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BLE()),
+                MaterialPageRoute(builder: (context) => (SchedulePage())),
               );
             },
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.history),
+            title: Text('History'),
+            onTap: () {},
           ),
           ListTile(
             leading: Icon(MdiIcons.logout),

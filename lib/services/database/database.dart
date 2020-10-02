@@ -15,4 +15,8 @@ class DatabaseService {
   DocumentReference getUserRef() {
     return this._userRef;
   }
+
+  FirebaseFirestore getInstance() {
+    return this._firestoreInstance;
+  }
 }

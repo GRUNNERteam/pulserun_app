@@ -99,7 +99,13 @@ class PlanModel {
 
   factory PlanModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
+
     Timestamp startts = map['start'];
+    if (map['targetHeartRate'] is int) {
+      int thr = map['targetHeartRate'];
+      map['targetHeartRate'] = thr.toDouble();
+    }
+
     return PlanModel(
       planId: map['planId'],
       goal: PlanGoalModel.fromMap(map['goal']),
@@ -135,7 +141,7 @@ class PlanModel {
       breakDay.hashCode;
 
   PlanModel copyWith({
-    int planId,
+    String planId,
     PlanGoalModel goal,
     double targetHeartRate,
     DateTime start,

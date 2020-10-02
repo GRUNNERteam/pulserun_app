@@ -250,7 +250,7 @@ class _PlanCreateBodyState extends State<PlanCreateBody> {
                     ),
                     breakDay: int.parse(_breakDayTextController.value.text),
                   );
-
+                  print(plan.toString());
                   // trigger event
                   BlocProvider.of<PlanBloc>(context).add(
                     PlanCreating(

@@ -4,6 +4,7 @@ import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/screens/plan/components/plan_create_body.dart';
+import 'package:pulserun_app/screens/plan/components/plan_detail.dart';
 import 'package:pulserun_app/screens/plan/components/plan_loaded_body.dart';
 
 class PlanPage extends StatefulWidget {
@@ -21,14 +22,26 @@ class _PlanPageState extends State<PlanPage> {
       builder: (context, state) {
         print(state.toString());
         if (state is PlanInitial) {
-          BlocProvider.of<PlanBloc>(context).add(GetPlan());
+          BlocProvider.of<PlanBloc>(context).add(GetPlanLists());
           return LoadingWidget();
         } else if (state is PlanLoading) {
           return LoadingWidget();
         } else if (state is PlanLoaded) {
           return Scaffold(
             key: _scaffoldKey,
-            body: PlanLoadedBody(),
+            body: PlanLoadedBody(
+              listPlan: state.planLists,
+            ),
+          );
+        } else if (state is PlanDetail) {
+          return Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text('Plan Details'),
+            ),
+            body: PlanDetailsBody(
+              planModel: state.planModel,
+            ),
           );
         } else if (state is PlanCreate) {
           return Scaffold(

@@ -19,6 +19,20 @@ class GetPlan extends PlanEvent {
   });
 }
 
+class GetPlanLists extends PlanEvent {
+  final List<PlanModel> planLists;
+  GetPlanLists({
+    this.planLists,
+  });
+}
+
+class GetPlanById extends PlanEvent {
+  final DocumentReference id;
+  GetPlanById({
+    this.id,
+  });
+}
+
 class DeletePlan extends PlanEvent {}
 
 class UpdatePlan extends PlanEvent {}

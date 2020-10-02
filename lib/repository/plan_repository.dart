@@ -6,6 +6,7 @@ import 'package:pulserun_app/services/database/database.dart';
 
 abstract class PlanRepository {
   Future<PlanModel> fetchPlan();
+  Future<List<PlanModel>> fetchPlanLists();
   Future<DocumentReference> getRef();
 
   Future<void> setRef();
@@ -57,6 +58,12 @@ class MockUpPlan implements PlanRepository {
   @override
   Future<void> setRef() {
     // TODO: implement setRef
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<PlanModel>> fetchPlanLists() {
+    // TODO: implement fetchPlanLists
     throw UnimplementedError();
   }
 }
@@ -135,5 +142,25 @@ class PlanData implements PlanRepository {
     } catch (e) {
       print('Creating Plan failed : $e');
     }
+  }
+
+  @override
+  Future<List<PlanModel>> fetchPlanLists() async {
+    List<PlanModel> planList = List<PlanModel>();
+    await DatabaseService()
+        .getUserRef()
+        .collection('plan')
+        .get()
+        .then((snapShotCollection) {
+      if (snapShotCollection.size > 0) {
+        snapShotCollection.docs.forEach((doc) {
+          if (doc.exists && doc.data().isNotEmpty) {
+            print(doc.data()['planId']);
+            planList.add(PlanModel.fromMap(doc.data()));
+          }
+        });
+      }
+    });
+    return planList;
   }
 }

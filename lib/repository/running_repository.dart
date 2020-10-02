@@ -18,7 +18,7 @@ abstract class RunningRepository {
 }
 
 class RunningData extends RunningRepository {
-  final PlanRepository _planRepository = MockUpPlan();
+  final PlanRepository _planRepository = PlanData();
   final LocationRepository _locationRepository = LocationServiceAndTracking();
   final CurrentStatusRepository _currentStatusRepository = CurrentStatus();
   final HeartRateRepository _heartRateRepository = TestHeartRate();

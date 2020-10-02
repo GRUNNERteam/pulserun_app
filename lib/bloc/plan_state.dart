@@ -18,10 +18,10 @@ class PlanCreate extends PlanState {
 }
 
 class PlanLoaded extends PlanState {
-  final PlanModel planModel;
+  final List<PlanModel> planLists;
   final CurrentStatusModel currentStatusModel;
   const PlanLoaded({
-    this.planModel,
+    this.planLists,
     this.currentStatusModel,
   });
 
@@ -30,12 +30,29 @@ class PlanLoaded extends PlanState {
     if (identical(this, o)) return true;
 
     return o is PlanLoaded &&
-        o.planModel == planModel &&
+        listEquals(o.planLists, planLists) &&
         o.currentStatusModel == currentStatusModel;
   }
 
   @override
-  int get hashCode => planModel.hashCode ^ currentStatusModel.hashCode;
+  int get hashCode => planLists.hashCode ^ currentStatusModel.hashCode;
+}
+
+class PlanDetail extends PlanState {
+  final PlanModel planModel;
+  const PlanDetail(
+    this.planModel,
+  );
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is PlanDetail && o.planModel == planModel;
+  }
+
+  @override
+  int get hashCode => planModel.hashCode;
 }
 
 class PlanError extends PlanState {

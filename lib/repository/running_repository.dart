@@ -49,6 +49,7 @@ class RunningData extends RunningRepository {
   @override
   Future<void> init() async {
     this._runningModel = null;
+    await _planRepository.setRef();
     this._reference = await _planRepository.getRef();
     this._reference = this._reference.collection('run').doc();
     this._runningModel =
@@ -66,7 +67,7 @@ class RunningData extends RunningRepository {
   @override
   Future<RunningModel> stop() async {
     loggerNoStack.i(heartRateModel.toString());
-    await this._heartRateRepository.init();
+    await this._heartRateRepository.init(this._reference);
     loggerNoStack.i(heartRateModel.toString());
     await this._heartRateRepository.addDB();
     await this._runningModel.setendTime();

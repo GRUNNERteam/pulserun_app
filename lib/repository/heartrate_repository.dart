@@ -9,18 +9,17 @@ import 'package:pulserun_app/repository/running_repository.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 
 abstract class HeartRateRepository {
-  Future<void> init();
+  Future<void> init(DocumentReference ref);
   Future<void> addDB();
 }
 
 class TestHeartRate implements HeartRateRepository {
-  final PlanRepository _planRepository = MockUpPlan();
+  final PlanRepository _planRepository = PlanData();
   DocumentReference _reference;
 
   @override
-  Future<void> init() async {
-    this._reference = await _planRepository.getRef(); //เอาแพลนไอดี
-    this._reference = this._reference.collection('run').doc(idR);
+  Future<void> init(DocumentReference ref) async {
+    this._reference = ref;
 
     loggerNoStack.i(this._reference.path);
   }

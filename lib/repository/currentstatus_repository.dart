@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:math';
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/services/database/database.dart';
@@ -12,6 +13,7 @@ abstract class CurrentStatusRepository {
 
   Future<void> updateDistance(double value);
   Future<void> updateUserHW(double height, double weight);
+
 }
 
 class CurrentStatus implements CurrentStatusRepository {

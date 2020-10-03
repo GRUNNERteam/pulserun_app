@@ -1,35 +1,13 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:pulserun_app/models/heartrate.dart';
-import 'package:pulserun_app/models/running.dart';
-import 'package:pulserun_app/repository/plan_repository.dart';
-import 'package:pulserun_app/repository/running_repository.dart';
-import 'package:pulserun_app/screens/running/running.dart';
 
 abstract class HeartRateRepository {
-  Future<void> init();
-  Future<void> addDB();
+  Future<HeartRateModel> fetch();
 }
 
 class TestHeartRate implements HeartRateRepository {
-  final PlanRepository _planRepository = MockUpPlan();
-  DocumentReference _reference;
-
   @override
-  Future<void> init() async {
-    this._reference = await _planRepository.getRef(); //เอาแพลนไอดี
-    this._reference = this._reference.collection('run').doc(idR);
-
-    loggerNoStack.i(this._reference.path);
-  }
-
-  Future<void> addDB() async {
-    this
-        ._reference
-        .collection('heartrate')
-        .doc('heartrate')
-        .set(heartRateModel.toMap());
+  Future<HeartRateModel> fetch() {
+    // TODO: implement fetch
+    throw UnimplementedError();
   }
 }

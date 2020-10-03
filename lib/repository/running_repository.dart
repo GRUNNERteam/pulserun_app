@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pulserun_app/models/heartrate.dart';
@@ -9,12 +7,9 @@ import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
-import 'package:pulserun_app/screens/running/running.dart';
-
-String idR;
 
 abstract class RunningRepository {
-  Future<RunningModel> fetch(LocationModel loc);
+  Future<RunningModel> fetch(LocationModel loc, HeartRateModel hr);
 
   Future<void> init();
   Future<double> working(PositionModel pos);
@@ -35,7 +30,7 @@ class RunningData extends RunningRepository {
   DateTime startTime;
 
   @override
-  Future<RunningModel> fetch(LocationModel loc) async {
+  Future<RunningModel> fetch(LocationModel loc, HeartRateModel hr) async {
     throw UnimplementedError();
   }
 
@@ -53,8 +48,9 @@ class RunningData extends RunningRepository {
     this._reference = this._reference.collection('run').doc();
     this._runningModel =
         RunningModel(runId: this._reference.id, startTime: DateTime.now());
-    idR = this._reference.id;
+
     await this._reference.set(this._runningModel.toMap());
+
     // Location
     this
         ._locationRepository
@@ -65,10 +61,6 @@ class RunningData extends RunningRepository {
 
   @override
   Future<RunningModel> stop() async {
-    loggerNoStack.i(heartRateModel.toString());
-    await this._heartRateRepository.init();
-    loggerNoStack.i(heartRateModel.toString());
-    await this._heartRateRepository.addDB();
     await this._runningModel.setendTime();
     await this._reference.update(this._runningModel.toMap());
     final double disT = await this._locationRepository.getDistance();

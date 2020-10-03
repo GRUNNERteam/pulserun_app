@@ -281,6 +281,17 @@ class _menu extends StatelessWidget {
             onTap: () {},
           ),
           ListTile(
+            leading: Icon(MdiIcons.devices),
+            title: Text('Device'),
+            onTap: () {
+              BlocProvider.of<PlanBloc>(context).add(GetPlanLists());
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BLE()),
+              );
+            },
+          ),
+          ListTile(
             leading: Icon(MdiIcons.floorPlan),
             title: Text('Plan'),
             onTap: () {
@@ -292,7 +303,6 @@ class _menu extends StatelessWidget {
             },
           ),
           ListTile(
-
             leading: Icon(MdiIcons.calendar),
             title: Text('Schedule'),
             onTap: () {

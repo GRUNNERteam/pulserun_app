@@ -16,12 +16,10 @@ class RunningLoading extends RunningState {
 class RunningLoaded extends RunningState {
   final PlanModel planModel;
   final CurrentStatusModel currentStatusModel;
-  final UserModel userModel;
 
   const RunningLoaded(
     this.planModel,
     this.currentStatusModel,
-    this.userModel,
   );
 
   @override
@@ -40,13 +38,9 @@ class RunningLoaded extends RunningState {
 class RunningWorking extends RunningState {
   final double distance;
   final PositionModel positionModel;
-  final int heartrate;
-  final int targetheartrate;
   RunningWorking({
     this.distance,
     this.positionModel,
-    this.heartrate,
-    this.targetheartrate,
   });
 
   @override
@@ -55,29 +49,19 @@ class RunningWorking extends RunningState {
 
     return o is RunningWorking &&
         o.distance == distance &&
-        o.positionModel == positionModel &&
-        o.heartrate == heartrate &&
-        o.targetheartrate == targetheartrate;
+        o.positionModel == positionModel;
   }
 
   @override
-  int get hashCode =>
-      distance.hashCode ^
-      positionModel.hashCode ^
-      heartrate.hashCode ^
-      targetheartrate.hashCode;
+  int get hashCode => distance.hashCode ^ positionModel.hashCode;
 }
 
 class RunningDisplayChange extends RunningState {
   final PositionModel positionModel;
   final double distance;
-  final int hearrate;
-  final targetheartrate;
   const RunningDisplayChange(
     this.positionModel,
     this.distance,
-    this.hearrate,
-    this.targetheartrate,
   );
 
   @override
@@ -86,17 +70,11 @@ class RunningDisplayChange extends RunningState {
 
     return o is RunningDisplayChange &&
         o.positionModel == positionModel &&
-        o.distance == distance &&
-        o.hearrate == hearrate &&
-        o.targetheartrate == targetheartrate;
+        o.distance == distance;
   }
 
   @override
-  int get hashCode =>
-      positionModel.hashCode ^
-      distance.hashCode ^
-      hearrate.hashCode ^
-      targetheartrate.hashCode;
+  int get hashCode => positionModel.hashCode ^ distance.hashCode;
 }
 
 class RunningResult extends RunningState {

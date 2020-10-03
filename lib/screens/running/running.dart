@@ -1,34 +1,14 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
-import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
-import 'package:pulserun_app/screens/BLE/BLE.dart';
-import 'package:logger/logger.dart';
-import 'package:pulserun_app/screens/home/home.dart';
-
-BluetoothDevice currentdevice;
-List<BluetoothService> service;
-BluetoothService heartrate;
-BluetoothCharacteristic characteristic;
-HearRateModel heartRateModel = HearRateModel();
-
-List<int> hr;
-
-var logger = Logger(
-  printer: PrettyPrinter(),
-);
-var loggerNoStack = Logger(
-  printer: PrettyPrinter(methodCount: 0),
-);
+import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
 class RunningPage extends StatefulWidget {
   const RunningPage({Key key}) : super(key: key);
@@ -168,7 +148,6 @@ class _RunningPageState extends State<RunningPage> {
             } else if (state is RunningLoading) {
               return LoadingWidget();
             } else if (state is RunningLoaded) {
-              heartRateModel.clear();
               this._markers.clear();
               this._polylineCoordinates.clear();
               this._polylines.clear();
@@ -176,11 +155,7 @@ class _RunningPageState extends State<RunningPage> {
                   context, state.currentStatusModel, state.planModel);
             } else if (state is RunningWorking) {
               return _buildbodyRunning(
-                  context,
-                  state.positionModel,
-                  state.distance ?? 0,
-                  state.heartrate ?? 0,
-                  state.targetheartrate);
+                  context, state.positionModel, state.distance ?? 0);
             } else if (state is RunningDisplayChange) {
               if (state.positionModel != null) {
                 try {
@@ -195,8 +170,8 @@ class _RunningPageState extends State<RunningPage> {
               _addPolyLine();
               // rebuild whole widget
               // https://github.com/felangel/bloc/issues/174#issuecomment-477867469
-              return _buildbodyRunning(context, state.positionModel,
-                  state.distance, state.hearrate, state.targetheartrate);
+              return _buildbodyRunning(
+                  context, state.positionModel, state.distance);
             } else if (state is RunningResult) {
               _mapResult();
               return _buildbodyResult(context);
@@ -265,10 +240,7 @@ class _RunningPageState extends State<RunningPage> {
                       onPressed: () {
                         BlocProvider.of<RunningBloc>(context)
                             .add(GetPlanAndStat());
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePage()));
+                        Navigator.pop(context);
                       },
                     ),
                   ),
@@ -281,13 +253,9 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyRunning(BuildContext context, PositionModel pos,
-      double distance, int hr, int thr) {
+  Widget _buildbodyRunning(
+      BuildContext context, PositionModel pos, double distance) {
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
-    int value;
-    String tZone = 'Loading';
-    int check;
-    double zone;
     return Stack(
       children: <Widget>[
         Column(
@@ -311,36 +279,8 @@ class _RunningPageState extends State<RunningPage> {
                       child: Column(
                         children: <Widget>[
                           Text('Current HeartRate'),
-                          StreamBuilder(
-                            stream: characteristic.value,
-                            initialData: characteristic.lastValue,
-                            builder: (c, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Text('Loading');
-                              } else if (snapshot.hasError)
-                                return Text('ERROR');
-                              else if (snapshot.data
-                                      .toString()
-                                      .split(',')
-                                      .last
-                                      .split(']')
-                                      .first
-                                      .toString() ==
-                                  '[') {
-                                return Text(value.toString());
-                              } else if (snapshot.hasData) {
-                                value = int.parse((snapshot.data
-                                    .toString()
-                                    .split(',')
-                                    .last
-                                    .split(']')
-                                    .first
-                                    .toString()));
-                                heartRateModel.add_model(value);
-                                return Text(value.toString());
-                              }
-                            },
-                          ),
+                          // TODO : change to Real-Time Heart Rate
+                          Text('100 bpm'),
                         ],
                       ),
                     ),
@@ -391,67 +331,6 @@ class _RunningPageState extends State<RunningPage> {
                       myLocationEnabled: true,
                       onMapCreated: _onMapCreated,
                       polylines: Set<Polyline>.of(this._polylines.values),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 30.0),
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      color: Colors.blue[100],
-                      padding: EdgeInsets.all(30.0),
-                      child: StreamBuilder(
-                        stream: characteristic.value,
-                        initialData: characteristic.lastValue,
-                        builder: (c, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Text('Loading');
-                          } else if (snapshot.hasError)
-                            return Text('ERROR');
-                          else if (snapshot.data
-                                  .toString()
-                                  .split(',')
-                                  .last
-                                  .split(']')
-                                  .first
-                                  .toString() ==
-                              '[') {
-                            return Text(tZone);
-                          } else if (snapshot.hasData) {
-                            check = int.parse((snapshot.data
-                                .toString()
-                                .split(',')
-                                .last
-                                .split(']')
-                                .first
-                                .toString()));
-                            zone = (100 * check) / thr;
-                            if (zone >= 100) {
-                              tZone = 'Dangerous slowdown or rest';
-                            } else if (zone >= 90 && zone < 100) {
-                              tZone = 'Zone 5';
-                            } else if (zone >= 80 && zone < 90) {
-                              tZone = 'Zone 4';
-                            } else if (zone >= 70 && zone < 80) {
-                              tZone = 'Zone 3';
-                            } else if (zone >= 60 && zone < 70) {
-                              tZone = 'Zone 2';
-                            } else if (zone >= 50 && zone < 60) {
-                              tZone = 'Zone 1';
-                            } else if (zone < 50) {
-                              tZone = 'Speed Up';
-                            } else
-                              tZone = 'Loading';
-                            loggerNoStack.i(DateTime.now());
-                            return Text(tZone);
-                          }
-                          return Text("Loading");
-                        },
-                      ),
                     ),
                   ),
                 ],
@@ -583,35 +462,8 @@ class _RunningPageState extends State<RunningPage> {
                         borderRadius: BorderRadius.circular(200),
                       ),
                       onPressed: () {
-                        if (currentdevice == null) {
-                          showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) => CupertinoActionSheet(
-                              title: Text("Please Select Your Device"),
-                              actions: [
-                                CupertinoActionSheetAction(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => BLE()));
-                                  },
-                                  child: Text("Select Device"),
-                                  isDefaultAction: true,
-                                ),
-                              ],
-                              cancelButton: CupertinoActionSheetAction(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("cancel"),
-                              ),
-                            ),
-                          );
-                        } else {
-                          BlocProvider.of<RunningBloc>(context)
-                              .add(StartRunning());
-                        }
+                        BlocProvider.of<RunningBloc>(context)
+                            .add(StartRunning());
                       },
                       child: ColorizeAnimatedTextKit(
                         text: ["Start"],

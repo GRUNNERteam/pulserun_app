@@ -55,9 +55,13 @@ dependencies:
   flutter_blue: ^0.7.2
   rxdart: ^0.24.1
   intl: ^0.16.1
+<<<<<<< HEAD
   table_calendar: ^2.2.3
   jiffy: ^3.0.1
   flutter_slidable: ^0.5.7
+=======
+  age: ^0.0.1
+>>>>>>> parent of 589d856... update ui BLE page
 
 dev_dependencies:
   flutter_test:

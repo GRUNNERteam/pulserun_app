@@ -2,9 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+<<<<<<< HEAD
 import 'package:pulserun_app/services/ble_heartrate/ble_heartrate.dart';
 
 import '../home/home.dart';
+=======
+import 'package:pulserun_app/screens/running/running.dart';
+>>>>>>> parent of 589d856... update ui BLE page
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.
@@ -223,7 +227,13 @@ class DeviceScreen extends StatelessWidget {
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.refresh),
+<<<<<<< HEAD
                         onPressed: () => device.discoverServices(),
+=======
+                        onPressed: () {
+                          discover();
+                        },
+>>>>>>> parent of 589d856... update ui BLE page
                       ),
                       IconButton(
                         icon: SizedBox(
@@ -234,12 +244,17 @@ class DeviceScreen extends StatelessWidget {
                           height: 18.0,
                         ),
                         onPressed: null,
+<<<<<<< HEAD
                       )
+=======
+                      ),
+>>>>>>> parent of 589d856... update ui BLE page
                     ],
                   ),
                 ),
               ),
             ),
+<<<<<<< HEAD
             StreamBuilder<List<BluetoothService>>(
               stream: device.services,
               initialData: [],
@@ -247,6 +262,67 @@ class DeviceScreen extends StatelessWidget {
                 return Column(
                   children: _buildServiceTiles(snapshot.data),
                 );
+=======
+            StreamBuilder<BluetoothDeviceState>(
+              stream: device.state,
+              builder: (context, snapshot) {
+                switch (snapshot.data) {
+                  case BluetoothDeviceState.connected:
+                    return AlertDialog(
+                      title: Text(device.name),
+                      content: Text("Status: " +
+                          snapshot.data.toString().split('.').last),
+                      elevation: 24.0,
+                      backgroundColor: Colors.lightGreenAccent,
+                      actions: [
+                        FlatButton(
+                            onPressed: () {
+                              discover();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RunningPage()),
+                              );
+                            },
+                            color: Colors.redAccent,
+                            child: Text(
+                              "Running",
+                            ))
+                      ],
+                    );
+                    break;
+                  case BluetoothDeviceState.disconnected:
+                    return AlertDialog(
+                      title: Text(device.name),
+                      content: Text("Status: " +
+                          snapshot.data.toString().split('.').last),
+                      elevation: 24.0,
+                      backgroundColor: Colors.lightGreenAccent,
+                      actions: [
+                        FlatButton(
+                            onPressed: () => null,
+                            color: Colors.lightGreenAccent,
+                            child: Text(
+                              "Wait",
+                            ))
+                      ],
+                    );
+                    break;
+                  default:
+                    return Container(
+                      color: Colors.yellowAccent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.cached),
+                            title: Text("Status: reconnecting"),
+                          ),
+                        ],
+                      ),
+                    );
+                    break;
+                }
+>>>>>>> parent of 589d856... update ui BLE page
               },
             ),
           ],

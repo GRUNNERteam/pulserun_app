@@ -177,11 +177,13 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         _locationSubscription?.cancel();
         String et = await stopwatchTime.first;
         await _runningRepository.setestimatedTime(et);
+
         await _runningRepository.stop();
         yield RunningResult(
             locationServiceAndTracking: event.locationServiceAndTracking,
             runningModel: event.runningModel);
       } catch (e) {
+        loggerNoStack.e(e.toString());
         yield RunningError('StopRunning Error');
       }
     }

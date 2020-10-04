@@ -8,12 +8,13 @@ class RunningModel {
   DateTime startTime;
   DateTime endTime;
   String estimatedTime;
-  RunningModel({
-    this.runId,
-    this.startTime,
-    this.endTime,
-    this.estimatedTime,
-  });
+  double distance;
+  RunningModel(
+      {this.runId,
+      this.startTime,
+      this.endTime,
+      this.estimatedTime,
+      this.distance});
 
   // void setRunningItem(RunningModelItem item) {
   //   if (this.runningItem == null) {
@@ -35,6 +36,10 @@ class RunningModel {
     }
   }
 
+  Future<void> updateDistance(double distance) async {
+    this.distance = distance;
+  }
+
   Map<String, dynamic> toMap() {
     if (endTime != null) {
       return {
@@ -44,12 +49,14 @@ class RunningModel {
         'endTime': Timestamp.fromMillisecondsSinceEpoch(
             endTime?.millisecondsSinceEpoch),
         'estimatedTime': estimatedTime,
+        'distance': distance,
       };
     } else {
       return {
         'runId': runId,
         'startTime': Timestamp.fromMillisecondsSinceEpoch(
             startTime?.millisecondsSinceEpoch),
+        'distance': distance,
       };
     }
   }
@@ -61,7 +68,7 @@ class RunningModel {
 
   @override
   String toString() {
-    return 'RunningModel(runId: $runId, startTime: $startTime, endTime: $endTime, estimatedTime: $estimatedTime)';
+    return 'RunningModel(runId: $runId, startTime: $startTime, endTime: $endTime, estimatedTime: $estimatedTime,distance: $distance)';
   }
 
   @override
@@ -72,7 +79,8 @@ class RunningModel {
         o.runId == runId &&
         o.startTime == startTime &&
         o.endTime == endTime &&
-        o.estimatedTime == estimatedTime;
+        o.estimatedTime == estimatedTime &&
+        o.distance == distance;
   }
 
   @override
@@ -80,7 +88,8 @@ class RunningModel {
     return runId.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^
-        estimatedTime.hashCode;
+        estimatedTime.hashCode ^
+        distance.hashCode;
   }
 
   RunningModel copyWith({
@@ -88,12 +97,14 @@ class RunningModel {
     DateTime startTime,
     DateTime endTime,
     String estimatedTime,
+    double distance,
   }) {
     return RunningModel(
       runId: runId ?? this.runId,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       estimatedTime: estimatedTime ?? this.estimatedTime,
+      distance: distance ?? this.distance,
     );
   }
 
@@ -106,6 +117,7 @@ class RunningModel {
       startTime: startts.toDate(),
       endTime: endts.toDate() ?? null,
       estimatedTime: map['estimatedTime'] ?? null,
+      distance: map['distance'],
     );
   }
 }

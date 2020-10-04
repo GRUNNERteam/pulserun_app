@@ -9,6 +9,7 @@ import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 
 String idR;
@@ -28,7 +29,7 @@ class RunningData extends RunningRepository {
   final LocationRepository _locationRepository = LocationServiceAndTracking();
   final CurrentStatusRepository _currentStatusRepository = CurrentStatus();
   final HeartRateRepository _heartRateRepository = TestHeartRate();
-
+  final ResultRepository _resultRepository = Result();
   RunningModel _runningModel;
   DocumentReference _reference;
 
@@ -66,15 +67,18 @@ class RunningData extends RunningRepository {
 
   @override
   Future<RunningModel> stop() async {
-    loggerNoStack.i(heartRateModel.toString());
+    final double disT = await this._locationRepository.getDistance();
     await this._heartRateRepository.init(this._reference);
-    loggerNoStack.i(heartRateModel.toString());
     await this._heartRateRepository.addDB();
     await this._runningModel.setendTime();
+    await this._runningModel.updateDistance(disT);
+    await this._reference.update({'distance': disT});
     await this._reference.update(this._runningModel.toMap());
-    final double disT = await this._locationRepository.getDistance();
     await this._currentStatusRepository.updateDistance(disT);
     await this._locationRepository.uploadToDB();
+    await this
+        ._resultRepository
+        .init(this._reference, this._runningModel, disT);
     return this._runningModel;
   }
 

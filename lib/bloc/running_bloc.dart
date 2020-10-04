@@ -125,7 +125,6 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         final LocationData position = await _location.getLocation();
         print(position);
         await _runningRepository.init();
-
         print('init Running Completed');
 
         final double distance = await _runningRepository

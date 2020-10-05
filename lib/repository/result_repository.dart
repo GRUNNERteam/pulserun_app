@@ -16,9 +16,13 @@ class Result implements ResultRepository {
   ResultModel _resultModel;
 
   Future<void> getHR(HearRateModel hrModel) async {
-    if (this._resultModel.totalHeartrate == null) {
-      this._resultModel.totalHeartrate = HearRateModel();
+    if (this._resultModel == null) {
+      this._resultModel = ResultModel();
     }
+    /*if (this._resultModel.totalHeartrate == null) {
+      loggerNoStack.i('null');
+      this._resultModel.totalHeartrate = HearRateModel();
+    }*/
     this._resultModel.totalHeartrate = hrModel;
     loggerNoStack.i('getHR OK');
   }

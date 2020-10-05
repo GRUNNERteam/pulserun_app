@@ -21,6 +21,7 @@ abstract class RunningRepository {
   Future<double> working(PositionModel pos);
   Future<RunningModel> stop();
   Future<void> setestimatedTime(String et);
+  DocumentReference gettReference();
 }
 
 class RunningData extends RunningRepository {
@@ -40,6 +41,10 @@ class RunningData extends RunningRepository {
     throw UnimplementedError();
   }
 
+  DocumentReference gettReference() {
+    return this._reference;
+  }
+
   @override
   Future<double> working(PositionModel pos) async {
     await this._locationRepository.setPos(pos);
@@ -55,7 +60,6 @@ class RunningData extends RunningRepository {
     this._reference = this._reference.collection('run').doc();
     this._runningModel =
         RunningModel(runId: this._reference.id, startTime: DateTime.now());
-    idR = this._reference.id;
     await this._reference.set(this._runningModel.toMap());
     // Location
     this
@@ -77,8 +81,12 @@ class RunningData extends RunningRepository {
     await this._currentStatusRepository.updateDistance(disT);
     await this._locationRepository.uploadToDB();
     await this
+        ._reference
+        .get()
+        .then((value) => loggerNoStack.i(value.toString()));
+    /*await this
         ._resultRepository
-        .init(this._reference, this._runningModel, disT);
+        .init(this._reference, this._runningModel, disT);*/
     return this._runningModel;
   }
 

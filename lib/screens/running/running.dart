@@ -11,6 +11,7 @@ import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/result.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
@@ -199,7 +200,7 @@ class _RunningPageState extends State<RunningPage> {
                   state.distance, state.hearrate, state.targetheartrate);
             } else if (state is RunningResult) {
               _mapResult();
-              return _buildbodyResult(context);
+              return _buildbodyResult(context, state.resultModel);
             } else {
               print('Error');
               return ShowErrorWidget();
@@ -210,7 +211,7 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyResult(BuildContext context) {
+  Widget _buildbodyResult(BuildContext context, ResultModel resultModel) {
     return Stack(
       children: <Widget>[
         SingleChildScrollView(
@@ -230,7 +231,21 @@ class _RunningPageState extends State<RunningPage> {
                     padding: EdgeInsets.all(12),
                     height: 150,
                     child: Row(
-                      children: <Widget>[],
+                      children: <Widget>[
+                        Center(
+                          child: Column(
+                            children: [
+                              Column(),
+                              Text('TotalDdistance : ' +
+                                  resultModel.totalDdistance.toString() +
+                                  ' KM'),
+                              Text('TotalTime : ' +
+                                  resultModel.totalTime.toString() +
+                                  ' Hr.'),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(

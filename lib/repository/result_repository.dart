@@ -8,6 +8,8 @@ abstract class ResultRepository {
   Future<void> getHR(HearRateModel hrModel);
   Future<void> getDistime(double dis, String time);
   Future<void> upDB(DocumentReference ref);
+  Future<void> setRef(DocumentReference ref);
+  ResultModel getResult();
 }
 
 class Result implements ResultRepository {
@@ -39,5 +41,19 @@ class Result implements ResultRepository {
   Future<void> upDB(DocumentReference ref) async {
     ref.collection('result').doc('result').set(this._resultModel.toMap());
     loggerNoStack.i('upDB OK');
+  }
+
+  Future<void> setRef(DocumentReference ref) async {
+    this._reference = ref;
+    loggerNoStack.i(this._reference.path.toString());
+    this._reference = this._reference.collection('result').doc('result');
+    loggerNoStack.i(this._reference.path.toString());
+  }
+
+  ResultModel getResult() {
+    this._reference.get().then((snapshot) {
+      this._resultModel = ResultModel.fromMap(snapshot.data());
+    });
+    return this._resultModel;
   }
 }

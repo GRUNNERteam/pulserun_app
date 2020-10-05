@@ -33,6 +33,8 @@ class RunningData extends RunningRepository {
   final ResultRepository _resultRepository = Result();
   RunningModel _runningModel;
   DocumentReference _reference;
+  HearRateModel hrm = HearRateModel();
+  RunningModel hrtd = RunningModel();
 
   DateTime startTime;
 
@@ -82,11 +84,20 @@ class RunningData extends RunningRepository {
     await this._locationRepository.uploadToDB();
     await this
         ._reference
+        .collection('heartrate')
+        .doc('heartrate')
         .get()
-        .then((value) => loggerNoStack.i(value.toString()));
-    /*await this
-        ._resultRepository
-        .init(this._reference, this._runningModel, disT);*/
+        .then((snapshot) async {
+      this.hrm = HearRateModel.fromMap(snapshot.data());
+      await _resultRepository.getHR(this.hrm);
+    });
+
+    await this._reference.get().then((snapshot) async {
+      this.hrtd = RunningModel.fromMap(snapshot.data());
+      await _resultRepository.getDistime(
+          this.hrtd.distance, this.hrtd.estimatedTime);
+    });
+    await _resultRepository.upDB(this._reference);
     return this._runningModel;
   }
 

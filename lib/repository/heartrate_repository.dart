@@ -20,7 +20,6 @@ class TestHeartRate implements HeartRateRepository {
   @override
   Future<void> init(DocumentReference ref) async {
     this._reference = ref;
-
     loggerNoStack.i(this._reference.path);
   }
 

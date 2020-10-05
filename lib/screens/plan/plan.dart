@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -29,6 +30,18 @@ class _PlanPageState extends State<PlanPage> {
         } else if (state is PlanLoaded) {
           return Scaffold(
             key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text('Plan Lists'),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(MdiIcons.plus),
+                  onPressed: () {
+                    BlocProvider.of<PlanBloc>(context)
+                        .add(PlanCreatingTrigger());
+                  },
+                )
+              ],
+            ),
             body: PlanLoadedBody(
               listPlan: state.planLists,
             ),

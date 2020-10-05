@@ -10,6 +10,8 @@ class PlanCreating extends PlanEvent {
   });
 }
 
+class PlanCreatingTrigger extends PlanEvent {}
+
 class GetPlan extends PlanEvent {
   final PlanModel planModel;
   final CurrentStatusModel currentStatusModel;
@@ -33,6 +35,24 @@ class GetPlanById extends PlanEvent {
   });
 }
 
-class DeletePlan extends PlanEvent {}
+class ShowPlanDetail extends PlanEvent {
+  final PlanModel planModel;
+  ShowPlanDetail({
+    this.planModel,
+  });
+}
 
-class UpdatePlan extends PlanEvent {}
+class DeletePlan extends PlanEvent {
+  final String planId;
+
+  DeletePlan({
+    this.planId,
+  });
+}
+
+class UpdatePlan extends PlanEvent {
+  final PlanModel planModel;
+  UpdatePlan({
+    this.planModel,
+  });
+}

@@ -73,6 +73,7 @@ class PlanGoalModel {
 
 class PlanModel {
   String planId;
+  String name;
   PlanGoalModel goal;
   double targetHeartRate;
   DateTime start;
@@ -80,6 +81,7 @@ class PlanModel {
 
   PlanModel({
     this.planId,
+    this.name,
     this.goal,
     this.targetHeartRate,
     this.start,
@@ -89,6 +91,7 @@ class PlanModel {
   Map<String, dynamic> toMap() {
     return {
       'planId': planId,
+      'name': name,
       'goal': goal.toMap(),
       'targetHeartRate': targetHeartRate,
       'start':
@@ -108,6 +111,7 @@ class PlanModel {
 
     return PlanModel(
       planId: map['planId'],
+      name: map['name'],
       goal: PlanGoalModel.fromMap(map['goal']),
       targetHeartRate: map['targetHeartRate'],
       start: startts.toDate(),
@@ -126,6 +130,7 @@ class PlanModel {
 
     return o is PlanModel &&
         o.planId == planId &&
+        o.name == name &&
         o.goal == goal &&
         o.targetHeartRate == targetHeartRate &&
         o.start == start &&
@@ -135,6 +140,7 @@ class PlanModel {
   @override
   int get hashCode =>
       planId.hashCode ^
+      name.hashCode ^
       goal.hashCode ^
       targetHeartRate.hashCode ^
       start.hashCode ^
@@ -142,6 +148,7 @@ class PlanModel {
 
   PlanModel copyWith({
     String planId,
+    String name,
     PlanGoalModel goal,
     double targetHeartRate,
     DateTime start,
@@ -149,6 +156,7 @@ class PlanModel {
   }) {
     return PlanModel(
       planId: planId ?? this.planId,
+      name: name ?? this.name,
       goal: goal ?? this.goal,
       targetHeartRate: targetHeartRate ?? this.targetHeartRate,
       start: start ?? this.start,
@@ -158,6 +166,6 @@ class PlanModel {
 
   @override
   String toString() {
-    return 'PlanModel(planId: $planId, goal: $goal, targetHeartRate: $targetHeartRate, start: $start, breakDay: $breakDay)';
+    return 'PlanModel(planId: $planId, name: $name, goal: $goal, targetHeartRate: $targetHeartRate, start: $start, breakDay: $breakDay)';
   }
 }

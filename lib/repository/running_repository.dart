@@ -94,14 +94,13 @@ class RunningData extends RunningRepository {
         await _resultRepository.getHR(this.hrm);
       });*/
     });
-    loggerNoStack.i(this._reference.toString());
+
     await this._reference.get().then((snapshot) async {
       this.hrtd = RunningModel.fromMap(snapshot.data());
       await this
           ._resultRepository
           .getDistime(this.hrtd.distance, this.hrtd.estimatedTime);
-      loggerNoStack.i(this.hrtd.distance, 'distance');
-      loggerNoStack.i(this.hrtd.estimatedTime, 'distance');
+      loggerNoStack.i(this.hrtd.distance.toString(), "TEST");
     });
     await this._resultRepository.upDB(this._reference);
     return this._runningModel;

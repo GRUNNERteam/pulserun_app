@@ -186,7 +186,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         await _runningRepository.setestimatedTime(et);
         await _runningRepository.stop();
         await _resultRepository.setRef(_runningRepository.gettReference());
-        _resultModel = _resultRepository.getResult();
+        _resultModel = await _resultRepository.getResult();
 
         yield RunningResult(
             locationServiceAndTracking: event.locationServiceAndTracking,

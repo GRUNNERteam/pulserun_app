@@ -76,7 +76,7 @@ class GenerateScheduleByBMIService extends GenerateScheduleService {
       createDay = startDay;
     }
     List<String> event = [];
-    for (int i; i < 7; i++) {
+    for (int i = 0; i < 7; i++) {
       event = [];
       if (restday > 0) {
         if (i == 4 || i == 6) {

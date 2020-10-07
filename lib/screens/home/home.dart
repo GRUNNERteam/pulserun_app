@@ -292,7 +292,6 @@ class _menu extends StatelessWidget {
             },
           ),
           ListTile(
-
             leading: Icon(MdiIcons.calendar),
             title: Text('Schedule'),
             onTap: () {

@@ -63,36 +63,32 @@ class ScheduleListModel {
 
 class ScheduleModel {
   Map<DateTime, List> events;
+  ScheduleGoalModel goalModel;
   bool isDone;
-  double distance;
-  DurationModel estmatetime;
+
   ScheduleModel({
     this.events,
+    this.goalModel,
     this.isDone,
-    this.distance,
-    this.estmatetime,
   });
 
   ScheduleModel copyWith({
     Map<DateTime, List> events,
+    ScheduleGoalModel goalModel,
     bool isDone,
-    double distance,
-    DurationModel estmatetime,
   }) {
     return ScheduleModel(
       events: events ?? this.events,
+      goalModel: goalModel ?? this.goalModel,
       isDone: isDone ?? this.isDone,
-      distance: distance ?? this.distance,
-      estmatetime: estmatetime ?? this.estmatetime,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'events': events,
+      'goalModel': goalModel?.toMap(),
       'isDone': isDone,
-      'distance': distance,
-      'estmatetime': estmatetime?.toMap(),
     };
   }
 
@@ -101,9 +97,8 @@ class ScheduleModel {
 
     return ScheduleModel(
       events: Map<DateTime, List>.from(map['events']),
+      goalModel: ScheduleGoalModel.fromMap(map['goalModel']),
       isDone: map['isDone'],
-      distance: map['distance'],
-      estmatetime: DurationModel.fromMap(map['estmatetime']),
     );
   }
 
@@ -113,9 +108,8 @@ class ScheduleModel {
       ScheduleModel.fromMap(json.decode(source));
 
   @override
-  String toString() {
-    return 'ScheduleModel(events: $events, isDone: $isDone, distance: $distance, estmatetime: $estmatetime)';
-  }
+  String toString() =>
+      'ScheduleModel(events: $events, goalModel: $goalModel, isDone: $isDone)';
 
   @override
   bool operator ==(Object o) {
@@ -123,26 +117,20 @@ class ScheduleModel {
 
     return o is ScheduleModel &&
         mapEquals(o.events, events) &&
-        o.isDone == isDone &&
-        o.distance == distance &&
-        o.estmatetime == estmatetime;
+        o.goalModel == goalModel &&
+        o.isDone == isDone;
   }
 
   @override
-  int get hashCode {
-    return events.hashCode ^
-        isDone.hashCode ^
-        distance.hashCode ^
-        estmatetime.hashCode;
-  }
+  int get hashCode => events.hashCode ^ goalModel.hashCode ^ isDone.hashCode;
 }
 
 class DurationModel {
   DateTime start;
   DateTime end;
   DurationModel({
-    this.start,
-    this.end,
+    @required this.start,
+    @required this.end,
   });
 
   Duration durationTime() {
@@ -152,6 +140,15 @@ class DurationModel {
 
     Duration diff = this.start.difference(this.end);
     return diff;
+  }
+
+  void addWithDuration(Duration duration) {
+    if (duration != null) {
+      return;
+    }
+
+    this.start = DateTime.now();
+    this.end = start.add(duration);
   }
 
   DurationModel copyWith({
@@ -201,4 +198,121 @@ class DurationModel {
 
   @override
   int get hashCode => start.hashCode ^ end.hashCode;
+}
+
+enum ScheduleGoalType {
+  none,
+  distance,
+  step,
+  time,
+}
+
+extension ScheduleGoalTypeExtension on ScheduleGoalType {
+  // Helper functions
+  String enumToString(Object o) => o.toString().split('.').last;
+
+  T enumFromString<T>(String key, List<T> values) =>
+      values.firstWhere((v) => key == enumToString(v), orElse: () => null);
+}
+
+class ScheduleGoalModel {
+  ScheduleGoalType scheduleGoalType;
+  double distance;
+  int step;
+  DurationModel time;
+
+  ScheduleGoalModel({
+    this.scheduleGoalType,
+    this.distance,
+    this.step,
+    this.time,
+  });
+
+  dynamic getGoal() {
+    if (this.scheduleGoalType == null || this.scheduleGoalType.index == 0) {
+      return null;
+    }
+    switch (this.scheduleGoalType.index) {
+      case 1:
+        {
+          return this.distance;
+        }
+
+      case 2:
+        {
+          return this.step;
+        }
+      case 3:
+        {
+          return this.time.durationTime();
+        }
+      default:
+        {
+          return null;
+        }
+    }
+  }
+
+  ScheduleGoalModel copyWith({
+    ScheduleGoalType scheduleGoalType,
+    double distance,
+    int step,
+    DurationModel time,
+  }) {
+    return ScheduleGoalModel(
+      scheduleGoalType: scheduleGoalType ?? this.scheduleGoalType,
+      distance: distance ?? this.distance,
+      step: step ?? this.step,
+      time: time ?? this.time,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'scheduleGoalType': scheduleGoalType?.index,
+      'distance': distance,
+      'step': step,
+      'time': time?.toMap(),
+    };
+  }
+
+  factory ScheduleGoalModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return ScheduleGoalModel(
+      scheduleGoalType: ScheduleGoalType.values[map['scheduleGoalType']],
+      distance: map['distance'],
+      step: map['step'],
+      time: DurationModel.fromMap(map['time']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ScheduleGoalModel.fromJson(String source) =>
+      ScheduleGoalModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'ScheduleGoalModel(scheduleGoalType: $scheduleGoalType, distance: $distance, step: $step, time: $time)';
+  }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is ScheduleGoalModel &&
+        o.scheduleGoalType == scheduleGoalType &&
+        o.distance == distance &&
+        o.step == step &&
+        o.time == time;
+  }
+
+  @override
+  int get hashCode {
+    return scheduleGoalType.hashCode ^
+        distance.hashCode ^
+        step.hashCode ^
+        time.hashCode;
+  }
 }

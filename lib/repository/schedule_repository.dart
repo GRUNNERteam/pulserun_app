@@ -9,21 +9,38 @@ abstract class ScheduleRespository {
   Future<void> create(ScheduleListModel listModel);
 
   // Ref
-  Future<DocumentReference> getRef();
+  Future<CollectionReference> getRef();
 
   Future<void> setRef(DocumentReference ref);
 }
 
 class ScheduleData implements ScheduleRespository {
-  DocumentReference _documentReference;
+  List<DocumentReference> _documentReference = [];
+  CollectionReference _collectionReference;
+  ScheduleListModel _scheduleListModel;
+  ScheduleModel _scheduleModel;
+  ScheduleGoalModel _scheduleGoalModel;
+  List<ScheduleGoalModel> _goalList;
 
   @override
   Future<void> create(ScheduleListModel listModel) async {
-    try {
-      await this._documentReference.set(listModel.toMap());
-    } catch (err) {
-      print('Error create schedule: $err');
+    if (this._scheduleListModel == null || this._collectionReference == null) {
+      return;
     }
+
+    // prepare the data
+    // update ref
+    await this._scheduleListModel.scheduleList.forEach((schedule) async {
+      this._documentReference.add(
+          _collectionReference.doc(schedule.events.values.first.toString()));
+
+      try {
+        await this._documentReference.last.set(schedule.toMap());
+        await this._documentReference.last.collection('goal').doc();
+      } catch (err) {
+        print('Error create schedule: $err');
+      }
+    });
   }
 
   @override
@@ -46,13 +63,12 @@ class ScheduleData implements ScheduleRespository {
   }
 
   @override
-  Future<DocumentReference> getRef() async {
-    return await this._documentReference;
+  Future<CollectionReference> getRef() async {
+    return await this._collectionReference;
   }
 
   @override
   Future<void> setRef(DocumentReference ref) async {
-    this._documentReference =
-        ref.collection('scheduleCollection').doc('schedule');
+    this._collectionReference = ref.collection('schedule');
   }
 }

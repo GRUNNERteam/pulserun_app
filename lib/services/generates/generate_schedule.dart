@@ -17,7 +17,7 @@ class GenerateScheduleService {
     int a = 0;
     int b = 50;
     List<String> event = [];
-    for (int i; i < 7; i++) {
+    for (int i = 0; i < 7; i++) {
       event = [];
       if (restday > 0) {
         a = randomObject.nextInt(100);
@@ -42,7 +42,7 @@ class GenerateScheduleService {
     List<Map<DateTime, List>> list = [];
     DateTime createWeek = startDay;
     List<Map<DateTime, List>> holder = [];
-    for (int i; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       createWeek.add(Duration(days: 7 * i));
       holder.clear();
       holder = this.generateScheduleWeekly(plan, startDay: createWeek);

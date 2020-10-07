@@ -3,7 +3,9 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/services/database/database.dart';
 
@@ -91,9 +93,12 @@ class MockUpPlan implements PlanRepository {
 
 class PlanData implements PlanRepository {
   DocumentReference _reference;
+  ScheduleRespository _scheduleRespository = ScheduleData();
+
   @override
   Future<PlanModel> fetchPlan() async {
     PlanModel plan;
+
     await this.setRef();
     if (this._reference == null) {
       return null;
@@ -177,6 +182,13 @@ class PlanData implements PlanRepository {
         'planId': planRef.id,
         'targetHeartRate': thr.toInt(),
       });
+
+      print('Creating Schedule by goalTpye');
+
+      switch (plan.goal.planType.index) {
+        default:
+          {}
+      }
 
       print('Creating Plan successful');
     } catch (e) {

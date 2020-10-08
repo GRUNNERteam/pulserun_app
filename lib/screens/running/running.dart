@@ -244,7 +244,7 @@ class _RunningPageState extends State<RunningPage> {
                                   ' KM'),
                               Text('TotalTime : ' +
                                   resultModel.totalTime.toString() +
-                                  ' Hr.'),
+                                  ' Min.'),
                               Text('AvgHeartRate : ' +
                                   resultModel.avgHearRate.toStringAsFixed(2) +
                                   ' BPM.'),

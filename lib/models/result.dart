@@ -8,21 +8,25 @@ class ResultModel {
   String totalTime;
   HearRateModel totalHeartrate;
   double totalDdistance;
+  double avgHearRate;
   ResultModel({
     this.totalTime,
     this.totalHeartrate,
     this.totalDdistance,
+    this.avgHearRate,
   });
 
   ResultModel copyWith({
     String totalTime,
     HearRateModel totalHeartrate,
     double totalDdistance,
+    double avgHearRate,
   }) {
     return ResultModel(
       totalTime: totalTime ?? this.totalTime,
       totalHeartrate: totalHeartrate ?? this.totalHeartrate,
       totalDdistance: totalDdistance ?? this.totalDdistance,
+      avgHearRate: avgHearRate ?? this.avgHearRate,
     );
   }
 
@@ -31,6 +35,7 @@ class ResultModel {
       'totalTime': totalTime,
       'totalHeartrate': totalHeartrate?.toMap(),
       'totalDdistance': totalDdistance,
+      'avgHearRate': avgHearRate,
     };
   }
 
@@ -41,6 +46,7 @@ class ResultModel {
       totalTime: map['totalTime'],
       totalHeartrate: HearRateModel.fromMap(map['totalHeartrate']),
       totalDdistance: map['totalDdistance'],
+      avgHearRate: map['avgHearRate'],
     );
   }
 
@@ -50,8 +56,9 @@ class ResultModel {
       ResultModel.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'ResultModel(totalTime: $totalTime, totalHeartrate: $totalHeartrate, totalDdistance: $totalDdistance)';
+  String toString() {
+    return 'ResultModel(totalTime: $totalTime, totalHeartrate: $totalHeartrate, totalDdistance: $totalDdistance, avgHearRate: $avgHearRate)';
+  }
 
   @override
   bool operator ==(Object o) {
@@ -60,10 +67,15 @@ class ResultModel {
     return o is ResultModel &&
         o.totalTime == totalTime &&
         o.totalHeartrate == totalHeartrate &&
-        o.totalDdistance == totalDdistance;
+        o.totalDdistance == totalDdistance &&
+        o.avgHearRate == avgHearRate;
   }
 
   @override
-  int get hashCode =>
-      totalTime.hashCode ^ totalHeartrate.hashCode ^ totalDdistance.hashCode;
+  int get hashCode {
+    return totalTime.hashCode ^
+        totalHeartrate.hashCode ^
+        totalDdistance.hashCode ^
+        avgHearRate.hashCode;
+  }
 }

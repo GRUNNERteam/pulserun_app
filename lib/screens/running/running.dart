@@ -245,6 +245,9 @@ class _RunningPageState extends State<RunningPage> {
                               Text('TotalTime : ' +
                                   resultModel.totalTime.toString() +
                                   ' Hr.'),
+                              Text('AvgHeartRate : ' +
+                                  resultModel.avgHearRate.toStringAsFixed(2) +
+                                  ' BPM.'),
                             ],
                           ),
                         ),
@@ -709,8 +712,7 @@ class _RunningPageState extends State<RunningPage> {
       hrList.add(element.hr.toInt());
       timeList.add(element.time.second.toInt());
     });
-    List<int> distinchrList = hrList.toSet().toList();
-    List<int> distincttimeList = timeList.toSet().toList();
+
     return LineChartData(
       gridData: FlGridData(
         show: true,

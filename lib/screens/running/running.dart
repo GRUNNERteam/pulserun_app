@@ -18,6 +18,8 @@ import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:slider_button/slider_button.dart';
+import 'package:getwidget/getwidget.dart';
 
 BluetoothDevice currentdevice;
 List<BluetoothService> service;
@@ -224,7 +226,25 @@ class _RunningPageState extends State<RunningPage> {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.all(8),
-                    child: Text('Result'),
+                    child: Card(
+                      color: Colors.orangeAccent,
+                      child: Container(
+                        width: 400,
+                        height: 50,
+                        child: Column(
+                          children: [
+                            Center(
+                                child: Container(
+                              padding: EdgeInsets.only(top: 13),
+                              child: Text("Result",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20)),
+                            ))
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                   Container(
                     height: 1,
@@ -236,18 +256,79 @@ class _RunningPageState extends State<RunningPage> {
                     child: Row(
                       children: <Widget>[
                         Center(
-                          child: Column(
+                          child: Row(
                             children: [
-                              Column(),
-                              Text('TotalDdistance : ' +
-                                  resultModel.totalDdistance.toString() +
-                                  ' KM'),
-                              Text('TotalTime : ' +
-                                  resultModel.totalTime.toString() +
-                                  ' Min.'),
-                              Text('AvgHeartRate : ' +
-                                  resultModel.avgHearRate.toStringAsFixed(2) +
-                                  ' BPM.'),
+                              Card(
+                                child: Container(
+                                  width: 121,
+                                  height: 150,
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(12),
+                                        child: Icon(
+                                          Icons.zoom_out_map,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      Text('Distance'),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Text(resultModel.totalDdistance
+                                                .toStringAsFixed(3) +
+                                            ' KM'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 121,
+                                  height: 150,
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(12),
+                                        child: Icon(
+                                          Icons.healing,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      Text('AvgHeartRate'),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Text(resultModel.avgHearRate
+                                                .toStringAsFixed(2) +
+                                            ' BPM.'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 121,
+                                  height: 150,
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(12),
+                                        child: Icon(
+                                          Icons.timer,
+                                        ),
+                                      ),
+                                      Text('Time'),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Text(
+                                            resultModel.totalTime.toString() +
+                                                ' Min.'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -257,10 +338,25 @@ class _RunningPageState extends State<RunningPage> {
                   Container(
                     child: Column(
                       children: <Widget>[
-                        Text('Location'),
-                        Container(
-                          height: 1,
-                          color: Colors.grey,
+                        Card(
+                          color: Colors.orangeAccent,
+                          child: Container(
+                            width: 400,
+                            height: 50,
+                            child: Column(
+                              children: [
+                                Center(
+                                    child: Container(
+                                  //padding: EdgeInsets.only(top: 5),
+                                  child: Icon(
+                                    Icons.map,
+                                    color: Colors.green,
+                                    size: 50,
+                                  ),
+                                ))
+                              ],
+                            ),
+                          ),
                         ),
                         Container(
                           height: 400,
@@ -366,44 +462,24 @@ class _RunningPageState extends State<RunningPage> {
                     Container(
                       child: Column(
                         children: <Widget>[
-                          Text('Current Distance'),
-                          Text((distance.toString() + ' KM') ?? 'Waiting'),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Column(
-                        children: <Widget>[
-                          Text('Current HeartRate'),
-                          StreamBuilder(
-                            stream: characteristic.value,
-                            initialData: characteristic.lastValue,
-                            builder: (c, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Text('Loading');
-                              } else if (snapshot.hasError)
-                                return Text('ERROR');
-                              else if (snapshot.data
-                                      .toString()
-                                      .split(',')
-                                      .last
-                                      .split(']')
-                                      .first
-                                      .toString() ==
-                                  '[') {
-                                return Text(value.toString());
-                              } else if (snapshot.hasData) {
-                                value = int.parse((snapshot.data
-                                    .toString()
-                                    .split(',')
-                                    .last
-                                    .split(']')
-                                    .first
-                                    .toString()));
-                                heartRateModel.add_model(value);
-                                return Text(value.toString());
-                              }
-                            },
+                          Card(
+                            child: Container(
+                              width: 120,
+                              height: 85,
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(12),
+                                    child: Icon(
+                                      Icons.zoom_out_map,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  Text((distance.toStringAsFixed(3) + ' KM') ??
+                                      'Waiting'),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -411,14 +487,83 @@ class _RunningPageState extends State<RunningPage> {
                     Container(
                       child: Column(
                         children: <Widget>[
-                          Text('Timer'),
-                          StreamBuilder<String>(
-                              stream: bloc.stopwatchTime,
-                              builder: (context, snapshot) {
-                                return snapshot.hasData
-                                    ? Text(snapshot.data)
-                                    : Text('');
-                              }),
+                          Card(
+                            child: Container(
+                              width: 120,
+                              height: 85,
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(12),
+                                    child: Icon(
+                                      Icons.healing,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  StreamBuilder(
+                                    stream: characteristic.value,
+                                    initialData: characteristic.lastValue,
+                                    builder: (c, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return Text('Loading');
+                                      } else if (snapshot.hasError)
+                                        return Text('ERROR');
+                                      else if (snapshot.data
+                                              .toString()
+                                              .split(',')
+                                              .last
+                                              .split(']')
+                                              .first
+                                              .toString() ==
+                                          '[') {
+                                        return Text(value.toString() + ' BPM');
+                                      } else if (snapshot.hasData) {
+                                        value = int.parse((snapshot.data
+                                            .toString()
+                                            .split(',')
+                                            .last
+                                            .split(']')
+                                            .first
+                                            .toString()));
+                                        heartRateModel.add_model(value);
+                                        return Text(value.toString() + ' BPM');
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Column(
+                        children: <Widget>[
+                          Card(
+                            child: Container(
+                              width: 120,
+                              height: 85,
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(12),
+                                    child: Icon(
+                                      Icons.timer,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  StreamBuilder<String>(
+                                      stream: bloc.stopwatchTime,
+                                      builder: (context, snapshot) {
+                                        return snapshot.hasData
+                                            ? Text(snapshot.data)
+                                            : Text('');
+                                      }),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -427,11 +572,29 @@ class _RunningPageState extends State<RunningPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
               height: MediaQuery.of(context).size.height * .5,
               child: Column(
                 children: <Widget>[
-                  Text(
+                  Card(
+                    color: Colors.orangeAccent,
+                    child: Container(
+                      width: 400,
+                      height: 50,
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Icon(
+                              Icons.map,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  /*Text(
                     'Location',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -446,7 +609,7 @@ class _RunningPageState extends State<RunningPage> {
                   ),
                   SizedBox(
                     height: 10,
-                  ),
+                  ),*/
                   Flexible(
                     child: GoogleMap(
                       initialCameraPosition:
@@ -461,10 +624,89 @@ class _RunningPageState extends State<RunningPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 30.0),
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Column(
                 children: [
-                  Center(
+                  Card(
+                    color: Colors.blue,
+                    child: Container(
+                      width: 200,
+                      height: 120,
+                      child: Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.directions_run,
+                            color: Colors.redAccent,
+                            size: 50,
+                          ),
+                          Center(
+                            child: Card(
+                                child: Container(
+                              width: 170,
+                              height: 60,
+                              child: Column(
+                                children: [
+                                  Center(
+                                    heightFactor: 3.3,
+                                    child: StreamBuilder(
+                                      stream: characteristic.value,
+                                      initialData: characteristic.lastValue,
+                                      builder: (c, snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return Text('Loading');
+                                        } else if (snapshot.hasError)
+                                          return Text('ERROR');
+                                        else if (snapshot.data
+                                                .toString()
+                                                .split(',')
+                                                .last
+                                                .split(']')
+                                                .first
+                                                .toString() ==
+                                            '[') {
+                                          return Text(tZone);
+                                        } else if (snapshot.hasData) {
+                                          check = int.parse((snapshot.data
+                                              .toString()
+                                              .split(',')
+                                              .last
+                                              .split(']')
+                                              .first
+                                              .toString()));
+                                          zone = (100 * check) / thr;
+                                          if (zone >= 100) {
+                                            tZone =
+                                                'Dangerous slowdown or rest';
+                                          } else if (zone >= 90 && zone < 100) {
+                                            tZone = 'Zone 5';
+                                          } else if (zone >= 80 && zone < 90) {
+                                            tZone = 'Zone 4';
+                                          } else if (zone >= 70 && zone < 80) {
+                                            tZone = 'Zone 3';
+                                          } else if (zone >= 60 && zone < 70) {
+                                            tZone = 'Zone 2';
+                                          } else if (zone >= 50 && zone < 60) {
+                                            tZone = 'Zone 1';
+                                          } else if (zone < 50) {
+                                            tZone = 'Speed Up';
+                                          } else
+                                            tZone = 'Loading';
+
+                                          return Text(tZone);
+                                        }
+                                        return Text("Loading");
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  /*Center(
                     child: Container(
                       color: Colors.blue[100],
                       padding: EdgeInsets.all(30.0),
@@ -517,21 +759,44 @@ class _RunningPageState extends State<RunningPage> {
                         },
                       ),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),
             Expanded(
               child: Container(
+                padding: EdgeInsets.only(top: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    RaisedButton(
-                      child: Text('Stop'),
-                      onPressed: () {
+                    SliderButton(
+                      action: () {
                         BlocProvider.of<RunningBloc>(context)
                             .add(StopRunning());
                       },
+                      label: Text(
+                        "Slide to stop !",
+                        style: TextStyle(
+                            color: Color(0xff4a4a4a),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 17),
+                      ),
+                      icon: Center(
+                          child: Icon(
+                        Icons.power_settings_new,
+                        color: Colors.white,
+                        size: 40.0,
+                        semanticLabel:
+                            'Text to announce in accessibility modes',
+                      )),
+
+                      ///Change All the color and size from here.
+                      width: 230,
+                      radius: 10,
+                      buttonColor: Color(0xffd60000),
+                      backgroundColor: Color(0xFF000000),
+                      highlightedColor: Colors.red,
+                      baseColor: Colors.white,
                     ),
                   ],
                 ),
@@ -610,7 +875,7 @@ class _RunningPageState extends State<RunningPage> {
                           Column(
                             children: [
                               Text('Current BMI'),
-                              Text(stat.bmi.toString()),
+                              Text(stat.bmi.toStringAsFixed(2)),
                             ],
                           ),
                         ],

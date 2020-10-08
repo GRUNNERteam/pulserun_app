@@ -69,6 +69,9 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.0.0
   json_serializable: ^3.2.0
+  rounded_loading_button: ^1.0.0
+  slider_button: ^0.6.0
+  getwidget: ^1.2.2
 
 
 

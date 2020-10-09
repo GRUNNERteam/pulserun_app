@@ -9,14 +9,9 @@ class ScheduleListModel {
     this.scheduleList,
   });
 
-  void addEntireFromGenerateService(List<Map<DateTime, List>> list) {
-    list.forEach((map) {
-      this.scheduleList.add(ScheduleModel(events: map, isDone: false));
-    });
-  }
-
   final Timestamp updateAt = Timestamp.fromMillisecondsSinceEpoch(
-      DateTime.now().millisecondsSinceEpoch);
+    DateTime.now().millisecondsSinceEpoch,
+  );
 
   ScheduleListModel copyWith({
     List<ScheduleModel> scheduleList,
@@ -61,44 +56,116 @@ class ScheduleListModel {
   int get hashCode => scheduleList.hashCode;
 }
 
-class ScheduleModel {
-  Map<DateTime, List> events;
-  ScheduleGoalModel goalModel;
-  bool isDone;
-
-  ScheduleModel({
+class ScheduleCalendarModel {
+  final DateTime appointment;
+  final List<String> events;
+  ScheduleCalendarModel({
+    this.appointment,
     this.events,
-    this.goalModel,
-    this.isDone,
   });
 
-  ScheduleModel copyWith({
-    Map<DateTime, List> events,
-    ScheduleGoalModel goalModel,
-    bool isDone,
+  ScheduleCalendarModel copyWith({
+    DateTime appointment,
+    List<String> events,
   }) {
-    return ScheduleModel(
+    return ScheduleCalendarModel(
+      appointment: appointment ?? this.appointment,
       events: events ?? this.events,
-      goalModel: goalModel ?? this.goalModel,
-      isDone: isDone ?? this.isDone,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'appointment': Timestamp.fromMillisecondsSinceEpoch(
+        appointment?.millisecondsSinceEpoch,
+      ),
       'events': events,
+    };
+  }
+
+  factory ScheduleCalendarModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+    Timestamp timestamp = map['appointment'];
+    return ScheduleCalendarModel(
+      appointment: timestamp.toDate(),
+      events: List<String>.from(map['events']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ScheduleCalendarModel.fromJson(String source) =>
+      ScheduleCalendarModel.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'ScheduleCalendarModel(appointment: $appointment, events: $events)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is ScheduleCalendarModel &&
+        o.appointment == appointment &&
+        listEquals(o.events, events);
+  }
+
+  @override
+  int get hashCode => appointment.hashCode ^ events.hashCode;
+}
+
+class ScheduleModel {
+  ScheduleCalendarModel calendarModel;
+  ScheduleGoalModel goalModel;
+  bool isRestDay;
+  bool isDone;
+  DateTime ts;
+
+  ScheduleModel({
+    this.calendarModel,
+    this.goalModel,
+    this.isRestDay,
+    this.isDone,
+    this.ts,
+  });
+
+  ScheduleModel copyWith({
+    ScheduleCalendarModel calendarModel,
+    ScheduleGoalModel goalModel,
+    bool isDone,
+    DateTime ts,
+  }) {
+    return ScheduleModel(
+      calendarModel: calendarModel ?? this.calendarModel,
+      goalModel: goalModel ?? this.goalModel,
+      isRestDay: isRestDay ?? this.isRestDay,
+      isDone: isDone ?? this.isDone,
+      ts: ts ?? this.ts,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'calendarModel': calendarModel?.toMap(),
       'goalModel': goalModel?.toMap(),
+      'isRestDay': isRestDay,
       'isDone': isDone,
+      'ts': Timestamp.fromMillisecondsSinceEpoch(
+        ts?.millisecondsSinceEpoch,
+      ),
     };
   }
 
   factory ScheduleModel.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
+    Timestamp timestamp = map['ts'];
 
     return ScheduleModel(
-      events: Map<DateTime, List>.from(map['events']),
+      calendarModel: ScheduleCalendarModel.fromMap(map['calendarModel']),
       goalModel: ScheduleGoalModel.fromMap(map['goalModel']),
+      isRestDay: map['isRestDay'],
       isDone: map['isDone'],
+      ts: timestamp.toDate(),
     );
   }
 
@@ -108,21 +175,30 @@ class ScheduleModel {
       ScheduleModel.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'ScheduleModel(events: $events, goalModel: $goalModel, isDone: $isDone)';
+  String toString() {
+    return 'ScheduleModel(calendarModel: $calendarModel, goalModel: $goalModel, isRestDay: $isRestDay, isDone: $isDone, ts: $ts)';
+  }
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
     return o is ScheduleModel &&
-        mapEquals(o.events, events) &&
+        o.calendarModel == calendarModel &&
         o.goalModel == goalModel &&
-        o.isDone == isDone;
+        o.isRestDay == isRestDay &&
+        o.isDone == isDone &&
+        o.ts == ts;
   }
 
   @override
-  int get hashCode => events.hashCode ^ goalModel.hashCode ^ isDone.hashCode;
+  int get hashCode {
+    return calendarModel.hashCode ^
+        goalModel.hashCode ^
+        isRestDay.hashCode ^
+        isDone.hashCode ^
+        ts.hashCode;
+  }
 }
 
 class DurationModel {

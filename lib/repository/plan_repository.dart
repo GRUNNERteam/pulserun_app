@@ -8,6 +8,7 @@ import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/services/database/database.dart';
+import 'package:pulserun_app/services/generates/generate_schedule.dart';
 
 abstract class PlanRepository {
   Future<PlanModel> fetchPlan();
@@ -138,6 +139,7 @@ class PlanData implements PlanRepository {
         DatabaseService().getUserRef().collection('plan').doc();
     DateTime dob;
     bool isPlanRefEmpty = true;
+    ScheduleListModel scheduleListModel = ScheduleListModel();
     // Check before create
     try {
       await DatabaseService().getUserRef().get().then((snapShot) {
@@ -183,12 +185,13 @@ class PlanData implements PlanRepository {
         'targetHeartRate': thr.toInt(),
       });
 
-      print('Creating Schedule by goalTpye');
+      print('Creating Schedule');
 
-      switch (plan.goal.planType.index) {
-        default:
-          {}
-      }
+      this._scheduleRespository = new ScheduleData();
+      await this._scheduleRespository.setRef(planRef);
+      await this._scheduleRespository.setPlanModel(plan);
+
+      await this._scheduleRespository.create();
 
       print('Creating Plan successful');
     } catch (e) {

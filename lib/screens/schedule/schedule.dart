@@ -24,12 +24,12 @@ class _SchedulePageState extends State<SchedulePage>
     planRepository.setRef();
     PlanModel plan = await planRepository.fetchPlan();
     print(plan.toString());
-    List<Map<DateTime, List>> lists =
-        generateScheduleService.generateScheduleWeekly(plan);
+    // List<Map<DateTime, List>> lists =
+    //     generateScheduleService.generateScheduleMonthly(plan);
     Map<DateTime, List> e = {};
-    lists.forEach((element) {
-      e.addAll(element);
-    });
+    // lists.forEach((element) {
+    //   e.addAll(element);
+    // });
 
     setState(() {
       this._events = e;

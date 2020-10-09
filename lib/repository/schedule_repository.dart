@@ -1,17 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/schedule.dart';
+import 'package:pulserun_app/services/generates/generate_schedule.dart';
+import 'package:pulserun_app/services/generates/generate_schedule_goal.dart';
 
 abstract class ScheduleRespository {
   Future<ScheduleListModel> fetchLists();
   Future<ScheduleModel> fetch();
 
   Future<void> update(ScheduleModel scheduleModel);
-  Future<void> create(ScheduleListModel listModel);
+  Future<void> create();
 
   // Ref
   Future<CollectionReference> getRef();
 
   Future<void> setRef(DocumentReference ref);
+  Future<void> setPlanModel(PlanModel plan);
 }
 
 class ScheduleData implements ScheduleRespository {
@@ -20,25 +25,28 @@ class ScheduleData implements ScheduleRespository {
   ScheduleListModel _scheduleListModel;
   ScheduleModel _scheduleModel;
   ScheduleGoalModel _scheduleGoalModel;
-  List<ScheduleGoalModel> _goalList;
+  PlanModel _plan;
 
   @override
-  Future<void> create(ScheduleListModel listModel) async {
-    if (this._scheduleListModel == null || this._collectionReference == null) {
+  Future<void> create() async {
+    if (this._plan == null) {
+      print('ScheduleRespository : _plan is null');
       return;
     }
 
-    // prepare the data
-    // update ref
-    await this._scheduleListModel.scheduleList.forEach((schedule) async {
-      this._documentReference.add(
-          _collectionReference.doc(schedule.events.values.first.toString()));
+    if (this._collectionReference == null) {
+      print('ScheduleRespository : _collectionReference is null');
+      return;
+    }
 
+    ScheduleListModel lists =
+        await GenerateScheduleService().generateScheduleWeekly(this._plan);
+
+    lists.scheduleList.forEach((element) {
       try {
-        await this._documentReference.last.set(schedule.toMap());
-        await this._documentReference.last.collection('goal').doc();
-      } catch (err) {
-        print('Error create schedule: $err');
+        this._collectionReference.doc().set(element.toMap());
+      } catch (e) {
+        print('Error createing schedule to DB : $e');
       }
     });
   }
@@ -70,5 +78,10 @@ class ScheduleData implements ScheduleRespository {
   @override
   Future<void> setRef(DocumentReference ref) async {
     this._collectionReference = ref.collection('schedule');
+  }
+
+  @override
+  Future<void> setPlanModel(PlanModel plan) async {
+    this._plan = plan;
   }
 }

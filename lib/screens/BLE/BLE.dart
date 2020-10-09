@@ -59,7 +59,6 @@ class FindDevicesScreen extends StatelessWidget {
                                   return RaisedButton(
                                     child: Text('OPEN'),
                                     onPressed: () {
-                                      //discover(d);
                                       currentdevice = d;
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
@@ -136,7 +135,6 @@ class DeviceScreen extends StatelessWidget {
               VoidCallback onPressed;
               String text;
               currentdevice = device;
-
               switch (snapshot.data) {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
@@ -193,7 +191,6 @@ class DeviceScreen extends StatelessWidget {
                                 color: Colors.black,
                               ),
                             ));
-
                         break;
                       case BluetoothDeviceState.disconnected:
                         return Container(
@@ -224,7 +221,7 @@ class DeviceScreen extends StatelessWidget {
                         return Container(
                           padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
                           child: RaisedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               discover();
                               Navigator.push(
                                 context,
@@ -300,16 +297,15 @@ Future<bool> discover() async {
   currentdevice.services.forEach((service) {
     service.forEach((c) {
       if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-        c.characteristics.forEach((element) async {
+        c.characteristics.forEach((element) {
           if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
             characteristic = element;
-            await characteristic.setNotifyValue(!characteristic.isNotifying);
-            return true;
           }
         });
       }
     });
   });
+  await characteristic.setNotifyValue(true);
 }
 
 class ScanResultTile extends StatelessWidget {

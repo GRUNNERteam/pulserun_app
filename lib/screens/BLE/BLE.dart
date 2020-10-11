@@ -143,6 +143,7 @@ class DeviceScreen extends StatelessWidget {
                 case BluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
                   text = 'CONNECT';
+
                   break;
                 default:
                   onPressed = null;
@@ -297,15 +298,17 @@ Future<bool> discover() async {
   currentdevice.services.forEach((service) {
     service.forEach((c) {
       if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-        c.characteristics.forEach((element) {
+        c.characteristics.forEach((element) async {
           if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
             characteristic = element;
+            await element.setNotifyValue(true);
+            await characteristic.setNotifyValue(true);
+            loggerNoStack.i(characteristic.isNotifying.toString());
           }
         });
       }
     });
   });
-  await characteristic.setNotifyValue(true);
 }
 
 class ScanResultTile extends StatelessWidget {

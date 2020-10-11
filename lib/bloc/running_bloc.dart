@@ -138,6 +138,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         print(distance);
         final UserModel userModel = await _userRepository.fetchUser();
         final int targetHR = userModel.targetHeartrate;
+        characteristic.setNotifyValue(true);
         yield RunningWorking(
           positionModel: PositionModel().convertLocToPos(position),
           distance: 0.toDouble(),

@@ -63,6 +63,7 @@ class RunningData extends RunningRepository {
     this._runningModel =
         RunningModel(runId: this._reference.id, startTime: DateTime.now());
     await this._reference.set(this._runningModel.toMap());
+    loggerNoStack.i(this._reference.path.toString());
     // Location
     this
         ._locationRepository
@@ -107,6 +108,7 @@ class RunningData extends RunningRepository {
       loggerNoStack.i(this.hrtd.distance.toString(), "TEST");
     });
     await this._resultRepository.upDB(this._reference);
+    loggerNoStack.i(this._reference.path.toString());
     return this._runningModel;
   }
 

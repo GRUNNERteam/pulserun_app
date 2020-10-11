@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
@@ -525,9 +526,20 @@ class _RunningPageState extends State<RunningPage> {
                                             .split(']')
                                             .first
                                             .toString()));
-                                        heartRateModel.add_model(value);
+
+                                        if (heartRateModel.heartRate.isEmpty) {
+                                          loggerNoStack.i("message");
+                                          heartRateModel.add_model(value);
+                                        } else if (DateFormat.jms()
+                                                .format(new DateTime.now()) !=
+                                            DateFormat.jms().format(
+                                                heartRateModel
+                                                    .heartRate.last.time)) {
+                                          heartRateModel.add_model(value);
+                                        }
                                         return Text(value.toString() + ' BPM');
                                       }
+                                      return Text(value.toString() + ' BPM');
                                     },
                                   ),
                                 ],

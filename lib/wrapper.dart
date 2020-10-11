@@ -65,10 +65,7 @@ class _WrapperState extends State<Wrapper> {
     if (_user == null) {
       return AuthPage();
     } else {
-      return BlocProvider(
-        create: (context) => HomeCubit(UserDB(), CurrentStatus()),
-        child: HomePage(),
-      );
+      return HomePage();
     }
   }
 }

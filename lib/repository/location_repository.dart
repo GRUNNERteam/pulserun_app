@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pulserun_app/models/localtion.dart';
-import 'package:pulserun_app/services/database/database.dart';
 import 'package:pulserun_app/services/trackloc/trackloc.dart';
 
 abstract class LocationRepository {
@@ -11,55 +10,6 @@ abstract class LocationRepository {
   Future<bool> setService();
   Future<bool> setPos(PositionModel pos);
   Future<bool> setRef(DocumentReference docRef);
-}
-
-class TestLocationDB implements LocationRepository {
-  @override
-  Future<LocationModel> uploadToDB() async {
-    // int planId = 0;
-    // LocationModel _data;
-    // DocumentReference _ref = DatabaseService()
-    //     .getUserRef()
-    //     .collection('plan')
-    //     .doc(planId.toString())
-    //     .collection('run')
-    //     .doc();
-    // ;
-
-    // await _ref.set(data.toMap());
-
-    // return _data;
-  }
-
-  @override
-  Future<bool> setService() {
-    // TODO: implement setService
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> setPos(PositionModel pos) {
-    // TODO: implement setPos
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> setRef(DocumentReference docRef) {
-    // TODO: implement setRef
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<double> getDistance() {
-    // TODO: implement getDistance
-    throw UnimplementedError();
-  }
-
-  @override
-  TrackingLocationService getService() {
-    // TODO: implement getService
-    throw UnimplementedError();
-  }
 }
 
 class LocationServiceAndTracking implements LocationRepository {

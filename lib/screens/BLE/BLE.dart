@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pulserun_app/screens/running/running.dart';
-import 'package:nice_button/nice_button.dart';
 
 class BLE extends StatelessWidget {
   // This widget is the root of your application.

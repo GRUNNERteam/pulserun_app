@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/services/generates/generate_schedule.dart';
-import 'package:pulserun_app/services/generates/generate_schedule_goal.dart';
 
 abstract class ScheduleRespository {
   Future<ScheduleListModel> fetchLists();

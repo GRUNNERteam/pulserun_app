@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/services/database/database.dart';
 
@@ -56,7 +55,6 @@ class UserDB implements UserRepository {
     if (dob == null) {
       return null;
     }
-    String formattedDate = DateFormat('yyyy-MM-dd').format(dob);
     int targetHR = 220 - (DateTime.now().year - dob.year);
     await _ref.update({
       'birthDate': dob.toString(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/bloc/plan_bloc.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/plan.dart';
 
 class PlanCreateBody extends StatefulWidget {
@@ -251,6 +252,7 @@ class _PlanCreateBodyState extends State<PlanCreateBody> {
                   );
                   print(plan.toString());
                   // trigger event
+
                   BlocProvider.of<PlanBloc>(context).add(
                     PlanCreating(
                       planModel: plan,

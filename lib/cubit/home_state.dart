@@ -16,7 +16,12 @@ class HomeLoading extends HomeState {
 class HomeLoaded extends HomeState {
   final CurrentStatusModel currentStatusModel;
   final UserModel userModel;
-  const HomeLoaded(this.currentStatusModel, this.userModel);
+  // final ScheduleModel scheduleModel;
+  const HomeLoaded(
+    // this.scheduleModel,
+    this.currentStatusModel,
+    this.userModel,
+  );
 
   @override
   bool operator ==(Object o) {

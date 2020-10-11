@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,13 +11,16 @@ import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
+import 'package:pulserun_app/screens/home/components/bottomcard_widget.dart';
 import 'package:pulserun_app/screens/home/components/dob_select.dart';
 import 'package:pulserun_app/screens/home/components/heightweight_select.dart';
 import 'package:pulserun_app/screens/home/components/history_card.dart';
+import 'package:pulserun_app/screens/home/components/topcard_widget.dart';
 import 'package:pulserun_app/screens/plan/plan.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/screens/schedule/schedule.dart';
 import 'package:pulserun_app/services/auth/auth.dart';
+import 'package:slimy_card/slimy_card.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -26,41 +30,42 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _indexHotbar = 1;
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
-        if (state is HomeInitial) {
-          BlocProvider.of<HomeCubit>(context).getUser(); // trigger to load data
-          return LoadingWidget();
-        } else if (state is HomeLoading) {
-          return LoadingWidget();
-        } else if (state is HomeRequestData) {
-          if (state.userModel.birthDate == null) {
-            return Scaffold(
-              body: DoBSelectBox(),
-            );
-          }
-          if (state.currentStatusModel.height == null ||
-              state.currentStatusModel.weight == null) {
-            return Scaffold(
-              body: HeightWeightSelectBox(),
-            );
-          }
-        } else if (state is HomeLoaded) {
+    return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+      print(state);
+      if (state is HomeInitial) {
+        BlocProvider.of<HomeCubit>(context).getUser(); // trigger to load data
+        return LoadingWidget();
+      } else if (state is HomeLoading) {
+        return LoadingWidget();
+      } else if (state is HomeRequestData) {
+        if (state.userModel.birthDate == null) {
           return Scaffold(
-            key: _scaffoldKey,
-            drawer: _menu(),
-            bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
-            body: _body(context, state.currentStatusModel, state.userModel),
+            body: DoBSelectBox(),
           );
-          //return _body(context, state.currentStatusModel, state.userModel);
-        } else {
-          // state Error
-          return ShowErrorWidget();
         }
-      }),
-    );
+        if (state.currentStatusModel.height == null ||
+            state.currentStatusModel.weight == null) {
+          return Scaffold(
+            body: HeightWeightSelectBox(),
+          );
+        }
+      } else if (state is HomeLoaded) {
+        this._indexHotbar = 1;
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: _menu(),
+          bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
+          body: _body(context, state.currentStatusModel, state.userModel),
+        );
+        //return _body(context, state.currentStatusModel, state.userModel);
+      } else {
+        // state Error
+        return ShowErrorWidget();
+      }
+    });
   }
 
   Widget _body(
@@ -185,22 +190,35 @@ class _buildBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(MdiIcons.floorPlan),
-          title: Text("Current Plan"),
+    return ConvexAppBar(
+      backgroundColor: Theme.of(context).primaryColor,
+      color: Colors.white,
+      activeColor: Theme.of(context).accentColor,
+      style: TabStyle.fixedCircle,
+      items: <TabItem>[
+        TabItem(
+          icon: Icon(
+            MdiIcons.floorPlan,
+            color: Colors.white,
+          ),
+          title: 'Current Plan',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(MdiIcons.home),
-          title: Text("HOME"),
+        TabItem(
+          icon: Icon(
+            MdiIcons.home,
+            color: Colors.white,
+          ),
+          title: 'HOME',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(MdiIcons.runFast),
-          title: Text("RUN"),
+        TabItem(
+          icon: Icon(
+            MdiIcons.runFast,
+            color: Colors.white,
+          ),
+          title: 'RUN',
         ),
       ],
-      currentIndex: index,
+      initialActiveIndex: index,
       onTap: (value) {
         switch (value) {
           case 0:
@@ -223,6 +241,9 @@ class _buildBottomNavBar extends StatelessWidget {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => PlanPage()));
 
+            break;
+          case 1:
+            BlocProvider.of<HomeCubit>(context).getUser();
             break;
           case 2:
             Navigator.push(context,

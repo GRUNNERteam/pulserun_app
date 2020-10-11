@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:meta/meta.dart';
@@ -9,12 +10,14 @@ import 'package:meta/meta.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/result.dart';
 import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/screens/running/running.dart';
@@ -49,6 +52,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
 
   final HeartRateRepository _heartRateRepository;
   final UserRepository _userRepository;
+  final ResultRepository _resultRepository;
 
   RunningBloc(
     this._location,
@@ -57,6 +61,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     this._currentStatusRepository,
     this._heartRateRepository,
     this._userRepository,
+    this._resultRepository,
   ) : super(RunningInitial()) {
     _setupStopWatch();
   }
@@ -132,6 +137,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         print(distance);
         final UserModel userModel = await _userRepository.fetchUser();
         final int targetHR = userModel.targetHeartrate;
+        characteristic.setNotifyValue(true);
         yield RunningWorking(
           positionModel: PositionModel().convertLocToPos(position),
           distance: 0.toDouble(),
@@ -170,6 +176,8 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
 
     if (event is StopRunning) {
       try {
+        ResultModel _resultModel = ResultModel();
+
         yield RunningLoading();
         this.stopwatchTime.asyncMap((event) => null);
         _stop();
@@ -177,10 +185,15 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         String et = await stopwatchTime.first;
         await _runningRepository.setestimatedTime(et);
         await _runningRepository.stop();
+        await _resultRepository.setRef(_runningRepository.gettReference());
+        _resultModel = await _resultRepository.getResult();
+        characteristic.setNotifyValue(false);
         yield RunningResult(
             locationServiceAndTracking: event.locationServiceAndTracking,
-            runningModel: event.runningModel);
+            runningModel: event.runningModel,
+            resultModel: _resultModel);
       } catch (e) {
+        loggerNoStack.e(e.toString());
         yield RunningError('StopRunning Error');
       }
     }

@@ -102,9 +102,11 @@ class RunningDisplayChange extends RunningState {
 class RunningResult extends RunningState {
   final RunningModel runningModel;
   final LocationServiceAndTracking locationServiceAndTracking;
+  final ResultModel resultModel;
   RunningResult({
     this.runningModel,
     this.locationServiceAndTracking,
+    this.resultModel,
   });
 
   @override
@@ -113,12 +115,15 @@ class RunningResult extends RunningState {
 
     return o is RunningResult &&
         o.runningModel == runningModel &&
-        o.locationServiceAndTracking == locationServiceAndTracking;
+        o.locationServiceAndTracking == locationServiceAndTracking &&
+        o.resultModel == resultModel;
   }
 
   @override
   int get hashCode =>
-      runningModel.hashCode ^ locationServiceAndTracking.hashCode;
+      runningModel.hashCode ^
+      locationServiceAndTracking.hashCode ^
+      resultModel.hashCode;
 }
 
 class RunningError extends RunningState {

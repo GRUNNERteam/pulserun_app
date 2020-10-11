@@ -12,6 +12,7 @@ import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
 import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
                   CurrentStatus(),
                   TestHeartRate(),
                   UserDB(),
+                  Result(),
                 )),
         BlocProvider(
           create: (context) => PlanBloc(PlanData(), CurrentStatus()),

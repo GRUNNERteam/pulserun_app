@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 
 class HearRateModel {
   List<HeartRateItem> heartRate;
@@ -17,33 +19,23 @@ class HearRateModel {
     this.heartRate.add(HeartRateItem(hr: add_hr, time: DateTime.now()));
   }
 
+  void set_model(int hr, DateTime time) {
+    if (this.heartRate == null) {
+      this.heartRate = List<HeartRateItem>();
+    }
+    this.heartRate.add(HeartRateItem(hr: hr, time: time));
+  }
+
   void clear() {
     if (this.heartRate != null) {
       this.heartRate.clear();
     }
   }
 
-  HearRateModel copyWith({
-    List<HeartRateItem> heartRate,
-  }) {
-    return HearRateModel(
-      heartRate: heartRate ?? this.heartRate,
-    );
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'heartRate': heartRate?.map((x) => x?.toMap())?.toList(),
     };
-  }
-
-  factory HearRateModel.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
-    return HearRateModel(
-      heartRate: List<HeartRateItem>.from(
-          map['heartRate']?.map((x) => HeartRateItem.fromMap(x))),
-    );
   }
 
   String toJson() => json.encode(toMap());
@@ -63,6 +55,23 @@ class HearRateModel {
 
   @override
   int get hashCode => heartRate.hashCode;
+
+  factory HearRateModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return HearRateModel(
+      heartRate: List<HeartRateItem>.from(
+          map['heartRate']?.map((x) => HeartRateItem.fromMap(x))),
+    );
+  }
+
+  HearRateModel copyWith({
+    List<HeartRateItem> heartRate,
+  }) {
+    return HearRateModel(
+      heartRate: heartRate ?? this.heartRate,
+    );
+  }
 }
 
 class HeartRateItem {

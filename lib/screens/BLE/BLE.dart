@@ -41,6 +41,39 @@ class FindDevicesScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              StreamBuilder<List<BluetoothDevice>>(
+                stream: Stream.periodic(Duration(seconds: 3))
+                    .asyncMap((_) => FlutterBlue.instance.connectedDevices),
+                initialData: [],
+                builder: (c, snapshot) => Column(
+                  children: snapshot.data
+                      .map((d) => ListTile(
+                            title: Text(d.name),
+                            subtitle: Text(d.id.toString()),
+                            trailing: StreamBuilder<BluetoothDeviceState>(
+                              stream: d.state,
+                              initialData: BluetoothDeviceState.disconnected,
+                              builder: (c, snapshot) {
+                                if (snapshot.data ==
+                                    BluetoothDeviceState.connected) {
+                                  return RaisedButton(
+                                    child: Text('OPEN'),
+                                    onPressed: () {
+                                      currentdevice = d;
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DeviceScreen(device: d)));
+                                    },
+                                  );
+                                }
+                                return Text(snapshot.data.toString());
+                              },
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
               StreamBuilder<List<ScanResult>>(
                 stream: FlutterBlue.instance.scanResults,
                 initialData: [],
@@ -102,7 +135,6 @@ class DeviceScreen extends StatelessWidget {
               VoidCallback onPressed;
               String text;
               currentdevice = device;
-
               switch (snapshot.data) {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
@@ -130,102 +162,106 @@ class DeviceScreen extends StatelessWidget {
           )
         ],
       ),
-      body: Container(
-        color: Colors.blueAccent[100],
-        padding: EdgeInsets.all(60),
-        child: Center(
-          child: Column(
-            children: [
-              Text(device.name,
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 40)),
-              StreamBuilder<BluetoothDeviceState>(
-                stream: device.state,
-                builder: (context, snapshot) {
-                  switch (snapshot.data) {
-                    case BluetoothDeviceState.connected:
-                      return Container(
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.blueAccent[100],
+          padding: EdgeInsets.all(60),
+          child: Center(
+            child: Column(
+              children: [
+                Text(device.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 30)),
+                StreamBuilder<BluetoothDeviceState>(
+                  stream: device.state,
+                  builder: (context, snapshot) {
+                    switch (snapshot.data) {
+                      case BluetoothDeviceState.connected:
+                        return Container(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                            child: Card(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              child: Icon(
+                                Icons.bluetooth_connected,
+                                size: 250,
+                                color: Colors.black,
+                              ),
+                            ));
+                        break;
+                      case BluetoothDeviceState.disconnected:
+                        return Container(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                            child: Card(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              child: Icon(
+                                Icons.bluetooth_disabled,
+                                size: 250,
+                                color: Colors.black,
+                              ),
+                            ));
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                ),
+                StreamBuilder<BluetoothDeviceState>(
+                  stream: device.state,
+                  builder: (context, snapshot) {
+                    switch (snapshot.data) {
+                      case BluetoothDeviceState.connected:
+                        return Container(
                           padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
-                          child: Card(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            child: Icon(
-                              Icons.bluetooth_connected,
-                              size: 250,
-                              color: Colors.black,
-                            ),
-                          ));
-
-                      break;
-                    case BluetoothDeviceState.disconnected:
-                      return Container(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
-                          child: Card(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            child: Icon(
-                              Icons.bluetooth_disabled,
-                              size: 250,
-                              color: Colors.black,
-                            ),
-                          ));
-                      break;
-                    default:
-                      break;
-                  }
-                },
-              ),
-              StreamBuilder<BluetoothDeviceState>(
-                stream: device.state,
-                builder: (context, snapshot) {
-                  switch (snapshot.data) {
-                    case BluetoothDeviceState.connected:
-                      return Container(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
-                        child: RaisedButton(
-                          onPressed: () {
-                            discover();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RunningPage()),
-                            );
-                          },
-                          color: Colors.lightGreenAccent,
-                          child: Text(
-                            'RUN',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 90,
+                          child: RaisedButton(
+                            onPressed: () async {
+                              discover();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RunningPage()),
+                              );
+                            },
+                            color: Colors.lightGreenAccent,
+                            child: Text(
+                              'RUN',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 90,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                      break;
+                        );
+                        break;
 
-                    default:
-                      return Container(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
-                        child: RaisedButton(
-                          onPressed: null,
-                          color: Colors.lightGreenAccent,
-                          child: Text(
-                            'RUN',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 90,
+                      default:
+                        return Container(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
+                          child: RaisedButton(
+                            onPressed: null,
+                            color: Colors.lightGreenAccent,
+                            child: Text(
+                              'RUN',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 90,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                      break;
-                  }
-                },
-              ),
-            ],
+                        );
+                        break;
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -261,16 +297,15 @@ Future<bool> discover() async {
   currentdevice.services.forEach((service) {
     service.forEach((c) {
       if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-        c.characteristics.forEach((element) async {
+        c.characteristics.forEach((element) {
           if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
             characteristic = element;
-            await characteristic.setNotifyValue(!characteristic.isNotifying);
-            return true;
           }
         });
       }
     });
   });
+  await characteristic.setNotifyValue(true);
 }
 
 class ScanResultTile extends StatelessWidget {

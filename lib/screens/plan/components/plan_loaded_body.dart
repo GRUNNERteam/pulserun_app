@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/screens/plan/components/planlist_item.dart';
 
@@ -16,6 +19,16 @@ class PlanLoadedBody extends StatefulWidget {
 
 class _PlanLoadedBodyState extends State<PlanLoadedBody> {
   final SlidableController slidableController = SlidableController();
+
+  RaisedButton _button(BuildContext context) {
+    return RaisedButton(
+      child: Text('Create Plan'),
+      onPressed: () {
+        BlocProvider.of<PlanBloc>(context).add(PlanCreatingTrigger());
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -25,37 +38,28 @@ class _PlanLoadedBodyState extends State<PlanLoadedBody> {
             actionPane: SlidableDrawerActionPane(),
             actionExtentRatio: 0.25,
             child: Container(
-              color: Colors.white,
-              child: PlanListItem(
-                name: widget.listPlan[index].planId,
-              ),
-            ),
+                color: Colors.white,
+                child: PlanListItem(
+                  planModel: widget.listPlan[index],
+                )),
             actions: <Widget>[
               IconSlideAction(
-                caption: 'Archive',
+                caption: 'Info',
                 color: Colors.blue,
-                icon: Icons.archive,
-                onTap: () {},
-              ),
-              IconSlideAction(
-                caption: 'Share',
-                color: Colors.indigo,
-                icon: Icons.share,
+                icon: MdiIcons.information,
                 onTap: () {},
               ),
             ],
             secondaryActions: <Widget>[
               IconSlideAction(
-                caption: 'More',
-                color: Colors.black45,
-                icon: Icons.more_horiz,
-                onTap: () {},
-              ),
-              IconSlideAction(
                 caption: 'Delete',
                 color: Colors.red,
-                icon: Icons.delete,
-                onTap: () {},
+                icon: MdiIcons.delete,
+                onTap: () {
+                  BlocProvider.of<PlanBloc>(context).add(
+                    DeletePlan(planId: widget.listPlan[index].planId),
+                  );
+                },
               ),
             ],
           );

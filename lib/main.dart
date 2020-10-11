@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:location/location.dart';
 import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
+import 'package:pulserun_app/bloc/schedule_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
+import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/screens/splash/splash.dart';
 import 'package:pulserun_app/theme/theme.dart';
@@ -43,7 +45,10 @@ class MyApp extends StatelessWidget {
                 )),
         BlocProvider(
           create: (context) => PlanBloc(PlanData(), CurrentStatus()),
-        )
+        ),
+        BlocProvider(
+          create: (context) => ScheduleBloc(ScheduleData(), CurrentStatus()),
+        ),
       ],
       child: FutureBuilder(
         future: Firebase.initializeApp(),

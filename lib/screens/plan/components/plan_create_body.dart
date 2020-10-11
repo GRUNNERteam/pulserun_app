@@ -211,8 +211,7 @@ class _PlanCreateBodyState extends State<PlanCreateBody> {
                       int day = int.parse(value);
                       if (day < 0) {
                         return 'Please fill only positive number';
-                      }
-                      if (day > 2) {
+                      } else if (day > 2) {
                         return 'Maximum day is 2';
                       }
                     } catch (e) {

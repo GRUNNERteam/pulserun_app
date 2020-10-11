@@ -70,9 +70,28 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
           ),
         );
 
-        add(GetPlan());
+        add(GetPlanLists());
       } catch (err) {
         print(err);
+        yield PlanError();
+      }
+    }
+    if (event is PlanCreatingTrigger) {
+      try {
+        yield PlanLoading();
+        yield PlanCreate();
+      } catch (e) {
+        print('Error PlanCreatingTrigger : $e');
+        yield PlanError();
+      }
+    }
+
+    if (event is ShowPlanDetail) {
+      try {
+        yield PlanLoading();
+        yield PlanDetail(event.planModel);
+      } catch (e) {
+        print('Error PlanCreatingTrigger : $e');
         yield PlanError();
       }
     }
@@ -81,8 +100,33 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
       try {
         yield PlanLoading();
         PlanModel plan = await _planRepository.fetchPlan();
-        yield PlanDetail(plan);
+        if (plan == null) {
+          add(PlanCreatingTrigger());
+        } else {
+          yield PlanDetail(plan);
+        }
       } catch (e) {
+        print('Error GetPlanById : $e');
+        yield PlanError();
+      }
+    }
+    if (event is UpdatePlan) {
+      try {
+        yield PlanLoading();
+        await _planRepository.updatePlan(event.planModel);
+        add(GetPlanLists());
+      } catch (e) {
+        print('Error UpdatePlan : $e');
+        yield PlanError();
+      }
+    }
+    if (event is DeletePlan) {
+      try {
+        yield PlanLoading();
+        await _planRepository.deletePlan(event.planId);
+        add(GetPlanLists());
+      } catch (e) {
+        print('Error DeletePlan : $e');
         yield PlanError();
       }
     }

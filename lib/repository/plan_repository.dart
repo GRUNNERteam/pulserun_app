@@ -1,9 +1,14 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/services/database/database.dart';
+import 'package:pulserun_app/services/generates/generate_schedule.dart';
 
 abstract class PlanRepository {
   Future<PlanModel> fetchPlan();
@@ -13,6 +18,8 @@ abstract class PlanRepository {
   Future<void> setRef();
 
   Future<void> createPlan(PlanModel plan);
+  Future<void> deletePlan(String planId);
+  Future<void> updatePlan(PlanModel plan);
 }
 
 class MockUpPlan implements PlanRepository {
@@ -71,14 +78,32 @@ class MockUpPlan implements PlanRepository {
     // TODO: implement fetchPlanLists
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> deletePlan(String planId) {
+    // TODO: implement deletePlan
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updatePlan(PlanModel plan) {
+    // TODO: implement updatePlan
+    throw UnimplementedError();
+  }
 }
 
 class PlanData implements PlanRepository {
   DocumentReference _reference;
+  ScheduleRespository _scheduleRespository = ScheduleData();
+
   @override
   Future<PlanModel> fetchPlan() async {
-    await this.setRef();
     PlanModel plan;
+
+    await this.setRef();
+    if (this._reference == null) {
+      return null;
+    }
 
     await _reference.get().then((snapShot) {
       if (snapShot.exists) {
@@ -113,6 +138,8 @@ class PlanData implements PlanRepository {
     DocumentReference planRef =
         DatabaseService().getUserRef().collection('plan').doc();
     DateTime dob;
+    bool isPlanRefEmpty = true;
+    ScheduleListModel scheduleListModel = ScheduleListModel();
     // Check before create
     try {
       await DatabaseService().getUserRef().get().then((snapShot) {
@@ -132,7 +159,22 @@ class PlanData implements PlanRepository {
           .getUserRef()
           .collection('stat')
           .doc('current')
-          .update({'planRef': planRef});
+          .get()
+          .then((snapshot) {
+        if (snapshot.exists && snapshot.data()['planRef'] != null) {
+          isPlanRefEmpty = false;
+        } else {
+          print('planRef already exists skip update.');
+        }
+      });
+
+      if (isPlanRefEmpty) {
+        await DatabaseService()
+            .getUserRef()
+            .collection('stat')
+            .doc('current')
+            .update({'planRef': planRef});
+      }
 
       print('Updating Normal target heartRate');
 
@@ -142,6 +184,14 @@ class PlanData implements PlanRepository {
         'planId': planRef.id,
         'targetHeartRate': thr.toInt(),
       });
+
+      print('Creating Schedule');
+
+      this._scheduleRespository = new ScheduleData();
+      await this._scheduleRespository.setRef(planRef);
+      await this._scheduleRespository.setPlanModel(plan);
+
+      await this._scheduleRespository.create();
 
       print('Creating Plan successful');
     } catch (e) {
@@ -167,5 +217,77 @@ class PlanData implements PlanRepository {
       }
     });
     return planList;
+  }
+
+  @override
+  Future<void> deletePlan(String planId) async {
+    DocumentReference ref;
+    await DatabaseService()
+        .getUserRef()
+        .collection('plan')
+        .where('planId', isEqualTo: planId)
+        .get()
+        .then((snapshot) {
+      if (snapshot.size > 0) {
+        snapshot.docs.forEach((doc) {
+          if (doc.data()['planId'] == planId) {
+            String tempplanId = doc.data()['planId'];
+            print('Found Plan : $tempplanId');
+
+            ref = doc.reference;
+          }
+        });
+      }
+    });
+
+    if (ref != null) {
+      await DatabaseService()
+          .getUserRef()
+          .collection('stat')
+          .doc('current')
+          .get()
+          .then((snapshot) {
+        if (snapshot.data()['planRef'] == ref) {
+          DatabaseService()
+              .getUserRef()
+              .collection('stat')
+              .doc('current')
+              .update(
+            {
+              'planRef': null,
+            },
+          );
+        }
+      });
+
+      await ref.delete();
+    }
+  }
+
+  @override
+  Future<void> updatePlan(PlanModel plan) async {
+    DocumentReference ref;
+    await DatabaseService()
+        .getUserRef()
+        .collection('plan')
+        .where('planId', isEqualTo: plan.planId)
+        .get()
+        .then((snapshot) {
+      if (snapshot.size > 0) {
+        snapshot.docs.forEach((doc) {
+          if (doc.data()['planId'] == plan.planId) {
+            String tempplanId = doc.data()['planId'];
+            print('Found Plan : $tempplanId');
+
+            ref = doc.reference;
+          }
+        });
+      }
+    });
+
+    if (ref != null) {
+      print(ref.toString());
+      await ref.update(plan.toMap());
+    }
   }
 }

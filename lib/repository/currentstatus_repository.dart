@@ -12,6 +12,7 @@ abstract class CurrentStatusRepository {
 
   Future<void> updateDistance(double value);
   Future<void> updateUserHW(double height, double weight);
+  Future<DocumentReference> getPlanRef();
 }
 
 class CurrentStatus implements CurrentStatusRepository {
@@ -45,8 +46,6 @@ class CurrentStatus implements CurrentStatusRepository {
             'status': data.status,
           });
         }
-
-        print(data.toString());
       } else {
         // init value
         _reference.set(
@@ -95,5 +94,18 @@ class CurrentStatus implements CurrentStatusRepository {
       'height': height.toDouble(),
     });
     print('Update Weight and Height complete');
+  }
+
+  @override
+  Future<DocumentReference> getPlanRef() async {
+    final CurrentStatusModel currentStatusModel =
+        await this.fetchCurrentStatus();
+
+    if (currentStatusModel.planRef == null) {
+      print('planRef currently on null');
+      return null;
+    } else {
+      return currentStatusModel.planRef;
+    }
   }
 }

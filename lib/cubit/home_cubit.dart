@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';

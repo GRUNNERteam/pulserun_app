@@ -52,15 +52,69 @@ class ScheduleData implements ScheduleRespository {
   }
 
   @override
-  Future<ScheduleModel> fetch() {
-    // TODO: implement fetch
-    throw UnimplementedError();
+  Future<ScheduleModel> fetch() async {
+    ScheduleModel scheduleModel;
+
+    // fetch CurrentDay
+
+    // where search in firebase
+    final DateTime start = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(start);
+    final DateTime end = DateTime.parse(formatted).add(Duration(days: 1));
+
+    await this
+        ._collectionReference
+        .where(
+          'ts',
+          isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(
+            start.millisecondsSinceEpoch,
+          ),
+        )
+        .where(
+          'ts',
+          isLessThan: Timestamp.fromMillisecondsSinceEpoch(
+            end.millisecondsSinceEpoch,
+          ),
+        )
+        .orderBy('ts')
+        .limit(1)
+        .get()
+        .then((collectionSnapShot) {
+          if (collectionSnapShot.size > 0) {
+            scheduleModel =
+                ScheduleModel.fromMap(collectionSnapShot.docs.first.data());
+          }
+        })
+        .then(
+          (_) => print('Fetch today schedule is done'),
+        )
+        .catchError(
+          (err) => print('Fetch today schedule ERROR : $err'),
+        );
+
+    return scheduleModel;
   }
 
   @override
   Future<ScheduleListModel> fetchLists() async {
-    ScheduleListModel scheduleListModel;
+    if (this._collectionReference == null) {
+      print('ScheduleRespository : _collectionReference is null');
+      return null;
+    }
 
+    ScheduleListModel scheduleListModel;
+    List<ScheduleModel> lists = [];
+
+    await this._collectionReference.get().then((docSnapShot) {
+      if (docSnapShot.size > 0) {
+        docSnapShot.docs.forEach((snapShot) {
+          lists.add(ScheduleModel.fromMap(snapShot.data()));
+        });
+      }
+    });
+
+    scheduleListModel = ScheduleListModel(scheduleList: lists);
     return scheduleListModel;
   }
 

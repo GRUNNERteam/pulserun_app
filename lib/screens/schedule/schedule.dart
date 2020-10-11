@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pulserun_app/bloc/schedule_bloc.dart';
+import 'package:pulserun_app/components/widgets/error_widget.dart';
+import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/models/plan.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/services/generates/generate_schedule.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,24 +22,6 @@ class _SchedulePageState extends State<SchedulePage>
   Map<DateTime, List> _events;
   List _selectedEvents;
   AnimationController _animationController;
-
-  void _loadEvents() async {
-    GenerateScheduleService generateScheduleService = GenerateScheduleService();
-    PlanRepository planRepository = PlanData();
-    planRepository.setRef();
-    PlanModel plan = await planRepository.fetchPlan();
-    print(plan.toString());
-    // List<Map<DateTime, List>> lists =
-    //     generateScheduleService.generateScheduleMonthly(plan);
-    Map<DateTime, List> e = {};
-    // lists.forEach((element) {
-    //   e.addAll(element);
-    // });
-
-    setState(() {
-      this._events = e;
-    });
-  }
 
   Widget _buildEventList() {
     if (_selectedEvents == null) {
@@ -108,12 +95,52 @@ class _SchedulePageState extends State<SchedulePage>
     print('CALLBACK: _onCalendarCreated');
   }
 
+  Widget _tableCalendar() {
+    return TableCalendar(
+      events: _events,
+      startingDayOfWeek: StartingDayOfWeek.sunday,
+      availableGestures: AvailableGestures.all,
+      initialCalendarFormat: CalendarFormat.week,
+      calendarController: _calendarController,
+      initialSelectedDay: DateTime.now(),
+      locale: 'en_US',
+      onDaySelected: _onDaySelected,
+      onVisibleDaysChanged: _onVisibleDaysChanged,
+      onCalendarCreated: _onCalendarCreated,
+      builders: CalendarBuilders(
+        markersBuilder: (context, date, events, holidays) {
+          final children = <Widget>[];
+
+          if (events.isNotEmpty) {
+            children.add(
+              Positioned(
+                right: 1,
+                bottom: 1,
+                child: _buildEventsMarker(date, events),
+              ),
+            );
+          }
+
+          if (holidays.isNotEmpty) {
+            children.add(
+              Positioned(
+                right: -2,
+                top: -2,
+                child: _buildHolidaysMarker(),
+              ),
+            );
+          }
+
+          return children;
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     final _selectedDay = DateTime.now();
-
-    _loadEvents();
 
     _calendarController = CalendarController();
     _animationController = AnimationController(
@@ -134,56 +161,34 @@ class _SchedulePageState extends State<SchedulePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Schedule Page'),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          TableCalendar(
-            events: _events,
-            startingDayOfWeek: StartingDayOfWeek.sunday,
-            availableGestures: AvailableGestures.all,
-            initialCalendarFormat: CalendarFormat.week,
-            calendarController: _calendarController,
-            initialSelectedDay: DateTime.now(),
-            locale: 'en_US',
-            onDaySelected: _onDaySelected,
-            onVisibleDaysChanged: _onVisibleDaysChanged,
-            onCalendarCreated: _onCalendarCreated,
-            builders: CalendarBuilders(
-              markersBuilder: (context, date, events, holidays) {
-                final children = <Widget>[];
-
-                if (events.isNotEmpty) {
-                  children.add(
-                    Positioned(
-                      right: 1,
-                      bottom: 1,
-                      child: _buildEventsMarker(date, events),
-                    ),
-                  );
-                }
-
-                if (holidays.isNotEmpty) {
-                  children.add(
-                    Positioned(
-                      right: -2,
-                      top: -2,
-                      child: _buildHolidaysMarker(),
-                    ),
-                  );
-                }
-
-                return children;
-              },
+    return BlocBuilder<ScheduleBloc, ScheduleState>(
+      builder: (context, state) {
+        print(state);
+        if (state is ScheduleInitial) {
+          BlocProvider.of<ScheduleBloc>(context).add(GetScheduleList());
+          return LoadingWidget();
+        } else if (state is ScheduleLoading) {
+          return LoadingWidget();
+        } else if (state is ScheduleLoadded) {
+          /// loaded from bloc
+          this._events = state.mapCalendar;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Schedule Page'),
             ),
-          ),
-          SizedBox(height: 8.0),
-          Expanded(child: _buildEventList()),
-        ],
-      ),
+            body: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                _tableCalendar(),
+                SizedBox(height: 8.0),
+                Expanded(child: _buildEventList()),
+              ],
+            ),
+          );
+        } else {
+          return ShowErrorWidget();
+        }
+      },
     );
   }
 }

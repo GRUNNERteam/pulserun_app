@@ -295,19 +295,22 @@ class BluetoothOffScreen extends StatelessWidget {
 // ignore: missing_return
 Future<bool> discover() async {
   service = await currentdevice.discoverServices();
-  currentdevice.services.forEach((service) {
-    service.forEach((c) {
-      if (c.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
-        c.characteristics.forEach((element) async {
-          if (element.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
-            characteristic = element;
-            await element.setNotifyValue(true);
-            await characteristic.setNotifyValue(true);
-            loggerNoStack.i(characteristic.isNotifying.toString());
-          }
-        });
-      }
-    });
+  service.forEach((s) async {
+    if (s.uuid.toString().toUpperCase().substring(4, 8) == "180D") {
+      s.characteristics.forEach((c) async {
+        if (c.uuid.toString().toUpperCase().substring(4, 8) == "2A37") {
+          characteristic = c;
+          loggerNoStack.i(
+              characteristic.isNotifying.toString(), 'characteristic');
+          await characteristic.setNotifyValue(true);
+          characteristic.descriptors.forEach((element) {
+            loggerNoStack.i(element.uuid.toString());
+          });
+          loggerNoStack.i(
+              characteristic.isNotifying.toString(), 'characteristic');
+        }
+      });
+    }
   });
 }
 

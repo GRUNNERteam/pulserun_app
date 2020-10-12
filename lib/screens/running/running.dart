@@ -378,49 +378,6 @@ class _RunningPageState extends State<RunningPage> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      children: <Widget>[
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(18),
-                                ),
-                                color: Color(0xff232d37)),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 18.0, left: 12.0, top: 24, bottom: 12),
-                              child: LineChart(
-                                showAvg ? avgData() : mainData(resultModel),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 60,
-                          height: 34,
-                          child: FlatButton(
-                            onPressed: () {
-                              setState(() {
-                                showAvg = !showAvg;
-                              });
-                            },
-                            child: Text(
-                              'avg',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: showAvg
-                                      ? Colors.white.withOpacity(0.5)
-                                      : Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
                     child: RaisedButton(
                       child: Text('Return to Home'),
                       onPressed: () {
@@ -526,9 +483,7 @@ class _RunningPageState extends State<RunningPage> {
                                             .split(']')
                                             .first
                                             .toString()));
-
-                                        if (heartRateModel.heartRate.isEmpty) {
-                                          loggerNoStack.i("message");
+                                        if (heartRateModel.heartRate == null) {
                                           heartRateModel.add_model(value);
                                         } else if (DateFormat.jms()
                                                 .format(new DateTime.now()) !=
@@ -718,60 +673,6 @@ class _RunningPageState extends State<RunningPage> {
                       ),
                     ),
                   ),
-                  /*Center(
-                    child: Container(
-                      color: Colors.blue[100],
-                      padding: EdgeInsets.all(30.0),
-                      child: StreamBuilder(
-                        stream: characteristic.value,
-                        initialData: characteristic.lastValue,
-                        builder: (c, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Text('Loading');
-                          } else if (snapshot.hasError)
-                            return Text('ERROR');
-                          else if (snapshot.data
-                                  .toString()
-                                  .split(',')
-                                  .last
-                                  .split(']')
-                                  .first
-                                  .toString() ==
-                              '[') {
-                            return Text(tZone);
-                          } else if (snapshot.hasData) {
-                            check = int.parse((snapshot.data
-                                .toString()
-                                .split(',')
-                                .last
-                                .split(']')
-                                .first
-                                .toString()));
-                            zone = (100 * check) / thr;
-                            if (zone >= 100) {
-                              tZone = 'Dangerous slowdown or rest';
-                            } else if (zone >= 90 && zone < 100) {
-                              tZone = 'Zone 5';
-                            } else if (zone >= 80 && zone < 90) {
-                              tZone = 'Zone 4';
-                            } else if (zone >= 70 && zone < 80) {
-                              tZone = 'Zone 3';
-                            } else if (zone >= 60 && zone < 70) {
-                              tZone = 'Zone 2';
-                            } else if (zone >= 50 && zone < 60) {
-                              tZone = 'Zone 1';
-                            } else if (zone < 50) {
-                              tZone = 'Speed Up';
-                            } else
-                              tZone = 'Loading';
-
-                            return Text(tZone);
-                          }
-                          return Text("Loading");
-                        },
-                      ),
-                    ),
-                  ),*/
                 ],
               ),
             ),
@@ -916,13 +817,19 @@ class _RunningPageState extends State<RunningPage> {
                 children: [
                   Container(
                     padding: EdgeInsets.only(top: 60),
-                    height: 300,
-                    width: 300,
-                    child: RaisedButton(
-                      color: Colors.red.shade100,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(200),
+                    height: 200,
+                    width: 250,
+                    child: GFButton(
+                      text: "START",
+                      textStyle: TextStyle(fontSize: 35),
+                      shape: GFButtonShape.pills,
+                      icon: Icon(
+                        Icons.play_arrow,
+                        size: 80,
+                        color: Colors.red,
                       ),
+                      fullWidthButton: true,
+                      type: GFButtonType.solid,
                       onPressed: () {
                         if (currentdevice == null) {
                           showCupertinoModalPopup(
@@ -954,242 +861,12 @@ class _RunningPageState extends State<RunningPage> {
                               .add(StartRunning());
                         }
                       },
-                      child: ColorizeAnimatedTextKit(
-                        text: ["Start"],
-                        textStyle: TextStyle(
-                          fontSize: 50.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        colors: [
-                          Colors.purple,
-                          Colors.blue,
-                          Colors.yellow,
-                          Colors.red,
-                        ],
-                        repeatForever: true,
-                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  LineChartData mainData(ResultModel resultModel) {
-    List<FlSpot> data = List<FlSpot>();
-    List<int> hrList = List<int>();
-    List<int> timeList = List<int>();
-    data.clear();
-    resultModel.totalHeartrate.heartRate.forEach((element) {
-      data.add(FlSpot(element.hr.toDouble(), element.time.second.toDouble()));
-      hrList.add(element.hr.toInt());
-      timeList.add(element.time.second.toInt());
-    });
-
-    return LineChartData(
-      gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 22,
-          getTextStyles: (value) => const TextStyle(
-              color: Color(0xff68737d),
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
-          getTitles: (value) {
-            /*for (int i = 0; i <= timeList.reduce(max); i++) {
-              return i.toString();
-            }*/
-            return value.toString();
-            /*switch (value.toInt()) {
-              case 2:
-                return 'MAR';
-              case 5:
-                return 'JUN';
-              case 8:
-                return 'SEP';
-            }
-            return timeList.reduce(min).toString();*/
-          },
-          margin: 8,
-        ),
-        leftTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (value) => const TextStyle(
-            color: Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            /* switch (value.toInt()) {
-              case 1:
-                return '10k';
-              case 3:
-                return '30k';
-              case 5:
-                return '50k';
-            }
-            */
-            return hrList.reduce(min).toString();
-          },
-          reservedSize: 28,
-          margin: 12,
-        ),
-      ),
-      borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: hrList.reduce(min).toDouble(),
-      maxX: hrList.reduce(max).toDouble(),
-      minY: timeList.reduce(min).toDouble(),
-      maxY: timeList.reduce(max).toDouble(),
-      lineBarsData: [
-        LineChartBarData(
-          spots: data,
-          isCurved: true,
-          colors: gradientColors,
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            colors:
-                gradientColors.map((color) => color.withOpacity(0.3)).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Color> gradientColors = [
-    const Color(0xff23b6e6),
-    const Color(0xff02d39a),
-  ];
-  bool showAvg = false;
-
-  LineChartData avgData() {
-    return LineChartData(
-      lineTouchData: LineTouchData(enabled: false),
-      gridData: FlGridData(
-        show: true,
-        drawHorizontalLine: true,
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 22,
-          getTextStyles: (value) => const TextStyle(
-              color: Color(0xff68737d),
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 2:
-                return 'test';
-              case 5:
-                return 'JUN';
-              case 8:
-                return 'SEP';
-            }
-            return '';
-          },
-          margin: 8,
-        ),
-        leftTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (value) => const TextStyle(
-            color: Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return '10k';
-              case 3:
-                return '30k';
-              case 5:
-                return '50k';
-            }
-            return '';
-          },
-          reservedSize: 28,
-          margin: 12,
-        ),
-      ),
-      borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 0,
-      maxX: 11,
-      minY: 0,
-      maxY: 6,
-      lineBarsData: [
-        LineChartBarData(
-          spots: [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-            FlSpot(4.9, 3.44),
-            FlSpot(6.8, 3.44),
-            FlSpot(8, 3.44),
-            FlSpot(9.5, 3.44),
-            FlSpot(11, 3.44),
-          ],
-          isCurved: true,
-          colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2),
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2),
-          ],
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(show: true, colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)
-                .withOpacity(0.1),
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)
-                .withOpacity(0.1),
-          ]),
         ),
       ],
     );

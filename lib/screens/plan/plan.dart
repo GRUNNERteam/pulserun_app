@@ -4,6 +4,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:pulserun_app/bloc/plan_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/screens/plan/components/plan_create_body.dart';
 import 'package:pulserun_app/screens/plan/components/plan_detail.dart';
 import 'package:pulserun_app/screens/plan/components/plan_loaded_body.dart';
@@ -32,6 +33,13 @@ class _PlanPageState extends State<PlanPage> {
             key: _scaffoldKey,
             appBar: AppBar(
               title: Text('Plan Lists'),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  BlocProvider.of<HomeCubit>(context).getUser();
+                  Navigator.pop(context);
+                },
+              ),
               actions: <Widget>[
                 IconButton(
                   icon: Icon(MdiIcons.plus),

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:pulserun_app/models/heartrate.dart';
 

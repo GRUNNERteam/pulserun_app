@@ -9,7 +9,6 @@ import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pulserun_app/screens/plan/components/plan_detail.dart';
 
 part 'plan_event.dart';
 part 'plan_state.dart';

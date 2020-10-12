@@ -1,7 +1,5 @@
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pulserun_app/repository/plan_repository.dart';
 
 import 'package:pulserun_app/screens/running/running.dart';
 

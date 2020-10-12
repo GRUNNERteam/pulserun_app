@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
-import 'package:pulserun_app/screens/running/running.dart';
 
 class HearRateModel {
   List<HeartRateItem> heartRate;

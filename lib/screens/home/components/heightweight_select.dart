@@ -32,89 +32,87 @@ class _HeightWeightSelectBoxState extends State<HeightWeightSelectBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(8),
+        height: MediaQuery.of(context).size.height * 0.8,
+        width: MediaQuery.of(context).size.width,
         child: Container(
-          padding: EdgeInsets.all(8),
-          height: MediaQuery.of(context).size.height * 0.8,
-          width: MediaQuery.of(context).size.width,
-          child: Container(
-            width: double.infinity,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  Text('Please Fill Height and Weight'),
-                  TextFormField(
-                    controller: _height,
-                    decoration: const InputDecoration(
-                      icon: Icon(MdiIcons.humanMaleHeight),
-                      hintText: 'Fill between 1-275',
-                      labelText: 'Your height in CM ?',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please fill Height';
-                      }
-                      try {
-                        print(value);
-                        double valueDouble = double.parse(value);
-                        if (valueDouble < 1.0 || valueDouble > 275.0) {
-                          return 'Please Fill Between 1-275';
-                        }
-                      } catch (err) {
-                        return 'Invalid height';
-                      }
-
-                      return null;
-                    },
+          width: double.infinity,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                Text('Please Fill Height and Weight'),
+                TextFormField(
+                  controller: _height,
+                  decoration: const InputDecoration(
+                    icon: Icon(MdiIcons.humanMaleHeight),
+                    hintText: 'Fill between 1-275',
+                    labelText: 'Your height in CM ?',
                   ),
-                  TextFormField(
-                    controller: _weight,
-                    decoration: const InputDecoration(
-                      icon: Icon(MdiIcons.weightKilogram),
-                      hintText: 'Fill between 1-200',
-                      labelText: 'Your height in KG ?',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please fill Weight';
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please fill Height';
+                    }
+                    try {
+                      print(value);
+                      double valueDouble = double.parse(value);
+                      if (valueDouble < 1.0 || valueDouble > 275.0) {
+                        return 'Please Fill Between 1-275';
                       }
-                      try {
-                        print(value);
-                        double valueDouble = double.parse(value);
-                        if (valueDouble < 1.0 || valueDouble > 200) {
-                          return 'Please Fill Between 1-200';
-                        }
-                      } catch (err) {
-                        return 'Invalid Weight';
-                      }
+                    } catch (err) {
+                      return 'Invalid height';
+                    }
 
-                      return null;
-                    },
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _weight,
+                  decoration: const InputDecoration(
+                    icon: Icon(MdiIcons.weightKilogram),
+                    hintText: 'Fill between 1-200',
+                    labelText: 'Your height in KG ?',
                   ),
-                  RaisedButton(
-                    child: Text('Update'),
-                    onPressed: () {
-                      if (_formKey.currentState.validate() != null) {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Processing Data'),
-                          ),
-                        );
-                        double h = double.parse(_height.value.text);
-                        double w = double.parse(_weight.value.text);
-                        BlocProvider.of<HomeCubit>(context).updateUser(
-                          height: h,
-                          weight: w,
-                        );
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please fill Weight';
+                    }
+                    try {
+                      print(value);
+                      double valueDouble = double.parse(value);
+                      if (valueDouble < 1.0 || valueDouble > 200) {
+                        return 'Please Fill Between 1-200';
                       }
-                    },
-                  )
-                ],
-              ),
+                    } catch (err) {
+                      return 'Invalid Weight';
+                    }
+
+                    return null;
+                  },
+                ),
+                RaisedButton(
+                  child: Text('Update'),
+                  onPressed: () {
+                    if (_formKey.currentState.validate() != null) {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Processing Data'),
+                        ),
+                      );
+                      double h = double.parse(_height.value.text);
+                      double w = double.parse(_weight.value.text);
+                      BlocProvider.of<HomeCubit>(context).updateUser(
+                        height: h,
+                        weight: w,
+                      );
+                    }
+                  },
+                )
+              ],
             ),
           ),
         ),

@@ -817,13 +817,19 @@ class _RunningPageState extends State<RunningPage> {
                 children: [
                   Container(
                     padding: EdgeInsets.only(top: 60),
-                    height: 300,
-                    width: 300,
-                    child: RaisedButton(
-                      color: Colors.red.shade100,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(200),
+                    height: 200,
+                    width: 250,
+                    child: GFButton(
+                      text: "START",
+                      textStyle: TextStyle(fontSize: 35),
+                      shape: GFButtonShape.pills,
+                      icon: Icon(
+                        Icons.play_arrow,
+                        size: 80,
+                        color: Colors.red,
                       ),
+                      fullWidthButton: true,
+                      type: GFButtonType.solid,
                       onPressed: () {
                         if (currentdevice == null) {
                           showCupertinoModalPopup(
@@ -855,20 +861,6 @@ class _RunningPageState extends State<RunningPage> {
                               .add(StartRunning());
                         }
                       },
-                      child: ColorizeAnimatedTextKit(
-                        text: ["Start"],
-                        textStyle: TextStyle(
-                          fontSize: 50.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        colors: [
-                          Colors.purple,
-                          Colors.blue,
-                          Colors.yellow,
-                          Colors.red,
-                        ],
-                        repeatForever: true,
-                      ),
                     ),
                   ),
                 ],

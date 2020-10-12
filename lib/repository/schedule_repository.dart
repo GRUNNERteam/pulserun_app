@@ -57,9 +57,10 @@ class ScheduleData implements ScheduleRespository {
     // fetch CurrentDay
 
     // where search in firebase
-    final DateTime start = DateTime.now();
+    final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String formatted = formatter.format(start);
+    final String formatted = formatter.format(now);
+    final DateTime start = DateTime.parse(formatted);
     final DateTime end = DateTime.parse(formatted).add(Duration(days: 1));
 
     await this
@@ -80,6 +81,11 @@ class ScheduleData implements ScheduleRespository {
         .limit(1)
         .get()
         .then((collectionSnapShot) {
+          // collectionSnapShot.docs.forEach((element) {
+          //   element.data().forEach((key, value) {
+          //     print('key : $key | value : $value');
+          //   });
+          // });
           if (collectionSnapShot.size > 0) {
             scheduleModel =
                 ScheduleModel.fromMap(collectionSnapShot.docs.first.data());

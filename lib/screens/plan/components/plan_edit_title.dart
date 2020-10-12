@@ -28,7 +28,7 @@ class _EditTitlePlanDialogState extends State<EditTitlePlanDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Title Edit'),
+      title: Text('Rename Title'),
       content: TextField(
         controller: _textEditingController,
         decoration: InputDecoration(

@@ -9,11 +9,23 @@ class BottomCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-        child: Text('Createing Plan'),
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.0),
+          side: BorderSide(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        child: Text(
+          'Create Plan'.toUpperCase(),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => PlanPage()));
-          BlocProvider.of<HomeCubit>(context).emptyPlan();
         });
   }
 }

@@ -16,11 +16,13 @@ class HomeLoading extends HomeState {
 class HomeLoaded extends HomeState {
   final CurrentStatusModel currentStatusModel;
   final UserModel userModel;
+  final ScheduleModel scheduleModel;
   // final ScheduleModel scheduleModel;
   const HomeLoaded(
     // this.scheduleModel,
     this.currentStatusModel,
     this.userModel,
+    this.scheduleModel,
   );
 
   @override
@@ -28,6 +30,29 @@ class HomeLoaded extends HomeState {
     if (identical(this, o)) return true;
 
     return o is HomeLoaded &&
+        o.currentStatusModel == currentStatusModel &&
+        o.userModel == userModel &&
+        o.scheduleModel == scheduleModel;
+  }
+
+  @override
+  int get hashCode =>
+      currentStatusModel.hashCode ^ userModel.hashCode ^ scheduleModel.hashCode;
+}
+
+class HomeEmptyPlan extends HomeState {
+  final CurrentStatusModel currentStatusModel;
+  final UserModel userModel;
+  HomeEmptyPlan({
+    this.currentStatusModel,
+    this.userModel,
+  });
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is HomeEmptyPlan &&
         o.currentStatusModel == currentStatusModel &&
         o.userModel == userModel;
   }

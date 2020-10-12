@@ -258,6 +258,7 @@ class _PlanCreateBodyState extends State<PlanCreateBody> {
                       planModel: plan,
                     ),
                   );
+                  BlocProvider.of<HomeCubit>(context).getUser();
                 },
               )
             ],

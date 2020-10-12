@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pulserun_app/bloc/plan_bloc.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/screens/plan/components/planlist_item.dart';
 
@@ -59,6 +60,8 @@ class _PlanLoadedBodyState extends State<PlanLoadedBody> {
                   BlocProvider.of<PlanBloc>(context).add(
                     DeletePlan(planId: widget.listPlan[index].planId),
                   );
+
+                  BlocProvider.of<HomeCubit>(context).getUser();
                 },
               ),
             ],

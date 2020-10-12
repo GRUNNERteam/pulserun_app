@@ -32,7 +32,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => HomeCubit(UserDB(), CurrentStatus())),
+        BlocProvider(
+            create: (context) => HomeCubit(
+                  UserDB(),
+                  CurrentStatus(),
+                  PlanData(),
+                )),
         BlocProvider(
             create: (context) => RunningBloc(
                   Location(),

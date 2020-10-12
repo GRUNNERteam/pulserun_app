@@ -17,79 +17,11 @@ abstract class PlanRepository {
 
   Future<void> setRef();
 
+  Future<ScheduleModel> fetchTodaySchedule();
+
   Future<void> createPlan(PlanModel plan);
   Future<void> deletePlan(String planId);
   Future<void> updatePlan(PlanModel plan);
-}
-
-class MockUpPlan implements PlanRepository {
-  final DocumentReference _reference =
-      DatabaseService().getUserRef().collection('plan').doc('0');
-  @override
-  Future<PlanModel> fetchPlan() async {
-    // ref doc zero for mockup plan
-
-    int planid = 0;
-    DocumentReference _ref = DatabaseService()
-        .getUserRef()
-        .collection('plan')
-        .doc(planid.toString());
-
-    PlanModel data;
-
-    await _ref.get().then((snapshot) async {
-      if (snapshot.exists) {
-        data = PlanModel.fromMap(snapshot.data());
-      } else {
-        UserRepository userRepository = UserDB();
-        UserModel userModel = await userRepository.fetchUser();
-
-        // Createing Plan
-
-        // data = PlanModel(
-        //     planId: planid, targetHeartRate: 180, start: DateTime.now());
-
-        _ref.set(data.toMap());
-      }
-    });
-
-    return data;
-  }
-
-  @override
-  Future<DocumentReference> getRef() async {
-    return this._reference;
-  }
-
-  @override
-  Future<void> createPlan(PlanModel plan) {
-    // TODO: implement createPlan
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> setRef() {
-    // TODO: implement setRef
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<PlanModel>> fetchPlanLists() {
-    // TODO: implement fetchPlanLists
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deletePlan(String planId) {
-    // TODO: implement deletePlan
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> updatePlan(PlanModel plan) {
-    // TODO: implement updatePlan
-    throw UnimplementedError();
-  }
 }
 
 class PlanData implements PlanRepository {
@@ -289,5 +221,14 @@ class PlanData implements PlanRepository {
       print(ref.toString());
       await ref.update(plan.toMap());
     }
+  }
+
+  @override
+  Future<ScheduleModel> fetchTodaySchedule() async {
+    if (_reference == null) {
+      await this.setRef();
+    }
+    await this._scheduleRespository.setRef(this._reference);
+    return await this._scheduleRespository.fetch();
   }
 }

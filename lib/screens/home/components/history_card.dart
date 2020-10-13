@@ -43,10 +43,10 @@ class historyCard extends StatelessWidget {
           padding: EdgeInsets.all(8),
           child: Column(
             children: <Widget>[
-              Text('Time'),
-              Text('Distance'),
-              Text('Avg.Heartrate'),
-              Text('Status'),
+              Text('Time: ' + this.time + " Min"),
+              Text('Distance: ' + this.distance + " KM"),
+              Text('Avg.HR: ' + this.avgHeartrate + " BPM"),
+              //Text('Status'),
             ],
           ),
         ),

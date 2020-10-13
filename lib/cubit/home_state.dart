@@ -17,12 +17,14 @@ class HomeLoaded extends HomeState {
   final CurrentStatusModel currentStatusModel;
   final UserModel userModel;
   final ScheduleModel scheduleModel;
+  final List<ResultModel> historyModel;
   // final ScheduleModel scheduleModel;
   const HomeLoaded(
     // this.scheduleModel,
     this.currentStatusModel,
     this.userModel,
     this.scheduleModel,
+    this.historyModel,
   );
 
   @override
@@ -32,12 +34,16 @@ class HomeLoaded extends HomeState {
     return o is HomeLoaded &&
         o.currentStatusModel == currentStatusModel &&
         o.userModel == userModel &&
-        o.scheduleModel == scheduleModel;
+        o.scheduleModel == scheduleModel &&
+        o.historyModel == historyModel;
   }
 
   @override
   int get hashCode =>
-      currentStatusModel.hashCode ^ userModel.hashCode ^ scheduleModel.hashCode;
+      currentStatusModel.hashCode ^
+      userModel.hashCode ^
+      scheduleModel.hashCode ^
+      historyModel.hashCode;
 }
 
 class HomeEmptyPlan extends HomeState {

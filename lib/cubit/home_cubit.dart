@@ -1,12 +1,17 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 
 import 'package:pulserun_app/models/currentstatus.dart';
+
+import 'package:pulserun_app/models/result.dart';
 import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
+import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 
 part 'home_state.dart';
 
@@ -14,10 +19,15 @@ class HomeCubit extends Cubit<HomeState> {
   final UserRepository _userRepository;
   final CurrentStatusRepository _currentStatusRepository;
   final PlanRepository _planRepository;
+  final ResultRepository _resultRepository;
+  List<ResultModel> historyModel;
+
   HomeCubit(
     this._userRepository,
     this._currentStatusRepository,
     this._planRepository,
+    this._resultRepository,
+    this.historyModel,
   ) : super(HomeInitial());
 
   Future<void> getUser() async {
@@ -39,7 +49,7 @@ class HomeCubit extends Cubit<HomeState> {
         final ScheduleModel scheduleModel =
             await _planRepository.fetchTodaySchedule();
         print(scheduleModel.toString());
-        emit(HomeLoaded(currentstatus, user, scheduleModel
+        emit(HomeLoaded(currentstatus, user, scheduleModel, historyModel
             // scheduleModel,
             ));
       }
@@ -94,6 +104,7 @@ class HomeCubit extends Cubit<HomeState> {
         currentstatus,
         user,
         scheduleModel,
+        historyModel,
       ));
     } catch (err) {
       emit(HomeError('ChangeBottomNav Error'));

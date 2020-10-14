@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,8 +10,11 @@ import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
 import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/models/result.dart';
+import 'package:pulserun_app/models/running.dart';
 import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/models/user.dart';
+import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:pulserun_app/screens/home/components/bottomcard_widget.dart';
 import 'package:pulserun_app/screens/home/components/dob_select.dart';
@@ -32,15 +36,54 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _indexHotbar = 1;
+  PlanRepository _planRepository;
+  List<ResultModel> historyModel;
+
+  Future<void> getHistory() async {
+    List<DocumentReference> id = List<DocumentReference>();
+    //id.clear();
+    //historyModel = List<ResultModel>();
+    //historyModel.clear();
+    await _planRepository.setRef();
+    DocumentReference ref = await _planRepository.getRef();
+    await ref
+        .collection('run')
+        .orderBy('startTime', descending: true)
+        .limit(5)
+        .get()
+        .then((collectionrun) {
+      collectionrun.docs.forEach((element) async {
+        loggerNoStack.i(RunningModel.fromMap(element.data()));
+        id.add(element.reference);
+      });
+    });
+    id = id.map((e) => e.collection('result').doc('result')).toList();
+    historyModel = new List<ResultModel>(id.length);
+    for (int i = 0; i < id.length; i++) {
+      id[i].get().then((value) async {
+        for (int j = 0; j < id.length; j++) {
+          if (id[j].path.toString() == value.reference.path.toString()) {
+            historyModel[j] = ResultModel.fromMap(value.data());
+            loggerNoStack.i(historyModel.last.totalTime);
+          }
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
       print(state);
+      loggerNoStack.i(state);
       if (state is HomeInitial) {
         BlocProvider.of<HomeCubit>(context).getUser(); // trigger to load data
+        _planRepository = PlanData();
+        historyModel = List<ResultModel>();
+        getHistory();
         return LoadingWidget();
       } else if (state is HomeLoading) {
+        getHistory();
         return LoadingWidget();
       } else if (state is HomeEmptyPlan) {
         return Scaffold(
@@ -78,7 +121,7 @@ class _HomePageState extends State<HomePage> {
           drawer: _menu(),
           bottomNavigationBar: _buildBottomNavBar(index: _indexHotbar),
           body: _body(context, state.currentStatusModel, state.userModel,
-              state.scheduleModel),
+              state.scheduleModel, historyModel),
         );
         //return _body(context, state.currentStatusModel, state.userModel);
       } else {
@@ -89,7 +132,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _body(BuildContext context, CurrentStatusModel status, UserModel user,
-      ScheduleModel scheduleModel) {
+      ScheduleModel scheduleModel, List<ResultModel> historyModel) {
+    List<historyCard> histoytCard = List<historyCard>();
+    if (historyModel != null) {
+      for (int i = 0; i < historyModel.length; i++) {
+        histoytCard.add(historyCard(
+          avgHeartrate:
+              historyModel[i].avgHearRate.toStringAsFixed(2).toString(),
+          distance:
+              historyModel[i].totalDdistance.toStringAsFixed(2).toString(),
+          time: historyModel[i].totalTime.toString(),
+        ));
+      }
+    }
     return Stack(
       children: <Widget>[
         Column(
@@ -181,13 +236,19 @@ class _HomePageState extends State<HomePage> {
                       height: 200,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
-                        children: <Widget>[
+                        children: histoytCard,
+                        /* <Widget>[
+                          /*historyCard(
+                            avgHeartrate:
+                                historyModel[0].avgHearRate.toString(),
+                            distance: historyModel[0].totalDdistance.toString(),
+                            time: historyModel[0].totalTime.toString(),
+                          ),*/
+                          /*historyCard(),
                           historyCard(),
                           historyCard(),
-                          historyCard(),
-                          historyCard(),
-                          historyCard(),
-                        ],
+                          historyCard(),*/
+                        ],*/
                       ),
                     ),
                     SizedBox(

@@ -18,7 +18,7 @@ import 'package:pulserun_app/models/result.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:slider_button/slider_button.dart';
 import 'package:getwidget/getwidget.dart';
 
@@ -723,6 +723,8 @@ class _RunningPageState extends State<RunningPage> {
 
   Widget _buildbodyPlan(
       BuildContext context, CurrentStatusModel stat, PlanModel plan) {
+    String nameP;
+    if (plan.name == null) nameP = "UnTitled";
     return Stack(
       children: <Widget>[
         Container(
@@ -736,12 +738,13 @@ class _RunningPageState extends State<RunningPage> {
         Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              //padding: const EdgeInsets.all(12.0,),
+              padding: EdgeInsets.fromLTRB(10, 60, 10, 0),
               child: Container(
-                height: 300,
+                height: 350,
                 decoration: BoxDecoration(
                     color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.5),
@@ -754,13 +757,27 @@ class _RunningPageState extends State<RunningPage> {
                   children: <Widget>[
                     Center(
                       child: Container(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Plan Infomation',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade400,
+                        padding: EdgeInsets.only(top: 10),
+                        child: Card(
+                          color: Colors.orangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: Container(
+                            width: 400,
+                            height: 50,
+                            child: Column(
+                              children: [
+                                Center(
+                                    child: Container(
+                                  padding: EdgeInsets.only(top: 13),
+                                  child: Text("Plan",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20)),
+                                ))
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -769,101 +786,256 @@ class _RunningPageState extends State<RunningPage> {
                       height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(0.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Column(
                             children: [
-                              Text('plan Id'),
-                              Text(plan.planId.toString()),
+                              Card(
+                                color: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Container(
+                                  width: 115,
+                                  height: 100,
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                          child: Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Container(
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Text("Plan",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15)),
+                                              ),
+                                              Container(
+                                                child: Text(nameP,
+                                                    style: TextStyle(
+                                                        fontSize: 15)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           Column(
                             children: [
-                              Text('target hr'),
-                              Text(plan.targetHeartRate.toString()),
+                              Card(
+                                color: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Container(
+                                  width: 115,
+                                  height: 100,
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                          child: Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Container(
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Text("Target HR",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15)),
+                                              ),
+                                              Container(
+                                                child: Text(
+                                                    plan.targetHeartRate
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        fontSize: 15)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              /*Text('target hr'),
+                              Text(plan.targetHeartRate.toString()),*/
                             ],
                           ),
                           Column(
                             children: [
-                              Text('Current BMI'),
-                              Text(stat.bmi.toStringAsFixed(2)),
+                              Card(
+                                color: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Container(
+                                  width: 115,
+                                  height: 100,
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                          child: Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Container(
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Text("Current BMI",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14)),
+                                              ),
+                                              Container(
+                                                child: Text(
+                                                    stat.bmi.toStringAsFixed(2),
+                                                    style: TextStyle(
+                                                        fontSize: 15)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              /*Text('Current BMI'),
+                              Text(stat.bmi.toStringAsFixed(2)),*/
                             ],
                           ),
                         ],
                       ),
                     ),
                     SizedBox(
-                      height: 60,
+                      height: 25,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Text('Need To Run'),
-                            Text('2 KM.'),
-                          ],
-                        ),
-                      ],
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            children: <Widget>[
+                              Card(
+                                color: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Container(
+                                  width: 350,
+                                  height: 100,
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                          child: Container(
+                                        padding: EdgeInsets.only(top: 13),
+                                        child: Container(
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Text("Need To Run",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15)),
+                                              ),
+                                              Container(
+                                                child: Text('2 KM.',
+                                                    style: TextStyle(
+                                                        fontSize: 15)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              /*Text('Need To Run'),
+                              Text('2 KM.'),*/
+                            ],
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),
               ),
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 60),
-                    height: 200,
-                    width: 250,
-                    child: GFButton(
-                      text: "START",
-                      textStyle: TextStyle(fontSize: 35),
-                      shape: GFButtonShape.pills,
-                      icon: Icon(
-                        Icons.play_arrow,
-                        size: 80,
-                        color: Colors.red,
-                      ),
-                      fullWidthButton: true,
-                      type: GFButtonType.solid,
-                      onPressed: () {
-                        if (currentdevice == null) {
-                          showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) => CupertinoActionSheet(
-                              title: Text("Please Select Your Device"),
-                              actions: [
-                                CupertinoActionSheetAction(
+            Container(
+              padding: EdgeInsets.all(50),
+              child: Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 60),
+                      height: 200,
+                      width: 250,
+                      child: GFButton(
+                        text: "START",
+                        textStyle: TextStyle(fontSize: 35),
+                        shape: GFButtonShape.pills,
+                        icon: Icon(
+                          Icons.directions_run,
+                          size: 80,
+                          color: Colors.red,
+                        ),
+                        fullWidthButton: true,
+                        type: GFButtonType.solid,
+                        onPressed: () {
+                          if (currentdevice == null) {
+                            showCupertinoModalPopup(
+                              context: context,
+                              builder: (context) => CupertinoActionSheet(
+                                title: Text("Please Select Your Device"),
+                                actions: [
+                                  CupertinoActionSheetAction(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => BLE()));
+                                    },
+                                    child: Text("Select Device"),
+                                    isDefaultAction: true,
+                                  ),
+                                ],
+                                cancelButton: CupertinoActionSheetAction(
                                   onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => BLE()));
+                                    Navigator.pop(context);
                                   },
-                                  child: Text("Select Device"),
-                                  isDefaultAction: true,
+                                  child: Text("cancel"),
                                 ),
-                              ],
-                              cancelButton: CupertinoActionSheetAction(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("cancel"),
                               ),
-                            ),
-                          );
-                        } else {
-                          BlocProvider.of<RunningBloc>(context)
-                              .add(StartRunning());
-                        }
-                      },
+                            );
+                          } else {
+                            BlocProvider.of<RunningBloc>(context)
+                                .add(StartRunning());
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

@@ -33,6 +33,37 @@ class FindDevicesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Find Devices'),
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 0.0),
+              child: FlatButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: new Text("Guide for Device"),
+                        content: Text(
+                            "1.Find your device that tracking\n\n2.Connect and start your device to tracking when connect tap run button to start to run\n\nIf can not find device \n-try to dicconnect form your phone and then connect by use this app\n-try check your device setting to allow connect form another app\n"),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text("Close"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: Icon(
+                  Icons.info,
+                  size: 50.0,
+                  color: Colors.white,
+                ),
+              )),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () =>
@@ -142,7 +173,6 @@ class DeviceScreen extends StatelessWidget {
                 case BluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
                   text = 'CONNECT';
-
                   break;
                 default:
                   onPressed = null;
@@ -164,7 +194,7 @@ class DeviceScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Container(
-          color: Colors.blueAccent[100],
+          //color: Colors.blueAccent[100],
           padding: EdgeInsets.all(60),
           child: Center(
             child: Column(
@@ -181,7 +211,7 @@ class DeviceScreen extends StatelessWidget {
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
                             child: Card(
-                              color: Colors.white,
+                              color: Colors.blueAccent[100],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
@@ -197,7 +227,7 @@ class DeviceScreen extends StatelessWidget {
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(0, 60, 0, 0),
                             child: Card(
-                              color: Colors.white,
+                              color: Colors.blueAccent[100],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50.0),
                               ),

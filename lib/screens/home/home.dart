@@ -393,7 +393,7 @@ class _menu extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(MdiIcons.calendarToday),
-            title: Text('Today'),
+            title: Text('Device'),
             onTap: () {
               BlocProvider.of<PlanBloc>(context).add(GetPlanLists());
               Navigator.push(

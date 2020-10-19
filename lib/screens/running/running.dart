@@ -15,6 +15,7 @@ import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/result.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
@@ -721,10 +722,10 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyPlan(
-      BuildContext context, CurrentStatusModel stat, PlanModel plan) {
+  Widget _buildbodyPlan(BuildContext context, CurrentStatusModel stat,
+      PlanModel plan, ScheduleModel schedule) {
     String nameP;
-    if (plan.name == null) nameP = "UnTitled";
+    if (plan.name == null) nameP = "Untitled";
     return Stack(
       children: <Widget>[
         Container(

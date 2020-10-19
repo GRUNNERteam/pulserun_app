@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/running.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
 import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/result_repository.dart';
+import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 
 String idR;
@@ -28,10 +30,13 @@ class RunningData extends RunningRepository {
   final CurrentStatusRepository _currentStatusRepository = CurrentStatus();
   final HeartRateRepository _heartRateRepository = TestHeartRate();
   final ResultRepository _resultRepository = Result();
+  final ScheduleRespository _scheduleRespository = ScheduleData();
+
   RunningModel _runningModel;
   DocumentReference _reference;
   HearRateModel hrm = HearRateModel();
   RunningModel hrtd = RunningModel();
+  ScheduleModel _scheduleModel;
 
   DateTime startTime;
 
@@ -61,6 +66,10 @@ class RunningData extends RunningRepository {
         RunningModel(runId: this._reference.id, startTime: DateTime.now());
     await this._reference.set(this._runningModel.toMap());
     loggerNoStack.i(this._reference.path.toString());
+    // set Plan Ref for schedule
+    await this._scheduleRespository.setRef(await this._planRepository.getRef());
+    this._scheduleModel = await this._scheduleRespository.fetch();
+
     // Location
     this
         ._locationRepository
@@ -72,6 +81,11 @@ class RunningData extends RunningRepository {
   @override
   Future<RunningModel> stop() async {
     final double disT = await this._locationRepository.getDistance();
+
+    // Schedule change
+    this._scheduleModel.isDone = true;
+    await this._scheduleRespository.update(this._scheduleModel);
+
     await this._heartRateRepository.init(this._reference);
     await this._heartRateRepository.addDB();
     await this._runningModel.setendTime();

@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
                   TestHeartRate(),
                   UserDB(),
                   Result(),
+                  ScheduleData(),
                 )),
         BlocProvider(
           create: (context) => PlanBloc(PlanData(), CurrentStatus()),

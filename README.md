@@ -12,5 +12,5 @@ This is senior project at ISNECMU2020
 
 ### Author
 
-Sompob Keawkhwankri
-Sophon Sriunjan
+- Sompob Keawkhwankri
+- Sophon Sriunjan

@@ -27,12 +27,24 @@ class TodayScheduleReminder extends StatelessWidget {
       child: Center(
         child: Column(
           children: <Widget>[
+<<<<<<< HEAD
             Text('Schedule'),
             Expanded(
               child: (scheduleModel.isRestDay == null
                   ? _restDay(scheduleModel)
                   : _runningDay(scheduleModel)),
             ),
+=======
+            Text(
+              'Schedule Today',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            (scheduleModel.isRestDay == null
+                ? _restDay(scheduleModel)
+                : _runningDay(scheduleModel)),
+>>>>>>> a35b0ae5c19d14235696191b0343e6522a009283
           ],
         ),
       ),
@@ -41,19 +53,46 @@ class TodayScheduleReminder extends StatelessWidget {
 
   Widget _runningDay(ScheduleModel scheduleModel) {
     String distance = scheduleModel.goalModel.distance != null
+<<<<<<< HEAD
         ? scheduleModel.goalModel.distance.toStringAsFixed(3).toString()
         : 'Any';
 
+=======
+        ? scheduleModel.goalModel.distance.toStringAsFixed(2)
+        : 'Not Set';
+>>>>>>> a35b0ae5c19d14235696191b0343e6522a009283
     String step = scheduleModel.goalModel.step != null
         ? scheduleModel.goalModel.step.toString()
-        : 'Any';
+        : 'Not Set';
     format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-    String time = format(scheduleModel.goalModel.time.durationTime());
+    String time = format(scheduleModel.goalModel.time.durationTime().abs());
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
+<<<<<<< HEAD
         Text('Distance : $distance' + ' KM'),
         Text(', Step : $step'),
         Text(', Time : $time'),
+=======
+        Column(
+          children: [
+            Text('Distance'),
+            Text('$distance KM'),
+          ],
+        ),
+        Column(
+          children: [
+            Text('Step'),
+            Text('$step'),
+          ],
+        ),
+        Column(
+          children: [
+            Text('Time'),
+            Text('$time'),
+          ],
+        ),
+>>>>>>> a35b0ae5c19d14235696191b0343e6522a009283
       ],
     );
   }

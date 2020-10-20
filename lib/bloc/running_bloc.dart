@@ -10,6 +10,7 @@ import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/result.dart';
 import 'package:pulserun_app/models/running.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/models/user.dart';
 import 'package:pulserun_app/repository/currentstatus_repository.dart';
 import 'package:pulserun_app/repository/heartrate_repository.dart';
@@ -17,6 +18,7 @@ import 'package:pulserun_app/repository/location_repository.dart';
 import 'package:pulserun_app/repository/plan_repository.dart';
 import 'package:pulserun_app/repository/result_repository.dart';
 import 'package:pulserun_app/repository/running_repository.dart';
+import 'package:pulserun_app/repository/schedule_repository.dart';
 import 'package:pulserun_app/repository/user_repository.dart';
 import 'package:pulserun_app/screens/running/running.dart';
 import 'package:rxdart/rxdart.dart';
@@ -46,6 +48,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
       BehaviorSubject<String>.seeded('00:00:00');
 
   final PlanRepository _planRepository;
+  final ScheduleRespository _scheduleRespository;
   final CurrentStatusRepository _currentStatusRepository;
 
   final HeartRateRepository _heartRateRepository;
@@ -60,6 +63,7 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
     this._heartRateRepository,
     this._userRepository,
     this._resultRepository,
+    this._scheduleRespository,
   ) : super(RunningInitial()) {
     _setupStopWatch();
   }
@@ -96,7 +100,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         yield RunningLoading();
         final plan = await _planRepository.fetchPlan();
         final stat = await _currentStatusRepository.fetchCurrentStatus();
-        yield RunningLoaded(plan, stat, user);
+        await this._scheduleRespository.setRef(stat.planRef);
+        final schdeule = await _scheduleRespository.fetch();
+        yield RunningLoaded(plan, stat, user, schdeule);
       } catch (e) {
         yield RunningError('Can not get Plan and CurrentStatus');
       }

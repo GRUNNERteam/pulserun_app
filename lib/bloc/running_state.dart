@@ -17,11 +17,13 @@ class RunningLoaded extends RunningState {
   final PlanModel planModel;
   final CurrentStatusModel currentStatusModel;
   final UserModel userModel;
+  final ScheduleModel scheduleModel;
 
   const RunningLoaded(
     this.planModel,
     this.currentStatusModel,
     this.userModel,
+    this.scheduleModel,
   );
 
   @override
@@ -30,11 +32,18 @@ class RunningLoaded extends RunningState {
 
     return o is RunningLoaded &&
         o.planModel == planModel &&
-        o.currentStatusModel == currentStatusModel;
+        o.currentStatusModel == currentStatusModel &&
+        o.userModel == userModel &&
+        o.scheduleModel == scheduleModel;
   }
 
   @override
-  int get hashCode => planModel.hashCode ^ currentStatusModel.hashCode;
+  int get hashCode {
+    return planModel.hashCode ^
+        currentStatusModel.hashCode ^
+        userModel.hashCode ^
+        scheduleModel.hashCode;
+  }
 }
 
 class RunningWorking extends RunningState {

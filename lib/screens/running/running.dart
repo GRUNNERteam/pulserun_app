@@ -10,11 +10,13 @@ import 'package:intl/intl.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
 import 'package:pulserun_app/models/plan.dart';
 import 'package:pulserun_app/models/result.dart';
+import 'package:pulserun_app/models/schedule.dart';
 import 'package:pulserun_app/screens/BLE/BLE.dart';
 import 'package:logger/logger.dart';
 import 'package:pulserun_app/screens/home/home.dart';
@@ -179,8 +181,8 @@ class _RunningPageState extends State<RunningPage> {
               this._markers.clear();
               this._polylineCoordinates.clear();
               this._polylines.clear();
-              return _buildbodyPlan(
-                  context, state.currentStatusModel, state.planModel);
+              return _buildbodyPlan(context, state.currentStatusModel,
+                  state.planModel, state.scheduleModel);
             } else if (state is RunningWorking) {
               return _buildbodyRunning(
                   context,
@@ -381,6 +383,8 @@ class _RunningPageState extends State<RunningPage> {
                     child: RaisedButton(
                       child: Text('Return to Home'),
                       onPressed: () {
+                        // trigger home
+                        BlocProvider.of<HomeCubit>(context).getUser();
                         BlocProvider.of<RunningBloc>(context)
                             .add(GetPlanAndStat());
                         Navigator.push(
@@ -721,10 +725,10 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
-  Widget _buildbodyPlan(
-      BuildContext context, CurrentStatusModel stat, PlanModel plan) {
+  Widget _buildbodyPlan(BuildContext context, CurrentStatusModel stat,
+      PlanModel plan, ScheduleModel schedule) {
     String nameP;
-    if (plan.name == null) nameP = "UnTitled";
+    if (plan.name == null) nameP = "Untitled";
     return Stack(
       children: <Widget>[
         Container(

@@ -78,7 +78,7 @@ class _SchedulePageState extends State<SchedulePage>
     );
   }
 
-  void _onDaySelected(DateTime day, List events) {
+  void _onDaySelected(DateTime day, List events, List holiday) {
     print('CALLBACK: _onDaySelected');
     setState(() {
       _selectedEvents = events;

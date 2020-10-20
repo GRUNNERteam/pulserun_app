@@ -181,8 +181,8 @@ class _RunningPageState extends State<RunningPage> {
               this._markers.clear();
               this._polylineCoordinates.clear();
               this._polylines.clear();
-              return _buildbodyPlan(
-                  context, state.currentStatusModel, state.planModel);
+              return _buildbodyPlan(context, state.currentStatusModel,
+                  state.planModel, state.scheduleModel);
             } else if (state is RunningWorking) {
               return _buildbodyRunning(
                   context,

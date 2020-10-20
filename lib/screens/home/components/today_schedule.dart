@@ -28,9 +28,11 @@ class TodayScheduleReminder extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Text('Schedule'),
-            (scheduleModel.isRestDay == null
-                ? _restDay(scheduleModel)
-                : _runningDay(scheduleModel)),
+            Expanded(
+              child: (scheduleModel.isRestDay == null
+                  ? _restDay(scheduleModel)
+                  : _runningDay(scheduleModel)),
+            ),
           ],
         ),
       ),
@@ -39,8 +41,9 @@ class TodayScheduleReminder extends StatelessWidget {
 
   Widget _runningDay(ScheduleModel scheduleModel) {
     String distance = scheduleModel.goalModel.distance != null
-        ? scheduleModel.goalModel.distance.toString()
+        ? scheduleModel.goalModel.distance.toStringAsFixed(3).toString()
         : 'Any';
+
     String step = scheduleModel.goalModel.step != null
         ? scheduleModel.goalModel.step.toString()
         : 'Any';
@@ -48,9 +51,9 @@ class TodayScheduleReminder extends StatelessWidget {
     String time = format(scheduleModel.goalModel.time.durationTime());
     return Row(
       children: <Widget>[
-        Text('Distance : $distance'),
-        Text('Step : $step'),
-        Text('Time : $time'),
+        Text('Distance : $distance' + ' KM'),
+        Text(', Step : $step'),
+        Text(', Time : $time'),
       ],
     );
   }

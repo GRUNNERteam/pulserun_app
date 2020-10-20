@@ -332,6 +332,7 @@ Future<bool> discover() async {
           loggerNoStack.i(
               characteristic.isNotifying.toString(), 'characteristic');
           await characteristic.setNotifyValue(true);
+          await c.setNotifyValue(true);
           characteristic.descriptors.forEach((element) {
             loggerNoStack.i(element.uuid.toString());
           });

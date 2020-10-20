@@ -24,29 +24,53 @@ class GenerateScheduleService {
     int restDay = planModel.breakDay;
 
     // not add goal yet
-    for (int i = 0; i < 7; i++) {
-      if (restDay > 0) {
-        if (i == 4 || i == 6) {
-          lists.add(
-            ScheduleModel(
-              calendarModel: ScheduleCalendarModel(
-                appointment: planModel.start.add(
+
+    for (int j = 0; j < 4; j++) {
+      restDay = planModel.breakDay;
+      for (int i = 0; i < 7; i++) {
+        if (restDay > 0) {
+          if (i == 4 || i == 6) {
+            lists.add(
+              ScheduleModel(
+                calendarModel: ScheduleCalendarModel(
+                  appointment: planModel.start.add(
+                    Duration(
+                      days: i,
+                    ),
+                  ),
+                  events: ['Rest Day'],
+                ),
+                isRestDay: true,
+                isDone: true,
+                ts: planModel.start.add(
                   Duration(
                     days: i,
                   ),
                 ),
-                events: ['Rest Day'],
               ),
-              isRestDay: true,
-              isDone: true,
-              ts: planModel.start.add(
-                Duration(
-                  days: i,
+            );
+            restDay--;
+          } else {
+            lists.add(
+              ScheduleModel(
+                calendarModel: ScheduleCalendarModel(
+                  appointment: planModel.start.add(
+                    Duration(
+                      days: i,
+                    ),
+                  ),
+                  events: ['Running Day'],
+                ),
+                isRestDay: false,
+                isDone: false,
+                ts: planModel.start.add(
+                  Duration(
+                    days: i,
+                  ),
                 ),
               ),
-            ),
-          );
-          restDay--;
+            );
+          }
         } else {
           lists.add(
             ScheduleModel(
@@ -68,26 +92,6 @@ class GenerateScheduleService {
             ),
           );
         }
-      } else {
-        lists.add(
-          ScheduleModel(
-            calendarModel: ScheduleCalendarModel(
-              appointment: planModel.start.add(
-                Duration(
-                  days: i,
-                ),
-              ),
-              events: ['Running Day'],
-            ),
-            isRestDay: false,
-            isDone: false,
-            ts: planModel.start.add(
-              Duration(
-                days: i,
-              ),
-            ),
-          ),
-        );
       }
     }
 

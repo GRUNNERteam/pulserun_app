@@ -124,9 +124,46 @@ class ScheduleData implements ScheduleRespository {
   }
 
   @override
-  Future<void> update(ScheduleModel scheduleModel) {
-    // TODO: implement update
-    throw UnimplementedError();
+  Future<void> update(ScheduleModel scheduleModel) async {
+    // update current schedule
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(now);
+    final DateTime start = DateTime.parse(formatted);
+    final DateTime end = DateTime.parse(formatted).add(Duration(days: 1));
+
+    await this
+        ._collectionReference
+        .where(
+          'ts',
+          isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(
+            start.millisecondsSinceEpoch,
+          ),
+        )
+        .where(
+          'ts',
+          isLessThan: Timestamp.fromMillisecondsSinceEpoch(
+            end.millisecondsSinceEpoch,
+          ),
+        )
+        .orderBy('ts')
+        .limit(1)
+        .get()
+        .then((collectionSnapShot) async {
+          if (collectionSnapShot.size > 0) {
+            await collectionSnapShot.docs.first.reference.update(
+              scheduleModel.toMap(),
+            );
+          } else {
+            print('Not found schedule');
+          }
+        })
+        .then(
+          (_) => print('Update today schedule is done'),
+        )
+        .catchError(
+          (err) => print('Update today schedule ERROR : $err'),
+        );
   }
 
   @override

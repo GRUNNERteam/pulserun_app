@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:pulserun_app/bloc/running_bloc.dart';
 import 'package:pulserun_app/components/widgets/error_widget.dart';
 import 'package:pulserun_app/components/widgets/loading_widget.dart';
+import 'package:pulserun_app/cubit/home_cubit.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
 import 'package:pulserun_app/models/heartrate.dart';
 import 'package:pulserun_app/models/localtion.dart';
@@ -382,6 +383,8 @@ class _RunningPageState extends State<RunningPage> {
                     child: RaisedButton(
                       child: Text('Return to Home'),
                       onPressed: () {
+                        // trigger home
+                        BlocProvider.of<HomeCubit>(context).getUser();
                         BlocProvider.of<RunningBloc>(context)
                             .add(GetPlanAndStat());
                         Navigator.push(

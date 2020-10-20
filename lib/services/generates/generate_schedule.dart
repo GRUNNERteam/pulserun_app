@@ -25,6 +25,8 @@ class GenerateScheduleService {
 
     // not add goal yet
 
+    int dayCount = 0;
+
     for (int j = 0; j < 4; j++) {
       restDay = planModel.breakDay;
       for (int i = 0; i < 7; i++) {
@@ -44,7 +46,7 @@ class GenerateScheduleService {
                 isDone: true,
                 ts: planModel.start.add(
                   Duration(
-                    days: i,
+                    days: dayCount,
                   ),
                 ),
               ),
@@ -56,7 +58,7 @@ class GenerateScheduleService {
                 calendarModel: ScheduleCalendarModel(
                   appointment: planModel.start.add(
                     Duration(
-                      days: i,
+                      days: dayCount,
                     ),
                   ),
                   events: ['Running Day'],
@@ -65,7 +67,7 @@ class GenerateScheduleService {
                 isDone: false,
                 ts: planModel.start.add(
                   Duration(
-                    days: i,
+                    days: dayCount,
                   ),
                 ),
               ),
@@ -77,7 +79,7 @@ class GenerateScheduleService {
               calendarModel: ScheduleCalendarModel(
                 appointment: planModel.start.add(
                   Duration(
-                    days: i,
+                    days: dayCount,
                   ),
                 ),
                 events: ['Running Day'],
@@ -86,12 +88,13 @@ class GenerateScheduleService {
               isDone: false,
               ts: planModel.start.add(
                 Duration(
-                  days: i,
+                  days: dayCount,
                 ),
               ),
             ),
           );
         }
+        dayCount++;
       }
     }
 

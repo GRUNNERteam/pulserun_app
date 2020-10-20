@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage> {
   Widget _body(BuildContext context, CurrentStatusModel status, UserModel user,
       ScheduleModel scheduleModel, List<ResultModel> historyModel) {
     List<historyCard> histoytCard = List<historyCard>();
-    if (historyModel != null) {
+    /*if (historyModel != null) {
       for (int i = 0; i < historyModel.length; i++) {
         histoytCard.add(historyCard(
           avgHeartrate:
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
           time: historyModel[i].totalTime.toString(),
         ));
       }
-    }
+    }*/
     return Stack(
       children: <Widget>[
         Column(

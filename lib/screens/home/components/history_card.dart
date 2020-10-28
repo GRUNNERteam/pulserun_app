@@ -1,22 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:pulserun_app/models/result.dart';
+import 'package:pulserun_app/models/running.dart';
 
 class historyCard extends StatelessWidget {
   final String time;
   final String distance;
   final String avgHeartrate;
-  final String status;
-  final DocumentReference ref;
-
-  const historyCard(
-      {Key key,
-      this.time,
-      this.distance,
-      this.avgHeartrate,
-      this.status,
-      this.ref})
-      : super(key: key);
+  final ResultModel resultModel;
+  final RunningModel runningModel;
+  const historyCard({
+    Key key,
+    this.time,
+    this.distance,
+    this.avgHeartrate,
+    this.resultModel,
+    this.runningModel,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,6 @@ class historyCard extends StatelessWidget {
               Text('Time: ' + this.time + " Min"),
               Text('Distance: ' + this.distance + " KM"),
               Text('Avg.HR: ' + this.avgHeartrate + " BPM"),
-              //Text('Status'),
             ],
           ),
         ),
@@ -67,7 +67,26 @@ class historyCard extends StatelessWidget {
           padding: EdgeInsets.all(8),
           child: RaisedButton(
             child: Text('More details'),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: new Text('Details'),
+                  content: ListView(
+                    children: <Widget>[
+                      // TODO: Add More Details
+                      Text(resultModel.totalTime),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("Close"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),

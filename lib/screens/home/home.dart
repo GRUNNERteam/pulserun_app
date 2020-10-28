@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   int _indexHotbar = 1;
   PlanRepository _planRepository;
   List<ResultModel> historyModel;
+  List<RunningModel> runningModel;
 
   Future<void> getHistory() async {
     List<DocumentReference> id = List<DocumentReference>();
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
         .get()
         .then((collectionrun) {
       collectionrun.docs.forEach((element) async {
+        runningModel.add(RunningModel.fromMap(element.data()));
         loggerNoStack.i(RunningModel.fromMap(element.data()));
         id.add(element.reference);
       });
@@ -136,13 +138,17 @@ class _HomePageState extends State<HomePage> {
     List<historyCard> histoytCard = List<historyCard>();
     if (historyModel != null) {
       for (int i = 0; i < historyModel.length; i++) {
-        histoytCard.add(historyCard(
-          avgHeartrate:
-              historyModel[i].avgHearRate.toStringAsFixed(2).toString(),
-          distance:
-              historyModel[i].totalDdistance.toStringAsFixed(2).toString(),
-          time: historyModel[i].totalTime.toString(),
-        ));
+        histoytCard.add(
+          historyCard(
+            avgHeartrate:
+                historyModel[i].avgHearRate.toStringAsFixed(2).toString(),
+            distance:
+                historyModel[i].totalDdistance.toStringAsFixed(2).toString(),
+            time: historyModel[i].totalTime.toString(),
+            runningModel: runningModel[i],
+            resultModel: historyModel[i],
+          ),
+        );
       }
     }
     return Stack(

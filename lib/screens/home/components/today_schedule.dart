@@ -23,7 +23,7 @@ class TodayScheduleReminder extends StatelessWidget {
           ),
         ],
       ),
-      height: 80,
+      height: 90,
       child: Center(
         child: Column(
           children: <Widget>[

@@ -169,6 +169,7 @@ class DeviceScreen extends StatelessWidget {
                 case BluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
                   text = 'DISCONNECT';
+                  discover();
                   break;
                 case BluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
@@ -332,6 +333,7 @@ Future<bool> discover() async {
           loggerNoStack.i(
               characteristic.isNotifying.toString(), 'characteristic');
           await characteristic.setNotifyValue(true);
+          await c.setNotifyValue(true);
           characteristic.descriptors.forEach((element) {
             loggerNoStack.i(element.uuid.toString());
           });
@@ -341,6 +343,7 @@ Future<bool> discover() async {
       });
     }
   });
+  await characteristic.setNotifyValue(true);
 }
 
 class ScanResultTile extends StatelessWidget {

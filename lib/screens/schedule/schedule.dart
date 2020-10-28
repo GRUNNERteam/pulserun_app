@@ -104,7 +104,7 @@ class _SchedulePageState extends State<SchedulePage>
       calendarController: _calendarController,
       initialSelectedDay: DateTime.now(),
       locale: 'en_US',
-      onDaySelected: _onDaySelected,
+      //onDaySelected: _onDaySelected,
       onVisibleDaysChanged: _onVisibleDaysChanged,
       onCalendarCreated: _onCalendarCreated,
       builders: CalendarBuilders(

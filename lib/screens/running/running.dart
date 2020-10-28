@@ -380,7 +380,29 @@ class _RunningPageState extends State<RunningPage> {
                     ),
                   ),
                   Container(
-                    child: RaisedButton(
+                    child: GFButton(
+                      onPressed: () {
+                        BlocProvider.of<HomeCubit>(context).getUser();
+                        BlocProvider.of<RunningBloc>(context)
+                            .add(GetPlanAndStat());
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomePage()));
+                      },
+                      text: "HOME",
+                      textStyle:
+                          const TextStyle(fontSize: 32, color: GFColors.DARK),
+                      icon: Icon(
+                        Icons.home,
+                        size: 60,
+                        color: Colors.greenAccent,
+                      ),
+                      type: GFButtonType.solid,
+                      fullWidthButton: true,
+                      size: 70,
+                    ),
+                    /*RaisedButton(
                       child: Text('Return to Home'),
                       onPressed: () {
                         // trigger home
@@ -392,7 +414,7 @@ class _RunningPageState extends State<RunningPage> {
                             MaterialPageRoute(
                                 builder: (context) => HomePage()));
                       },
-                    ),
+                    ),*/
                   ),
                 ],
               ),
@@ -462,7 +484,7 @@ class _RunningPageState extends State<RunningPage> {
                                       color: Colors.red,
                                     ),
                                   ),
-                                  StreamBuilder(
+                                  StreamBuilder<List<int>>(
                                     stream: characteristic.value,
                                     initialData: characteristic.lastValue,
                                     builder: (c, snapshot) {
@@ -478,7 +500,7 @@ class _RunningPageState extends State<RunningPage> {
                                               .first
                                               .toString() ==
                                           '[') {
-                                        return Text(value.toString() + ' BPM');
+                                        // return Text(value.toString() + ' BPM');
                                       } else if (snapshot.hasData) {
                                         value = int.parse((snapshot.data
                                             .toString()
@@ -496,7 +518,7 @@ class _RunningPageState extends State<RunningPage> {
                                                     .heartRate.last.time)) {
                                           heartRateModel.add_model(value);
                                         }
-                                        return Text(value.toString() + ' BPM');
+                                        // return Text(value.toString() + ' BPM');
                                       }
                                       return Text(value.toString() + ' BPM');
                                     },

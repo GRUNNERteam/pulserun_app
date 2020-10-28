@@ -71,6 +71,17 @@ class FindDevicesScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              Card(
+                color: Colors.greenAccent,
+                child: Container(
+                  child: ListTile(
+                    title: Text(
+                        "Find device to connecting for tracking heart rate",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 25)),
+                  ),
+                ),
+              ),
               StreamBuilder<List<BluetoothDevice>>(
                 stream: Stream.periodic(Duration(seconds: 3))
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),

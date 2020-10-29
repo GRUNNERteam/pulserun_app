@@ -984,7 +984,10 @@ class _RunningPageState extends State<RunningPage> {
                                                         fontSize: 15)),
                                               ),
                                               Container(
-                                                child: Text('2 KM.',
+                                                child: Text(
+                                                    schedule.goalModel.distance
+                                                            .toString() +
+                                                        ' KM.',
                                                     style: TextStyle(
                                                         fontSize: 15)),
                                               ),

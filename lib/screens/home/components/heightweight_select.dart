@@ -74,7 +74,7 @@ class _HeightWeightSelectBoxState extends State<HeightWeightSelectBox> {
                   decoration: const InputDecoration(
                     icon: Icon(MdiIcons.weightKilogram),
                     hintText: 'Fill between 1-200',
-                    labelText: 'Your height in KG ?',
+                    labelText: 'Your weight in KG ?',
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {

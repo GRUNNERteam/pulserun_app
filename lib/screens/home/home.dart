@@ -42,11 +42,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getHistory() async {
     List<DocumentReference> id = List<DocumentReference>();
-    //id.clear();
-    //historyModel = List<ResultModel>();
-    //historyModel.clear();
+    runningModel = List<RunningModel>();
+    id.clear();
+    historyModel = List<ResultModel>();
+    historyModel.clear();
     await _planRepository.setRef();
     DocumentReference ref = await _planRepository.getRef();
+    loggerNoStack.i(ref.path);
     await ref
         .collection('run')
         .orderBy('startTime', descending: true)
@@ -55,10 +57,13 @@ class _HomePageState extends State<HomePage> {
         .then((collectionrun) {
       collectionrun.docs.forEach((element) async {
         runningModel.add(RunningModel.fromMap(element.data()));
-        loggerNoStack.i(RunningModel.fromMap(element.data()));
+        loggerNoStack.i(runningModel.last.runId.toString());
+
+        //loggerNoStack.i(RunningModel.fromMap(element.data()));
         id.add(element.reference);
       });
     });
+
     id = id.map((e) => e.collection('result').doc('result')).toList();
     historyModel = new List<ResultModel>(id.length);
     for (int i = 0; i < id.length; i++) {

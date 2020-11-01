@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +30,8 @@ List<BluetoothService> service;
 BluetoothService heartrate;
 BluetoothCharacteristic characteristic;
 HearRateModel heartRateModel = HearRateModel();
-
+int touchedIndex;
+List<int> zonecount;
 List<int> hr = List<int>.generate(10, (i) => i + 1);
 
 var logger = Logger(
@@ -402,19 +404,27 @@ class _RunningPageState extends State<RunningPage> {
                       fullWidthButton: true,
                       size: 70,
                     ),
-                    /*RaisedButton(
-                      child: Text('Return to Home'),
-                      onPressed: () {
-                        // trigger home
-                        BlocProvider.of<HomeCubit>(context).getUser();
-                        BlocProvider.of<RunningBloc>(context)
-                            .add(GetPlanAndStat());
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePage()));
-                      },
-                    ),*/
+                  ),
+                  PieChart(
+                    PieChartData(
+                        pieTouchData:
+                            PieTouchData(touchCallback: (pieTouchResponse) {
+                          setState(() {
+                            if (pieTouchResponse.touchInput is FlLongPressEnd ||
+                                pieTouchResponse.touchInput is FlPanEnd) {
+                              touchedIndex = -1;
+                            } else {
+                              touchedIndex =
+                                  pieTouchResponse.touchedSectionIndex;
+                            }
+                          });
+                        }),
+                        borderData: FlBorderData(
+                          show: false,
+                        ),
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 40,
+                        sections: showingSections()),
                   ),
                 ],
               ),
@@ -425,8 +435,100 @@ class _RunningPageState extends State<RunningPage> {
     );
   }
 
+  List<PieChartSectionData> showingSections() {
+    return List.generate(7, (i) {
+      final isTouched = i == touchedIndex;
+      final double fontSize = isTouched ? 25 : 16;
+      final double radius = isTouched ? 60 : 50;
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: const Color(0xff0293ee),
+            value: 40,
+            title: '40%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 1:
+          return PieChartSectionData(
+            color: const Color(0xfff8b250),
+            value: 30,
+            title: '30%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 2:
+          return PieChartSectionData(
+            color: const Color(0xff845bef),
+            value: 15,
+            title: '15%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 3:
+          return PieChartSectionData(
+            color: const Color(0xff13d38e),
+            value: 15,
+            title: '15%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 4:
+          return PieChartSectionData(
+            color: const Color(0xFFD31313),
+            value: 4,
+            title: '4%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 5:
+          return PieChartSectionData(
+            color: const Color(0xFFFF14F3),
+            value: 5,
+            title: '5%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        case 6:
+          return PieChartSectionData(
+            color: const Color(0xFF00FF00),
+            value: 6,
+            title: '6%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff)),
+          );
+        default:
+          return null;
+      }
+    });
+  }
+
   Widget _buildbodyRunning(BuildContext context, PositionModel pos,
       double distance, int hr, int thr) {
+    zonecount = List<int>();
+    zonecount.clear();
+    for (int i = 0; i <= 6; i++) {}
     final RunningBloc bloc = BlocProvider.of<RunningBloc>(context);
     int value;
     String tZone = 'Loading';
@@ -587,22 +689,6 @@ class _RunningPageState extends State<RunningPage> {
                       ),
                     ),
                   ),
-                  /*Text(
-                    'Location',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    height: 1,
-                    color: Colors.grey.shade300,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),*/
                   Flexible(
                     child: GoogleMap(
                       initialCameraPosition:
@@ -670,18 +756,55 @@ class _RunningPageState extends State<RunningPage> {
                                           if (zone >= 100) {
                                             tZone =
                                                 'Dangerous slowdown or rest';
+                                            if (zonecount[6] = null) {
+                                              zonecount[6] = 0;
+                                            } else {
+                                              zonecount[6] = zonecount[6] + 1;
+                                            }
                                           } else if (zone >= 90 && zone < 100) {
                                             tZone = 'Zone 5';
+                                            if (zonecount[5] = null) {
+                                              zonecount[5] = 0;
+                                            } else {
+                                              zonecount[5] = zonecount[5] + 1;
+                                            }
                                           } else if (zone >= 80 && zone < 90) {
                                             tZone = 'Zone 4';
+                                            if (zonecount[4] = null) {
+                                              zonecount[4] = 0;
+                                            } else {
+                                              zonecount[4] = zonecount[4] + 1;
+                                            }
                                           } else if (zone >= 70 && zone < 80) {
                                             tZone = 'Zone 3';
+                                            if (zonecount[3] = null) {
+                                              zonecount[3] = 0;
+                                            } else {
+                                              zonecount[3] = zonecount[3] + 1;
+                                            }
                                           } else if (zone >= 60 && zone < 70) {
                                             tZone = 'Zone 2';
+                                            if (zonecount[2] = null) {
+                                              zonecount[2] = 0;
+                                            } else {
+                                              zonecount[2] = zonecount[2] + 1;
+                                            }
                                           } else if (zone >= 50 && zone < 60) {
                                             tZone = 'Zone 1';
+                                            if (zonecount[1] = null) {
+                                              zonecount[1] = 0;
+                                              loggerNoStack.i("0");
+                                            } else {
+                                              loggerNoStack.i("2");
+                                              zonecount[1] = zonecount[1] + 1;
+                                            }
                                           } else if (zone < 50) {
                                             tZone = 'Speed Up';
+                                            if (zonecount[0] = null) {
+                                              zonecount[0] = 0;
+                                            } else {
+                                              zonecount[0] = zonecount[0] + 1;
+                                            }
                                           } else
                                             tZone = 'Loading';
 

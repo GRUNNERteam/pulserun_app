@@ -57,9 +57,7 @@ class _HomePageState extends State<HomePage> {
         .then((collectionrun) {
       collectionrun.docs.forEach((element) async {
         runningModel.add(RunningModel.fromMap(element.data()));
-        loggerNoStack.i(runningModel.last.runId.toString());
-
-        //loggerNoStack.i(RunningModel.fromMap(element.data()));
+        loggerNoStack.i(RunningModel.fromMap(element.data()));
         id.add(element.reference);
       });
     });

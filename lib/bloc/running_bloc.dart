@@ -191,7 +191,9 @@ class RunningBloc extends Bloc<RunningEvent, RunningState> {
         await _runningRepository.stop();
         await _resultRepository.setRef(_runningRepository.gettReference());
         _resultModel = await _resultRepository.getResult();
-        characteristic.setNotifyValue(false);
+        //characteristic.setNotifyValue(false);
+        await _currentStatusRepository
+            .updateDistance(_resultModel.totalDdistance);
         yield RunningResult(
             locationServiceAndTracking: event.locationServiceAndTracking,
             runningModel: event.runningModel,

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pulserun_app/models/currentstatus.dart';
+import 'package:pulserun_app/screens/running/running.dart';
 import 'package:pulserun_app/services/database/database.dart';
 
 abstract class CurrentStatusRepository {
@@ -73,10 +74,13 @@ class CurrentStatus implements CurrentStatusRepository {
     await _reference.get().then((snapshot) {
       if (snapshot.exists) {
         CurrentStatusModel model = CurrentStatusModel.fromMap(snapshot.data());
+        loggerNoStack.i(value.toString(), 'VALUE');
+        loggerNoStack.i(model.distance.toString(), 'MODEL');
         double distance = model.distance ?? 0;
-        distance = distance * 100000; // km to cm
+        // distance = distance * 100000; // km to cm
         distance = distance + value;
-        distance = distance / 100000;
+
+        // distance = distance / 100000;
         _reference.update({'distance': distance});
       }
     });

@@ -77,10 +77,7 @@ class CurrentStatus implements CurrentStatusRepository {
         loggerNoStack.i(value.toString(), 'VALUE');
         loggerNoStack.i(model.distance.toString(), 'MODEL');
         double distance = model.distance ?? 0;
-        // distance = distance * 100000; // km to cm
         distance = distance + value;
-
-        // distance = distance / 100000;
         _reference.update({'distance': distance});
       }
     });

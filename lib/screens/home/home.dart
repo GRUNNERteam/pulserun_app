@@ -246,18 +246,6 @@ class _HomePageState extends State<HomePage> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: histoytCard,
-                        /* <Widget>[
-                          /*historyCard(
-                            avgHeartrate:
-                                historyModel[0].avgHearRate.toString(),
-                            distance: historyModel[0].totalDdistance.toString(),
-                            time: historyModel[0].totalTime.toString(),
-                          ),*/
-                          /*historyCard(),
-                          historyCard(),
-                          historyCard(),
-                          historyCard(),*/
-                        ],*/
                       ),
                     ),
                     SizedBox(
@@ -321,21 +309,6 @@ class _buildBottomNavBar extends StatelessWidget {
       onTap: (value) {
         switch (value) {
           case 0:
-            // showDialog(
-            //   context: context,
-            //   builder: (context) => AlertDialog(
-            //     title: Text('Not Available'),
-            //     content: const Text('Plan is not a available yet.'),
-            //     actions: <Widget>[
-            //       FlatButton(
-            //         child: Text('Close'),
-            //         onPressed: () {
-            //           Navigator.of(context).pop();
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // );
             BlocProvider.of<PlanBloc>(context).add(GetPlanById());
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => PlanPage()));
